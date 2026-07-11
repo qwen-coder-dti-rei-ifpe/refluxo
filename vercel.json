@@ -3,7 +3,7 @@
   "framework": null,
   "installCommand": "pip install -r requirements.txt --break-system-packages",
   "buildCommand": "python manage.py makemigrations --noinput && python manage.py migrate --noinput && python manage.py collectstatic --noinput",
-  "outputDirectory": "staticfiles",
+  "outputDirectory": "static",
   "env": {
     "DJANGO_SETTINGS_MODULE": "config.settings",
     "PYTHON_VERSION": "3.12"
