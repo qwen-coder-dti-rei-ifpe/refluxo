@@ -20,6 +20,5 @@
   "env": {
     "DJANGO_SETTINGS_MODULE": "config.settings",
     "PYTHON_VERSION": "3.12"
-  },
-  "outputDirectory": "staticfiles"
+  }
 }
