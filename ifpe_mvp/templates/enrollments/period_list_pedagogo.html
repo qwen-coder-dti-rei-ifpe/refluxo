@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Programas de Inscrição - IFPE{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-file-alt"></i> Programas de Inscrição</h2>
+        <p class="text-muted">Gerencie os editais e acompanhe as inscrições</p>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-filter"></i> Filtros
+    </div>
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-6">
+                <label for="nome" class="form-label">Nome/Descrição</label>
+                <input type="text" class="form-control" id="nome" name="nome" value="{{ nome_filter }}" placeholder="Buscar por nome ou descrição">
+            </div>
+            <div class="col-md-4">
+                <label for="status" class="form-label">Situação do Edital</label>
+                <select class="form-select" id="status" name="status">
+                    <option value="">Todos</option>
+                    {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search"></i> Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Lista de Editais -->
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Nome</th>
+                <th>Descrição</th>
+                <th>Situação</th>
+                <th>Inscritos</th>
+                <th>Período de Inscrição</th>
+                <th>Período de Avaliação</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for period in periods %}
+            <tr>
+                <td><strong>{{ period.titulo }}</strong></td>
+                <td>{{ period.descricao|truncatechars:50 }}</td>
+                <td>
+                    <span class="badge 
+                        {% if period.status == 'ABERTO' %}bg-success
+                        {% elif period.status == 'EM_ANDAMENTO' %}bg-primary
+                        {% elif period.status == 'ENCERRADO' %}bg-secondary
+                        {% else %}bg-danger{% endif %}">
+                        {{ period.get_status_display }}
+                    </span>
+                </td>
+                <td><span class="badge bg-info">{{ period.qtd_inscritos }}</span></td>
+                <td>
+                    <small>
+                        {{ period.data_inicio|date:"d/m/Y H:i" }}<br>
+                        até {{ period.data_fim|date:"d/m/Y H:i" }}
+                    </small>
+                </td>
+                <td>
+                    {% if period.data_inicio_avaliacao and period.data_fim_avaliacao %}
+                    <small>
+                        {{ period.data_inicio_avaliacao|date:"d/m/Y" }}<br>
+                        até {{ period.data_fim_avaliacao|date:"d/m/Y" }}
+                    </small>
+                    {% else %}
+                    <span class="text-muted">-</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'pedagogo_enrolled_students' period.pk %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-users"></i> Ver Inscritos
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center text-muted">Nenhum edital encontrado.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

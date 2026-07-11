@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Estudantes Inscritos - {{ period.titulo }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'enrollment_period_list' %}">Programas de Inscrição</a></li>
+                <li class="breadcrumb-item active">{{ period.titulo }}</li>
+            </ol>
+        </nav>
+        <h2><i class="fas fa-users"></i> Estudantes Inscritos</h2>
+        <p class="text-muted">{{ period.titulo }} - {{ period.get_status_display }}</p>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-filter"></i> Filtros
+    </div>
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label for="nome" class="form-label">Nome do Candidato</label>
+                <input type="text" class="form-control" id="nome" name="nome" value="{{ nome_filter }}" placeholder="Buscar por nome">
+            </div>
+            <div class="col-md-3">
+                <label for="curso" class="form-label">Curso</label>
+                <input type="text" class="form-control" id="curso" name="curso" value="{{ curso_filter }}" placeholder="Nome do curso">
+            </div>
+            <div class="col-md-2">
+                <label for="modalidade" class="form-label">Modalidade</label>
+                <input type="text" class="form-control" id="modalidade" name="modalidade" value="{{ modalidade_filter }}" placeholder="Modalidade">
+            </div>
+            <div class="col-md-2">
+                <label for="ivs" class="form-label">Índice Vulnerabilidade (mín)</label>
+                <input type="text" class="form-control" id="ivs" name="ivs" value="{{ ivs_filter }}" placeholder="0.00">
+            </div>
+            <div class="col-md-3">
+                <label for="situacao" class="form-label">Situação</label>
+                <select class="form-select" id="situacao" name="situacao">
+                    <option value="">Todas</option>
+                    {% for value, label in situacao_choices %}
+                    <option value="{{ value }}" {% if situacao_filter == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fas fa-search"></i> Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Lista de Estudantes -->
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Nome</th>
+                <th>Matrícula</th>
+                <th>Curso</th>
+                <th>Turno</th>
+                <th>Índice Vulnerabilidade</th>
+                <th>Situação</th>
+                <th>Data Inscrição</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for enrollment in enrollments %}
+            <tr>
+                <td><strong>{{ enrollment.student.nome_completo }}</strong></td>
+                <td>{{ enrollment.student.matricula }}</td>
+                <td>{{ enrollment.student.curso }}</td>
+                <td>{{ enrollment.student.get_turno_display }}</td>
+                <td>
+                    {% if enrollment.indice_vulnerabilidade %}
+                    <span class="badge bg-secondary">{{ enrollment.indice_vulnerabilidade }}</span>
+                    {% else %}
+                    <span class="text-muted">-</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <span class="badge 
+                        {% if enrollment.status == 'CONTEMPLADO' %}bg-success
+                        {% elif enrollment.status == 'EM_AVALIACAO' %}bg-primary
+                        {% elif enrollment.status == 'ELEGIVEL' %}bg-info
+                        {% elif enrollment.status == 'NAO_ELEGIVEL' %}bg-danger
+                        {% elif enrollment.status == 'PENDENTE' %}bg-warning
+                        {% elif enrollment.status == 'NAO_REGULARIZADO' %}bg-dark
+                        {% else %}bg-secondary{% endif %}">
+                        {{ enrollment.get_status_display }}
+                    </span>
+                </td>
+                <td>{{ enrollment.criado_em|date:"d/m/Y H:i" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center text-muted">Nenhum estudante encontrado com os filtros selecionados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="mt-3">
+    <a href="{% url 'enrollment_period_list' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left"></i> Voltar para lista de editais
+    </a>
+</div>
+{% endblock %}

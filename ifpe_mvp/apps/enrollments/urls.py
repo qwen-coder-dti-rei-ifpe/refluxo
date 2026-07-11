@@ -5,11 +5,14 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Listagem de editais abertos
+    # Listagem de editais para o pedagogo
     path('', views.enrollment_period_list, name='enrollment_period_list'),
     
-    # Dashboard de inscrição para um edital específico
-    path('<int:pk>/', views.enrollment_dashboard, name='enrollment_dashboard'),
+    # Lista de estudantes inscritos para o pedagogo
+    path('<int:pk>/students/', views.pedagogo_enrolled_students, name='pedagogo_enrolled_students'),
+    
+    # Dashboard de inscrição para um edital específico (estudante)
+    path('<int:pk>/dashboard/', views.enrollment_dashboard, name='enrollment_dashboard'),
     
     # Criar/editar inscrição
     path('<int:pk>/create/', views.enrollment_create, name='enrollment_create'),

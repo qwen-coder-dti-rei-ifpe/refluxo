@@ -5,19 +5,85 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
+from django.db.models import Q
 from .models import EnrollmentPeriod, Enrollment
 from students.models import Student
 
 
 def enrollment_period_list(request):
-    """Lista todos os editais/periodos de inscrição ativos."""
-    periods = EnrollmentPeriod.objects.filter(
-        ativo=True,
-        data_fim__gte=timezone.now()
-    ).order_by('-data_inicio')
+    """Lista todos os editais/periodos de inscrição para o pedagogo."""
+    # Filtros da requisição
+    nome_filter = request.GET.get('nome', '')
+    status_filter = request.GET.get('status', '')
     
-    context = {'periods': periods}
-    return render(request, 'enrollments/period_list.html', context)
+    periods = EnrollmentPeriod.objects.all().order_by('-data_inicio')
+    
+    # Aplicar filtros
+    if nome_filter:
+        periods = periods.filter(Q(titulo__icontains=nome_filter) | Q(descricao__icontains=nome_filter))
+    
+    if status_filter:
+        periods = periods.filter(status=status_filter)
+    
+    # Adicionar quantidade de inscritos
+    for period in periods:
+        period.qtd_inscritos = period.enrollments.count()
+    
+    context = {
+        'periods': periods,
+        'nome_filter': nome_filter,
+        'status_filter': status_filter,
+        'status_choices': EnrollmentPeriod.STATUS_CHOICES,
+    }
+    return render(request, 'enrollments/period_list_pedagogo.html', context)
+
+
+@login_required
+def pedagogo_enrolled_students(request, pk):
+    """Lista de estudantes inscritos em um edital específico para o pedagogo."""
+    period = get_object_or_404(EnrollmentPeriod, pk=pk)
+    
+    # Filtros da requisição
+    nome_filter = request.GET.get('nome', '')
+    curso_filter = request.GET.get('curso', '')
+    modalidade_filter = request.GET.get('modalidade', '')
+    ivs_filter = request.GET.get('ivs', '')
+    situacao_filter = request.GET.get('situacao', '')
+    
+    enrollments = Enrollment.objects.filter(enrollment_period=period).select_related('student').order_by('student__nome_completo')
+    
+    # Aplicar filtros
+    if nome_filter:
+        enrollments = enrollments.filter(student__nome_completo__icontains=nome_filter)
+    
+    if curso_filter:
+        enrollments = enrollments.filter(student__curso__icontains=curso_filter)
+    
+    if modalidade_filter:
+        # Considerando que modalidade pode estar no curso ou em outro campo
+        enrollments = enrollments.filter(Q(student__curso__icontains=modalidade_filter))
+    
+    if ivs_filter:
+        try:
+            ivs_value = float(ivs_filter.replace(',', '.'))
+            enrollments = enrollments.filter(indice_vulnerabilidade__gte=ivs_value)
+        except ValueError:
+            pass
+    
+    if situacao_filter:
+        enrollments = enrollments.filter(status=situacao_filter)
+    
+    context = {
+        'period': period,
+        'enrollments': enrollments,
+        'nome_filter': nome_filter,
+        'curso_filter': curso_filter,
+        'modalidade_filter': modalidade_filter,
+        'ivs_filter': ivs_filter,
+        'situacao_filter': situacao_filter,
+        'situacao_choices': Enrollment.STATUS_CHOICES,
+    }
+    return render(request, 'enrollments/pedagogo_enrolled_students.html', context)
 
 
 @login_required
