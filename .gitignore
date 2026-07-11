@@ -1,17 +1,4 @@
 ```
-# Python cache
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Virtual environment
-venv/
-
 # Database
 db.sqlite3
-
-# Dependencies
-pip/
-
 ```
