@@ -4,39 +4,29 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
-.Python
-env/
-venv/
-.venv/
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.log
-.DS_Store
-Thumbs.db
-
-# Database
-db.sqlite3
-*.sqlite3
 
 # Environment
+.venv/
+venv/
 .env
 .env.local
-.env.*
+*.env.*
 
-# Migrations
-*migrations/
+# Logs and temp files
+*.log
+*.tmp
 
-# IDE
+# Editors
 .vscode/
 .idea/
-*.swp
-*.swo
-*.tmp
+
+# Coverage
+.coverage
+coverage/
+htmlcov/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
 ```
