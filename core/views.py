@@ -7,7 +7,7 @@ com estudantes e endereços.
 from rest_framework import viewsets, filters
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import render
-from .models import Estudante
+from .models import Estudante, Endereco
 from .serializers import EstudanteSerializer, EnderecoSerializer
 
 

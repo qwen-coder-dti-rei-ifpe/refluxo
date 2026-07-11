@@ -1,3 +1,26 @@
-Nothing should be ignored in this case, as the changes only include source files (.html, .py) and config files (.py). No build artifacts, dependencies, or temporary files are present in the changes.
+```
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 
-Output: (empty)
+# Compiled Python files
+*.pyc
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+
+# Django specific
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.sqlite3-journal
+media/
+staticfiles/
+.env
+```
