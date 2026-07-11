@@ -1,25 +1,28 @@
 # Django e framework web
-Django>=4.2,<5.1
-djangorestframework>=3.15,<4.0
-django-cors-headers>=4.3,<5.0
-django-widget-tweaks>=1.5,<2.0
-django-filter>=24.0
+Django==4.2.16
+djangorestframework==3.15.2
+django-cors-headers==4.4.0
+django-widget-tweaks==1.5.0
+django-filter==24.3
 
 # Banco de dados (SQLite é nativo no Django, não precisa de pacote extra)
-# psycopg2-binary removido pois estamos usando SQLite
 
 # HTTP requests para integrações
-requests>=2.31,<3.0
+requests==2.32.3
 
 # Processamento de imagens
-pillow>=10.0,<11.0
+pillow==10.4.0
 
 # Documentação API
-drf-spectacular>=0.27,<1.0
+drf-spectacular==0.27.2
 
 # Utilitários
-python-decouple>=3.8,<4.0
+python-decouple==3.8
+
+# Servidor WSGI para produção
+gunicorn==22.0.0
+whitenoise==6.7.0
 
 # Testes
-pytest>=8.0,<9.0
-pytest-django>=4.8,<5.0
+pytest==8.3.3
+pytest-django==4.9.0
