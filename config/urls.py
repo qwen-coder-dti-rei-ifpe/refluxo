@@ -19,7 +19,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-from core.views import home_view, buscar_cpf_view
+from core.views import home_view, buscar_cpf_view, buscar_matricula_view
 
 urlpatterns = [
     # Página inicial do programa
@@ -27,6 +27,9 @@ urlpatterns = [
     
     # Busca de estudante por CPF
     path('buscar-cpf/', buscar_cpf_view, name='buscar_cpf'),
+    
+    # Busca de estudante por matrícula
+    path('buscar-matricula/', buscar_matricula_view, name='buscar_matricula'),
     
     # Admin Django
     path('admin/', admin.site.urls),

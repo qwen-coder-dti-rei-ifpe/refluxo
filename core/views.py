@@ -47,6 +47,29 @@ def buscar_cpf_view(request):
     return render(request, 'buscar_cpf.html', context)
 
 
+def buscar_matricula_view(request):
+    """
+    View para página de busca de estudante por matrícula.
+    """
+    matricula_search = request.GET.get('matricula', '')
+    estudante = None
+    error = None
+    
+    if matricula_search:
+        try:
+            estudante = Estudante.objects.select_related('endereco').get(matricula=matricula_search)
+        except Estudante.DoesNotExist:
+            error = 'Estudante com esta matrícula não encontrado.'
+    
+    context = {
+        'matricula_search': matricula_search,
+        'estudante': estudante,
+        'error': error,
+    }
+    
+    return render(request, 'buscar_matricula.html', context)
+
+
 class EstudanteViewSet(viewsets.ModelViewSet):
     """
     ViewSet para operações CRUD com Estudante.
