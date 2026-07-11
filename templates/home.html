@@ -204,6 +204,7 @@
             justify-content: center;
             gap: 2rem;
             flex-wrap: wrap;
+            margin-bottom: 1.5rem;
         }
         
         .footer-link {
@@ -221,6 +222,20 @@
             background: white;
             color: #667eea;
             transform: translateY(-2px);
+        }
+        
+        .footer-link.admin {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .footer-link.student {
+            background: #667eea;
+            border-color: #667eea;
+        }
+        
+        .footer-link.student:hover {
+            background: #5568d3;
+            color: white;
         }
         
         @media (max-width: 768px) {
@@ -268,7 +283,7 @@
         </section>
         
         <section class="search-card">
-            <h2>Consultar Estudante</h2>
+            <h2>Consultar Estudante por CPF</h2>
             <form method="get" action="" class="search-form">
                 <input 
                     type="text" 
@@ -330,8 +345,8 @@
     
     <footer>
         <div class="footer-links">
-            <a href="/admin/" class="footer-link">Administração</a>
-            <a href="/" class="footer-link">Área do Estudante</a>
+            <a href="/admin/" class="footer-link admin">Administração</a>
+            <a href="{% url 'home' %}" class="footer-link student">Área do Estudante</a>
         </div>
         <p style="color: white; margin-top: 1.5rem; opacity: 0.8; font-size: 0.9rem;">
             &copy; {% now "Y" %} Programa de Apoio e Manutenção Acadêmica - Todos os direitos reservados
