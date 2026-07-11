@@ -18,7 +18,7 @@
       "src": "/(.*)",
       "dest": "config/wsgi.py"
     }
-  ]
+  ],
   "builds": [
     {
       "src": "backend/wsgi.py",
