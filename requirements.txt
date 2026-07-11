@@ -1,12 +1,12 @@
 # Django e framework web
-Django>=6.0,<7.0
+Django>=4.2,<5.1
 djangorestframework>=3.15,<4.0
 django-cors-headers>=4.3,<5.0
 django-widget-tweaks>=1.5,<2.0
 django-filter>=24.0
 
-# Banco de dados
-psycopg2-binary>=2.9,<3.0
+# Banco de dados (SQLite é nativo no Django, não precisa de pacote extra)
+# psycopg2-binary removido pois estamos usando SQLite
 
 # HTTP requests para integrações
 requests>=2.31,<3.0

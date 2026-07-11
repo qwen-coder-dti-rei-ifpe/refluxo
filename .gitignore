@@ -1,1 +1,50 @@
-Nothing needs to be added to .gitignore since the changes only include source/config files (HTML template and JSON config) without any build artifacts, dependencies, or temporary files that should be ignored.
+```
+# Dependencies
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.py.class
+*.py.o
+*.py.obj
+*.py.out
+*.py.dll
+*.py.so
+*.py.a
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+.coverage
+htmlcov/
+.mypy_cache/
+.pytest_cache/
+.tox/
+.hypothesis/
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+*.env.*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+```
