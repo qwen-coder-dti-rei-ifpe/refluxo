@@ -1,0 +1,198 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}{{ block.super }}
+<style>
+  /* Reset e Base */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  /* Sobrescreve o fundo padrão do admin para aplicar o gradiente */
+  body.colLogin {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Container Principal Centralizado */
+  #container {
+    width: 100%;
+    max-width: 400px;
+    padding: 2rem;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  /* Remove elementos desnecessários do admin padrão */
+  #header, #branding, #user-tools, .messagelist, .breadcrumbs, #nav-sidebar, .module caption, .aligned label {
+    display: none !important;
+  }
+  
+  #content {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Título do Login */
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    text-align: center;
+    margin-bottom: 0.5rem;
+  }
+  
+  .subtitle {
+    text-align: center;
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Formulário */
+  .form-row {
+    margin-bottom: 1.25rem;
+    position: relative;
+  }
+
+  .form-row label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+  }
+
+  .form-row input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: all 0.2s;
+    background: #fff;
+  }
+
+  .form-row input:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  }
+
+  /* Botão de Login */
+  .submit-row {
+    margin-top: 1.5rem;
+  }
+
+  .submit-row input[type="submit"] {
+    width: 100%;
+    padding: 0.75rem;
+    background: linear-gradient(to right, #4f46e5, #7c3aed);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+  }
+
+  .submit-row input[type="submit"]:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 8px -1px rgba(79, 70, 229, 0.3);
+  }
+
+  .submit-row input[type="submit"]:active {
+    transform: translateY(0);
+  }
+
+  /* Mensagens de Erro */
+  .errornote {
+    background: #fee2e2;
+    color: #dc2626;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #fecaca;
+    text-align: center;
+  }
+
+  /* Footer do card */
+  .login-footer {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #9ca3af;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  {% if form.errors and not form.non_field_errors %}
+    <p class="errornote">
+      {% if form.errors.items|length == 1 %}
+        {% translate "Por favor, corrija o erro abaixo." %}
+      {% else %}
+        {% translate "Por favor, corrija os erros abaixo." %}
+      {% endif %}
+    </p>
+  {% endif %}
+
+  {% if form.non_field_errors %}
+    {% for error in form.non_field_errors %}
+      <p class="errornote">{{ error }}</p>
+    {% endfor %}
+  {% endif %}
+
+  {% if next %}
+    {% if user.is_authenticated %}
+      <p class="errornote">
+        {% blocktranslate with escaped_next=next|urlencodes %}Sua conta não tem acesso a esta página. Para prosseguir, faça login com uma conta que tenha acesso.{% endblocktranslate %}
+      </p>
+    {% endif %}
+  {% endif %}
+
+  <div class="login-header">
+    <h1>PAMA</h1>
+    <p class="subtitle">Programa de Apoio e Manutenção Acadêmica</p>
+  </div>
+
+  <form action="{{ app_path }}" method="post" id="login-form">
+    {% csrf_token %}
+    
+    <div class="form-row">
+      <label for="id_username">{% translate 'Usuário' %}</label>
+      <input type="text" name="username" id="id_username" required autofocus autocomplete="username">
+    </div>
+
+    <div class="form-row">
+      <label for="id_password">{% translate 'Senha' %}</label>
+      <input type="password" name="password" id="id_password" required autocomplete="current-password">
+    </div>
+
+    <input type="hidden" name="next" value="{{ next }}">
+
+    <div class="submit-row">
+      <input type="submit" value="{% translate 'Entrar' %}">
+    </div>
+  </form>
+
+  <div class="login-footer">
+    &copy; {% now "Y" %} PAMA - Gestão Acadêmica
+  </div>
+</div>
+
+<script>
+  document.getElementById('id_username').focus();
+</script>
+{% endblock %}
