@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "backend/wsgi.py",
+      "src": "config/wsgi.py",
       "use": "@vercel/python"
     }
   ],
@@ -14,12 +14,12 @@
     },
     {
       "src": "/(.*)",
-      "dest": "backend/wsgi.py"
+      "dest": "config/wsgi.py"
     }
   ],
   "env": {
-    "DJANGO_SETTINGS_MODULE": "backend.settings",
+    "DJANGO_SETTINGS_MODULE": "config.settings",
     "PYTHON_VERSION": "3.12"
   },
-  "outputDirectory": "backend/staticfiles"
+  "outputDirectory": "staticfiles"
 }
