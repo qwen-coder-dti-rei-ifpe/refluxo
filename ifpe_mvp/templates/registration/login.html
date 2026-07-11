@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - IFPE{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow">
+            <div class="card-header text-center">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label">Usuário ou Email</label>
+                        <input type="text" 
+                               name="username" 
+                               class="form-control" 
+                               id="id_username" 
+                               required 
+                               autofocus>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_password" class="form-label">Senha</label>
+                        <input type="password" 
+                               name="password" 
+                               class="form-control" 
+                               id="id_password" 
+                               required>
+                    </div>
+                    
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Usuário ou senha inválidos. Tente novamente.
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-sign-in-alt"></i> Entrar
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-center">
+                <small class="text-muted">
+                    Acesso restrito a estudantes e servidores do IFPE
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
