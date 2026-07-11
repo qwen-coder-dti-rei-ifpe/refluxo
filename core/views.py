@@ -6,8 +6,38 @@ com estudantes e endereços.
 """
 from rest_framework import viewsets, filters
 from django_filters.rest_framework import DjangoFilterBackend
-from .models import Estudante, Endereco
+from django.shortcuts import render
+from .models import Estudante
 from .serializers import EstudanteSerializer, EnderecoSerializer
+
+
+def home_view(request):
+    """
+    View para página inicial de busca de estudante por CPF.
+    """
+    cpf_search = request.GET.get('cpf', '')
+    estudante = None
+    error = None
+    
+    if cpf_search:
+        # Remove caracteres não numéricos do CPF
+        cpf_limpo = ''.join(filter(str.isdigit, cpf_search))
+        
+        if len(cpf_limpo) != 11:
+            error = 'CPF deve conter 11 dígitos.'
+        else:
+            try:
+                estudante = Estudante.objects.select_related('endereco').get(cpf=cpf_limpo)
+            except Estudante.DoesNotExist:
+                error = None  # Não mostra erro, apenas não encontra resultado
+    
+    context = {
+        'cpf_search': cpf_search,
+        'estudante': estudante,
+        'error': error,
+    }
+    
+    return render(request, 'home.html', context)
 
 
 class EstudanteViewSet(viewsets.ModelViewSet):

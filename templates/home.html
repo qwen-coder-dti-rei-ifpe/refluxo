@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Busca de Estudante</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+        .result h2 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        .result-item {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .result-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        .result-value {
+            color: #333;
+            font-size: 16px;
+            margin-top: 4px;
+        }
+        .error {
+            background: #fee;
+            border-left-color: #e74c3c;
+            color: #c0392b;
+        }
+        .success {
+            background: #efe;
+            border-left-color: #27ae60;
+        }
+        .no-result {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 Busca de Estudante</h1>
+        <p class="subtitle">Digite o CPF para encontrar as informações do estudante</p>
+        
+        <form method="GET" action="/">
+            <div class="form-group">
+                <label for="cpf">CPF do Estudante</label>
+                <input 
+                    type="text" 
+                    id="cpf" 
+                    name="cpf" 
+                    placeholder="Digite apenas números do CPF"
+                    value="{{ cpf_search }}"
+                    required
+                >
+            </div>
+            <button type="submit">🔍 Buscar Estudante</button>
+        </form>
+
+        {% if error %}
+        <div class="result error">
+            <h2>⚠️ Erro</h2>
+            <p>{{ error }}</p>
+        </div>
+        {% endif %}
+
+        {% if estudante %}
+        <div class="result success">
+            <h2>✅ Estudante Encontrado</h2>
+            
+            <div class="result-item">
+                <div class="result-label">Nome Completo</div>
+                <div class="result-value">{{ estudante.nome_completo }}</div>
+            </div>
+            
+            <div class="result-item">
+                <div class="result-label">Matrícula</div>
+                <div class="result-value">{{ estudante.matricula }}</div>
+            </div>
+            
+            <div class="result-item">
+                <div class="result-label">CPF</div>
+                <div class="result-value">{{ estudante.cpf }}</div>
+            </div>
+            
+            <div class="result-item">
+                <div class="result-label">Curso</div>
+                <div class="result-value">{{ estudante.curso }}</div>
+            </div>
+            
+            <div class="result-item">
+                <div class="result-label">Campus</div>
+                <div class="result-value">{{ estudante.campus }}</div>
+            </div>
+            
+            <div class="result-item">
+                <div class="result-label">Turno</div>
+                <div class="result-value">{{ estudante.get_turno_display }}</div>
+            </div>
+            
+            <div class="result-item">
+                <div class="result-label">Período</div>
+                <div class="result-value">{{ estudante.periodo }}</div>
+            </div>
+            
+            <div class="result-item">
+                <div class="result-label">Email Institucional</div>
+                <div class="result-value">{{ estudante.email_institucional }}</div>
+            </div>
+            
+            {% if estudante.endereco %}
+            <div class="result-item">
+                <div class="result-label">Endereço</div>
+                <div class="result-value">
+                    {{ estudante.endereco.cep }} - {{ estudante.endereco.bairro }}<br>
+                    {{ estudante.endereco.cidade }}/{{ estudante.endereco.estado }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% elif cpf_search and not error %}
+        <div class="result">
+            <p class="no-result">Nenhum estudante encontrado com este CPF.</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
