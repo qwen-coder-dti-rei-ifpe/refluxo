@@ -83,13 +83,13 @@ IS_VERCEL = os.environ.get('VERCEL') == '1'
 
 if IS_VERCEL:
     # No Vercel, usa o sistema de arquivos temporário (/tmp) que permite escrita
+    # É crucial que as migrações rodem no build command para criar este arquivo
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': '/tmp/db.sqlite3',
         }
     }
-    # Ajusta a raiz de mídia para o diretório temporário
     MEDIA_ROOT = '/tmp/media'
 else:
     # Em desenvolvimento local, usa o db.sqlite3 na raiz do projeto
