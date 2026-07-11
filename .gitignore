@@ -1,27 +1,42 @@
 ```
-# Compiled and build artifacts
-*.pyc
+# Python
 __pycache__/
-
-# Dependencies
-.venv/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
 venv/
-node_modules/
-
-# Logs and temp files
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
 *.log
-*.tmp
-*.swp
+.DS_Store
+Thumbs.db
+
+# Database
+db.sqlite3
+*.sqlite3
 
 # Environment
 .env
 .env.local
 .env.*
 
-# Editors
+# Migrations
+*migrations/
+
+# IDE
 .vscode/
 .idea/
-
-# Original rules preserved
-*.log
+*.swp
+*.swo
+*.tmp
 ```

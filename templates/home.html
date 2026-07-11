@@ -82,114 +82,39 @@
             line-height: 1.6;
         }
         
-        .search-card {
+        .access-card {
             background: white;
             border-radius: 15px;
             padding: 2.5rem;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             max-width: 600px;
             margin: 0 auto 3rem auto;
+            text-align: center;
         }
         
-        .search-card h2 {
+        .access-card h2 {
             color: #667eea;
             margin-bottom: 1.5rem;
-            text-align: center;
             font-size: 1.8rem;
         }
         
-        .search-form {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .search-input {
-            flex: 1;
-            padding: 1rem;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-        
-        .search-input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        .search-button {
-            padding: 1rem 2rem;
+        .access-button {
+            display: inline-block;
+            padding: 1rem 2.5rem;
             background: #667eea;
             color: white;
-            border: none;
+            text-decoration: none;
             border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background 0.3s;
+            font-size: 1.1rem;
             font-weight: bold;
+            transition: all 0.3s;
+            margin-top: 1rem;
         }
         
-        .search-button:hover {
+        .access-button:hover {
             background: #5568d3;
-        }
-        
-        .result-card {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 1.5rem;
-            margin-top: 1.5rem;
-            border-left: 4px solid #667eea;
-        }
-        
-        .result-card h3 {
-            color: #667eea;
-            margin-bottom: 1rem;
-        }
-        
-        .result-info {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-        
-        .info-item {
-            background: white;
-            padding: 0.8rem;
-            border-radius: 6px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        
-        .info-label {
-            font-weight: bold;
-            color: #666;
-            font-size: 0.9rem;
-            margin-bottom: 0.3rem;
-        }
-        
-        .info-value {
-            color: #333;
-            font-weight: 500;
-        }
-        
-        .error-message {
-            background: #fee;
-            color: #c00;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-top: 1rem;
-            border-left: 4px solid #c00;
-        }
-        
-        .no-results {
-            background: #eef;
-            color: #55a;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-top: 1rem;
-            text-align: center;
-            border-left: 4px solid #55a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
         
         footer {
@@ -228,21 +153,7 @@
             background: rgba(255,255,255,0.1);
         }
         
-        .footer-link.student {
-            background: #667eea;
-            border-color: #667eea;
-        }
-        
-        .footer-link.student:hover {
-            background: #5568d3;
-            color: white;
-        }
-        
         @media (max-width: 768px) {
-            .search-form {
-                flex-direction: column;
-            }
-            
             header h1 {
                 font-size: 2rem;
             }
@@ -282,71 +193,16 @@
             <p>As seleções ocorrem semestralmente através de edital específico. Os estudantes interessados devem submeter sua candidatura com a documentação comprobatória de renda e situação socioeconômica. A análise é realizada por uma comissão multidisciplinar que avalia cada caso individualmente.</p>
         </section>
         
-        <section class="search-card">
-            <h2>Consultar Estudante por CPF</h2>
-            <form method="get" action="" class="search-form">
-                <input 
-                    type="text" 
-                    name="cpf" 
-                    class="search-input" 
-                    placeholder="Digite o CPF (apenas números)" 
-                    value="{{ cpf|default:'' }}"
-                    maxlength="11"
-                    required
-                >
-                <button type="submit" class="search-button">Buscar</button>
-            </form>
-            
-            {% if error_message %}
-                <div class="error-message">
-                    {{ error_message }}
-                </div>
-            {% endif %}
-            
-            {% if estudante %}
-                <div class="result-card">
-                    <h3>Informações do Estudante</h3>
-                    <div class="result-info">
-                        <div class="info-item">
-                            <div class="info-label">Nome Completo</div>
-                            <div class="info-value">{{ estudante.nome }}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">CPF</div>
-                            <div class="info-value">{{ estudante.cpf }}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Curso</div>
-                            <div class="info-value">{{ estudante.curso }}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Matrícula</div>
-                            <div class="info-value">{{ estudante.matricula }}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Status</div>
-                            <div class="info-value">{{ estudante.status }}</div>
-                        </div>
-                        {% if estudante.endereco %}
-                        <div class="info-item">
-                            <div class="info-label">Cidade</div>
-                            <div class="info-value">{{ estudante.endereco.cidade }}</div>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-            {% elif searched %}
-                <div class="no-results">
-                    Nenhum estudante encontrado com o CPF informado.
-                </div>
-            {% endif %}
+        <section class="access-card">
+            <h2>Área do Estudante</h2>
+            <p style="color: #555; margin-bottom: 1.5rem;">Consulte o status da sua inscrição e acompanhe o processo de avaliação.</p>
+            <a href="{% url 'buscar_cpf' %}" class="access-button">Buscar por CPF</a>
         </section>
     </div>
     
     <footer>
         <div class="footer-links">
             <a href="/admin/" class="footer-link admin">Administração</a>
-            <a href="{% url 'home' %}" class="footer-link student">Área do Estudante</a>
         </div>
         <p style="color: white; margin-top: 1.5rem; opacity: 0.8; font-size: 0.9rem;">
             &copy; {% now "Y" %} Programa de Apoio e Manutenção Acadêmica - Todos os direitos reservados

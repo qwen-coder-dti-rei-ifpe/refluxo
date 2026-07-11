@@ -16,11 +16,26 @@ class Edital(models.Model):
     Define o período de inscrições, descrição e regras do edital
     para seleção de estudantes beneficiários.
     """
+    STATUS_CHOICES = [
+        ('ATIVO', 'Ativo'),
+        ('SUSPENSO', 'Suspenso'),
+        ('CANCELADO', 'Cancelado'),
+        ('FINALIZADO', 'Finalizado'),
+    ]
+    
     titulo = models.CharField(max_length=255)
     descricao = models.TextField()
     numero = models.CharField(max_length=50, unique=True)
-    data_abertura = models.DateTimeField()
-    data_fechamento = models.DateTimeField()
+    
+    # Período de inscrições dos estudantes
+    periodo_inscricao_abertura = models.DateTimeField(null=True, blank=True)
+    periodo_inscricao_fechamento = models.DateTimeField(null=True, blank=True)
+    
+    # Período de avaliação dos pedagogos
+    periodo_avaliacao_abertura = models.DateTimeField(null=True, blank=True)
+    periodo_avaliacao_fechamento = models.DateTimeField(null=True, blank=True)
+    
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='ATIVO')
     ativo = models.BooleanField(default=True)
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
@@ -28,15 +43,28 @@ class Edital(models.Model):
     class Meta:
         verbose_name = "Edital"
         verbose_name_plural = "Editais"
-        ordering = ['-data_abertura']
+        ordering = ['-criado_em']
     
     def __str__(self):
         return f"{self.numero} - {self.titulo}"
     
-    def esta_aberto(self):
+    def esta_com_inscricoes_abertas(self):
         """Verifica se o edital está com inscrições abertas."""
         agora = timezone.now()
-        return self.ativo and self.data_abertura <= agora <= self.data_fechamento
+        return (self.ativo and 
+                self.status == 'ATIVO' and
+                self.periodo_inscricao_abertura and
+                self.periodo_inscricao_fechamento and
+                self.periodo_inscricao_abertura <= agora <= self.periodo_inscricao_fechamento)
+    
+    def esta_com_avaliacao_aberta(self):
+        """Verifica se o edital está com avaliação aberta."""
+        agora = timezone.now()
+        return (self.ativo and 
+                self.status == 'ATIVO' and
+                self.periodo_avaliacao_abertura and
+                self.periodo_avaliacao_fechamento and
+                self.periodo_avaliacao_abertura <= agora <= self.periodo_avaliacao_fechamento)
 
 
 class Inscricao(models.Model):
@@ -54,9 +82,22 @@ class Inscricao(models.Model):
         ('INDEFERIDA', 'Indeferida'),
     ]
     
+    # Status de classificação da inscrição
+    CLASSIFICACAO_CHOICES = [
+        ('ANALISE', 'Em Análise'),
+        ('COM_PENDENCIA', 'Com Pendência'),
+        ('NAO_REGULARIZADO', 'Não Regularizado'),
+        ('REGULARIZADO', 'Regularizado'),
+        ('NAO_ELEGIVEL', 'Não Elegível'),
+        ('ELEGIVEL', 'Elegível'),
+        ('CONTEMPLADO', 'Contemplado'),
+        ('NAO_CONTEMPLADO', 'Não Contemplado'),
+    ]
+    
     edital = models.ForeignKey(Edital, on_delete=models.CASCADE, related_name='inscricoes')
     estudante = models.ForeignKey(Estudante, on_delete=models.CASCADE, related_name='inscricoes')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='RASCUNHO')
+    classificacao = models.CharField(max_length=30, choices=CLASSIFICACAO_CHOICES, default='ANALISE')
     
     # Dados do formulário (armazenados como JSON para flexibilidade)
     informacoes_estudante = models.JSONField(default=dict, blank=True)

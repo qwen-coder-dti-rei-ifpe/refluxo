@@ -13,7 +13,14 @@ from .serializers import EstudanteSerializer, EnderecoSerializer
 
 def home_view(request):
     """
-    View para página inicial de busca de estudante por CPF.
+    View para página inicial do programa.
+    """
+    return render(request, 'home.html')
+
+
+def buscar_cpf_view(request):
+    """
+    View para página de busca de estudante por CPF.
     """
     cpf_search = request.GET.get('cpf', '')
     estudante = None
@@ -29,7 +36,7 @@ def home_view(request):
             try:
                 estudante = Estudante.objects.select_related('endereco').get(cpf=cpf_limpo)
             except Estudante.DoesNotExist:
-                error = None  # Não mostra erro, apenas não encontra resultado
+                pass  # Não mostra erro, apenas não encontra resultado
     
     context = {
         'cpf_search': cpf_search,
@@ -37,7 +44,7 @@ def home_view(request):
         'error': error,
     }
     
-    return render(request, 'home.html', context)
+    return render(request, 'buscar_cpf.html', context)
 
 
 class EstudanteViewSet(viewsets.ModelViewSet):
