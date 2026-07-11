@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "backend/wsgi.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "headers": { "cache-control": "s-maxage=31536000,immutable" },
+      "continue": true
+    },
+    {
+      "src": "/(.*)",
+      "dest": "backend/wsgi.py"
+    }
+  ],
+  "env": {
+    "DJANGO_SETTINGS_MODULE": "backend.settings",
+    "PYTHON_VERSION": "3.12"
+  },
+  "outputDirectory": "backend/staticfiles"
+}

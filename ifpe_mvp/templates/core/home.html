@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Início - IFPE{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 text-center mb-5">
+        <h1 class="display-4 fw-bold">Programa de Apoio e Manutenção Acadêmica</h1>
+        <p class="lead text-muted">IFPE - Instituto Federal de Pernambuco</p>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Card de Consulta -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card dashboard-card h-100">
+            <div class="dashboard-icon">
+                <i class="fas fa-search"></i>
+            </div>
+            <h5>Consultar Estudante</h5>
+            <p class="text-muted">Busque por matrícula ou CPF para consultar dados</p>
+            <a href="{% url 'student_search' %}" class="btn btn-primary">
+                <i class="fas fa-arrow-right"></i> Consultar
+            </a>
+        </div>
+    </div>
+    
+    <!-- Card de Editais -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card dashboard-card h-100">
+            <div class="dashboard-icon">
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <h5>Editais Abertos</h5>
+            <p class="text-muted">Veja os períodos de inscrição disponíveis</p>
+            <a href="{% url 'enrollment_period_list' %}" class="btn btn-primary">
+                <i class="fas fa-arrow-right"></i> Ver Editais
+            </a>
+        </div>
+    </div>
+    
+    <!-- Card de Inscrição -->
+    {% if user.is_authenticated %}
+    <div class="col-md-6 col-lg-3">
+        <div class="card dashboard-card h-100">
+            <div class="dashboard-icon">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <h5>Minha Inscrição</h5>
+            <p class="text-muted">Acesse seu dashboard e faça sua inscrição</p>
+            <a href="{% url 'dashboard' %}" class="btn btn-success">
+                <i class="fas fa-arrow-right"></i> Acessar
+            </a>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Card de Login/Cadastro -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card dashboard-card h-100">
+            <div class="dashboard-icon">
+                <i class="fas fa-user"></i>
+            </div>
+            <h5>Área do Usuário</h5>
+            <p class="text-muted">
+                {% if user.is_authenticated %}
+                    Acesse seu painel pessoal
+                {% else %}
+                    Faça login para acessar
+                {% endif %}
+            </p>
+            {% if user.is_authenticated %}
+                <a href="{% url 'dashboard' %}" class="btn btn-success">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt"></i> Entrar
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Informações sobre o programa -->
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-info-circle"></i> Sobre o Programa
+            </div>
+            <div class="card-body">
+                <p>O Programa de Apoio e Manutenção Acadêmica do IFPE visa garantir a permanência e o sucesso acadêmico dos estudantes em situação de vulnerabilidade socioeconômica.</p>
+                <div class="row g-3 mt-2">
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Auxílio financeiro para estudantes</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Apoio para transporte e alimentação</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <span>Suporte pedagógico especializado</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

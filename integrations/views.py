@@ -1,0 +1,205 @@
+"""
+Views do app integrations - Views para integrações com APIs externas.
+
+Este módulo contém as views da API REST para integração com
+QAcadêmico e ConectaGov, incluindo consulta de elegibilidade.
+"""
+import requests
+from rest_framework import viewsets, status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from django.conf import settings
+from .models import QAcademicoMock, ConectaGovMock
+from .serializers import QAcademicoMockSerializer, ConectaGovMockSerializer
+
+
+class QAcademicoViewSet(viewsets.ViewSet):
+    """
+    ViewSet para integração com API QAcadêmico (mock).
+    
+    Fornece endpoints para consultar dados acadêmicos do estudante
+    usando matrícula como identificador.
+    """
+    
+    @action(detail=False, methods=['get'])
+    def consultar(self, request):
+        """Consulta dados do estudante pela matrícula."""
+        matricula = request.query_params.get('matricula')
+        
+        if not matricula:
+            return Response(
+                {'error': 'Matrícula é obrigatória'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Mock de dados - em produção faria chamada HTTP para API QAcadêmico
+        dados_mock = {
+            'matricula': matricula,
+            'nome_estudante': f'Estudante Exemplo {matricula}',
+            'curso': 'Técnico em Informática',
+            'campus': 'Recife',
+            'periodo': '3º',
+            'turno': 'MATUTINO',
+            'status_matricula': 'ATIVO'
+        }
+        
+        return Response(dados_mock)
+    
+    @action(detail=False, methods=['get'])
+    def validar_matricula(self, request):
+        """Valida se a matrícula existe e está ativa."""
+        matricula = request.query_params.get('matricula')
+        
+        if not matricula:
+            return Response(
+                {'error': 'Matrícula é obrigatória'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Mock de validação
+        valido = True  # Em produção consultaria a API real
+        
+        return Response({
+            'matricula': matricula,
+            'valida': valido,
+            'mensagem': 'Matrícula válida' if valido else 'Matrícula inválida ou inativa'
+        })
+
+
+class ConectaGovViewSet(viewsets.ViewSet):
+    """
+    ViewSet para integração com API ConectaGov (mock).
+    
+    Fornece endpoints para consultar dados do cidadão no
+    CadÚnico/CBC usando CPF como identificador.
+    """
+    
+    @action(detail=False, methods=['get'])
+    def consultar(self, request):
+        """Consulta dados do cidadão pelo CPF."""
+        cpf = request.query_params.get('cpf')
+        
+        if not cpf:
+            return Response(
+                {'error': 'CPF é obrigatório'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Mock de dados - em produção faria chamada HTTP para API ConectaGov
+        dados_mock = {
+            'cpf': cpf,
+            'nome_cidadao': f'Cidadão Exemplo {cpf}',
+            'nis': '12345678901',
+            'possui_cadastro_unico': True,
+            'renda_per_capita': 450.00,
+            'familiares': [
+                {
+                    'nome': 'Familiar 1',
+                    'cpf': '12345678900',
+                    'parentesco': 'MÃE',
+                    'renda': 1200.00
+                },
+                {
+                    'nome': 'Familiar 2',
+                    'cpf': '09876543210',
+                    'parentesco': 'IRMÃO',
+                    'renda': 0.00
+                }
+            ],
+            'beneficios_sociais': [
+                {'programa': 'Bolsa Família', 'valor': 600.00}
+            ]
+        }
+        
+        return Response(dados_mock)
+    
+    @action(detail=False, methods=['get'])
+    def verificar_beneficios(self, request):
+        """Verifica benefícios sociais do cidadão."""
+        cpf = request.query_params.get('cpf')
+        
+        if not cpf:
+            return Response(
+                {'error': 'CPF é obrigatório'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Mock de verificação
+        beneficios = [
+            {'programa': 'Bolsa Família', 'ativo': True, 'valor': 600.00},
+            {'programa': 'BPC', 'ativo': False, 'valor': 0.00}
+        ]
+        
+        return Response({
+            'cpf': cpf,
+            'beneficios': beneficios
+        })
+
+
+class ConsultaElegibilidadeView(APIView):
+    """
+    View para consulta completa de elegibilidade do estudante.
+    
+    Integra dados do QAcadêmico e ConectaGov para determinar
+    se o estudante é elegível ao programa de apoio estudantil.
+    """
+    
+    def get(self, request):
+        """Consulta elegibilidade baseada em matrícula ou CPF."""
+        matricula = request.query_params.get('matricula')
+        cpf = request.query_params.get('cpf')
+        
+        if not matricula and not cpf:
+            return Response(
+                {'error': 'Matrícula ou CPF são obrigatórios'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Simula integração com APIs
+        dados_qacademico = {
+            'matricula_valida': True,
+            'curso': 'Técnico em Informática',
+            'periodo': '3º',
+            'status': 'ATIVO'
+        }
+        
+        dados_conecta_gov = {
+            'cadastro_unico': True,
+            'renda_per_capita': 450.00,
+            'possui_beneficio': True,
+            'familiares_count': 3
+        }
+        
+        # Regras de elegibilidade
+        elegivel = (
+            dados_qacademico['matricula_valida'] and
+            dados_qacademico['status'] == 'ATIVO' and
+            dados_conecta_gov['renda_per_capita'] <= 800.00
+        )
+        
+        return Response({
+            'elegivel': elegivel,
+            'dados_academicos': dados_qacademico,
+            'dados_socioeconomicos': dados_conecta_gov,
+            'motivos': self._gerar_motivos(elegivel, dados_qacademico, dados_conecta_gov)
+        })
+    
+    def _gerar_motivos(self, elegivel, qacademico, conecta_gov):
+        """Gera lista de motivos para elegibilidade ou inelegibilidade."""
+        motivos = []
+        
+        if elegivel:
+            motivos.append('Estudante matriculado e ativo')
+            motivos.append('Renda per capita dentro do limite')
+            if conecta_gov.get('possui_beneficio'):
+                motivos.append('Possui benefício social ativo')
+        else:
+            if not qacademico.get('matricula_valida'):
+                motivos.append('Matrícula inválida')
+            if qacademico.get('status') != 'ATIVO':
+                motivos.append('Matrícula não está ativa')
+            if conecta_gov.get('renda_per_capita', 0) > 800.00:
+                motivos.append('Renda per capita acima do limite permitido')
+        
+        return motivos

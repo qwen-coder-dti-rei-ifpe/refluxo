@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - IFPE{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-tachometer-alt"></i> Dashboard do Estudante</h2>
+        <p class="text-muted">Bem-vindo(a), {{ user.get_full_name|default:user.username }}!</p>
+    </div>
+</div>
+
+<!-- Resumo das inscrições -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6 col-lg-3">
+        <div class="card text-white bg-primary h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Inscrições Ativas</h5>
+                <h2 class="display-4">{{ user.student.enrollments.count|default:0 }}</h2>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3">
+        <div class="card text-white bg-success h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Aprovadas</h5>
+                <h2 class="display-4">{{ user.student.enrollments.filter(status='APROVADA').count|default:0 }}</h2>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3">
+        <div class="card text-white bg-warning h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Em Análise</h5>
+                <h2 class="display-4">{{ user.student.enrollments.filter=status='EM_ANALISE'.count|default:0 }}</h2>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3">
+        <div class="card text-white bg-info h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Editais Abertos</h5>
+                <h2 class="display-4">{{ periods_abertos|default:0 }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ações rápidas -->
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="fas fa-bolt"></i> Ações Rápidas
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'student_search' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-search"></i> Consultar Dados
+                    </a>
+                    <a href="{% url 'enrollment_period_list' %}" class="btn btn-outline-success">
+                        <i class="fas fa-file-alt"></i> Ver Editais Abertos
+                    </a>
+                    {% if user.student %}
+                    <a href="{% url 'student_update' user.student.pk %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-edit"></i> Atualizar Meus Dados
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="fas fa-clock"></i> Próximas Inscrições
+            </div>
+            <div class="card-body">
+                {% if periods_abertos_list %}
+                    <ul class="list-group list-group-flush">
+                        {% for period in periods_abertos_list %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ period.titulo }}</strong>
+                                <br>
+                                <small class="text-muted">
+                                    {{ period.data_inicio|date:"d/m/Y" }} - {{ period.data_fim|date:"d/m/Y" }}
+                                </small>
+                            </div>
+                            <a href="{% url 'enrollment_dashboard' period.pk %}" class="btn btn-sm btn-primary">
+                                Acessar
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted text-center">Não há editais abertos no momento.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Informações do estudante -->
+{% if user.student %}
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-user-graduate"></i> Meus Dados
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Nome:</strong> {{ user.student.nome_completo }}</p>
+                        <p><strong>Matrícula:</strong> {{ user.student.matricula }}</p>
+                        <p><strong>Curso:</strong> {{ user.student.curso|default:"Não informado" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Campus:</strong> {{ user.student.campus|default:"Não informado" }}</p>
+                        <p><strong>CPF:</strong> {{ user.student.cpf }}</p>
+                        <p><strong>Email:</strong> {{ user.student.email_institucional|default:user.email }}</p>
+                    </div>
+                </div>
+                <a href="{% url 'student_detail' user.student.pk %}" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-eye"></i> Ver detalhes completos
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
