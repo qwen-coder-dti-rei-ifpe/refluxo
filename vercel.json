@@ -25,9 +25,5 @@
       "use": "@vercel/python"
     }
   ],
-  "functions": {
-    "config/wsgi.py": {
-      "maxDuration": 60
-    }
-  }
+  
 }
