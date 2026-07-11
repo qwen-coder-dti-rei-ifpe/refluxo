@@ -1,5 +1,5 @@
 {% extends "admin/base_site.html" %}
-{% load i18n static %}
+{% load i18n static admin_urls %}
 
 {% block extrastyle %}{{ block.super }}
 <style>
@@ -157,7 +157,7 @@
   {% if next %}
     {% if user.is_authenticated %}
       <p class="errornote">
-        {% blocktranslate with escaped_next=next|urlencodes %}Sua conta não tem acesso a esta página. Para prosseguir, faça login com uma conta que tenha acesso.{% endblocktranslate %}
+        {% blocktranslate with escaped_next=next|urlencode %}Sua conta não tem acesso a esta página. Para prosseguir, faça login com uma conta que tenha acesso.{% endblocktranslate %}
       </p>
     {% endif %}
   {% endif %}

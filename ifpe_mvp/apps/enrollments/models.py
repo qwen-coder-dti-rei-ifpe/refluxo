@@ -14,7 +14,8 @@ class EnrollmentPeriod(models.Model):
     
     STATUS_CHOICES = [
         ('ABERTO', 'Aberto'),
-        ('FECHADO', 'Fechado'),
+        ('EM_ANDAMENTO', 'Em andamento'),
+        ('ENCERRADO', 'Encerrado'),
         ('CANCELADO', 'Cancelado'),
     ]
     
@@ -22,11 +23,13 @@ class EnrollmentPeriod(models.Model):
     descricao = models.TextField(_('Descrição'))
     data_inicio = models.DateTimeField(_('Data de início'))
     data_fim = models.DateTimeField(_('Data de fim'))
+    data_inicio_avaliacao = models.DateTimeField(_('Data de início da avaliação'), null=True, blank=True)
+    data_fim_avaliacao = models.DateTimeField(_('Data de fim da avaliação'), null=True, blank=True)
     status = models.CharField(
         _('Status'), 
         max_length=20, 
         choices=STATUS_CHOICES, 
-        default='FECHADO'
+        default='ENCERRADO'
     )
     ativo = models.BooleanField(_('Ativo?'), default=False)
     
@@ -46,6 +49,10 @@ class EnrollmentPeriod(models.Model):
         """Verifica se o período de inscrição está aberto."""
         agora = timezone.now()
         return self.ativo and self.data_inicio <= agora <= self.data_fim
+    
+    def quantidade_inscritos(self):
+        """Retorna a quantidade de estudantes inscritos."""
+        return self.enrollments.count()
 
 
 class Displacement(models.Model):
@@ -106,9 +113,12 @@ class Enrollment(models.Model):
     STATUS_CHOICES = [
         ('RASCUNHO', 'Rascunho'),
         ('SUBMETIDA', 'Submetida'),
-        ('EM_ANALISE', 'Em análise'),
-        ('APROVADA', 'Aprovada'),
-        ('REPROVADA', 'Reprovada'),
+        ('EM_AVALIACAO', 'Em avaliação'),
+        ('CONTEMPLADO', 'Contemplado'),
+        ('NAO_ELEGIVEL', 'Não elegível'),
+        ('ELEGIVEL', 'Elegível'),
+        ('NAO_REGULARIZADO', 'Não regularizado'),
+        ('PENDENTE', 'Pendente'),
         ('CANCELADA', 'Cancelada'),
     ]
     
