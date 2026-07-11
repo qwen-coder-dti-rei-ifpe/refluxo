@@ -1,11 +1,11 @@
 {
   "version": 2,
   "framework": null,
-  "installCommand": "pip install -r requirements.txt",
-  "buildCommand": "python manage.py migrate --noinput && python criar_usuarios_teste.py && python manage.py collectstatic --noinput",
-  "outputDirectory": ".vercel/output/static",
+  "installCommand": "pip install -r requirements.txt --break-system-packages",
+  "buildCommand": "python manage.py makemigrations --noinput && python manage.py migrate --noinput && python manage.py collectstatic --noinput",
+  "outputDirectory": "backend/staticfiles",
   "env": {
-    "DJANGO_SETTINGS_MODULE": "config.settings",
+    "DJANGO_SETTINGS_MODULE": "backend.settings",
     "PYTHON_VERSION": "3.12"
   },
   "routes": [
@@ -17,6 +17,12 @@
     {
       "src": "/(.*)",
       "dest": "config/wsgi.py"
+    }
+  ],
+  "builds": [
+    {
+      "src": "backend/wsgi.py",
+      "use": "@vercel/python"
     }
   ]
 }
