@@ -75,15 +75,27 @@ TEMPLATES = [
 # Ponto de entrada da aplicação WSGI
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Configuração do banco de dados SQLite (padrão para desenvolvimento e Vercel)
+# Configuração do banco de dados
 import os
+import dj_database_url
 
 # Detecta se está rodando no ambiente Vercel
 IS_VERCEL = os.environ.get('VERCEL') == '1'
 
-if IS_VERCEL:
-    # No Vercel, usa o sistema de arquivos temporário (/tmp) que permite escrita
-    # É crucial que as migrações rodem no build command para criar este arquivo
+# Tenta obter URL do banco de dados PostgreSQL (recomendado para produção)
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL:
+    # Usa PostgreSQL se DATABASE_URL estiver definido
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            ssl_require='POSTGRES_SSL' in os.environ
+        )
+    }
+elif IS_VERCEL:
+    # Fallback para SQLite no /tmp se não houver DATABASE_URL (não persistente)
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
