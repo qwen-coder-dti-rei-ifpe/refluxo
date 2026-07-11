@@ -76,12 +76,30 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # Configuração do banco de dados SQLite (padrão para desenvolvimento e Vercel)
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+import os
+
+# Detecta se está rodando no ambiente Vercel
+IS_VERCEL = os.environ.get('VERCEL') == '1'
+
+if IS_VERCEL:
+    # No Vercel, usa o sistema de arquivos temporário (/tmp) que permite escrita
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': '/tmp/db.sqlite3',
+        }
     }
-}
+    # Ajusta a raiz de mídia para o diretório temporário
+    MEDIA_ROOT = '/tmp/media'
+else:
+    # Em desenvolvimento local, usa o db.sqlite3 na raiz do projeto
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+    MEDIA_ROOT = BASE_DIR / 'media'
 
 # Validação de senhas do Django
 AUTH_PASSWORD_VALIDATORS = [
