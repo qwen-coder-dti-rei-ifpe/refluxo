@@ -1,8 +1,8 @@
 {
   "version": 2,
   "framework": null,
-  "installCommand": "pip install -r requirements.txt",
-  "buildCommand": "python manage.py migrate --noinput && python manage.py collectstatic --noinput",
+  "installCommand": "pip install -r requirements.txt --break-system-packages",
+  "buildCommand": "./build_files.sh",
   "outputDirectory": ".vercel/output/static",
   "env": {
     "DJANGO_SETTINGS_MODULE": "config.settings",
