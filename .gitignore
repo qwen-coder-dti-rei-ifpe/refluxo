@@ -1,36 +1,5 @@
-```
-# Compiled and build artifacts
-*.pyc
-__pycache__/
-*.o
-*.obj
+(build_files.sh is a shell script, which is a source file, so no need to add anything to .gitignore)
 
-# Dependencies
-.venv/
-venv/
-node_modules/
+```text
 
-# Logs and temp files
-*.log
-*.tmp
-*.swp
-
-# Environment
-.env
-.env.local
-*.env.*
-
-# Editors
-.vscode/
-.idea/
-
-# Coverage reports
-.coverage
-coverage/
-htmlcov/
-
-# Distribution artifacts
-dist/
-build/
-*.egg-info/
 ```

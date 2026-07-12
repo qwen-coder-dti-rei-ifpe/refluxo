@@ -1,28 +1,27 @@
 {
   "version": 2,
-  "framework": null,
-  "installCommand": "pip install -r requirements.txt --break-system-packages",
-  "buildCommand": "python manage.py makemigrations --noinput && python manage.py migrate --noinput && python manage.py collectstatic --noinput",
-  "outputDirectory": "backend/staticfiles",
-  "env": {
-    "DJANGO_SETTINGS_MODULE": "backend.settings",
-    "PYTHON_VERSION": "3.12"
-  },
+  "builds": [
+    {
+      "src": "config/wsgi.py",
+      "use": "@vercel/python",
+      "config": { "maxLambdaSize": "15mb", "runtime": "python3.9" }
+    },
+    {
+      "src": "build_files.sh",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "staticfiles"
+      }
+    }
+  ],
   "routes": [
     {
       "src": "/static/(.*)",
-      "headers": { "cache-control": "s-maxage=31536000,immutable" },
-      "continue": true
+      "dest": "/static/$1"
     },
     {
       "src": "/(.*)",
       "dest": "config/wsgi.py"
-    }
-  ],
-  "builds": [
-    {
-      "src": "backend/wsgi.py",
-      "use": "@vercel/python"
     }
   ]
 }
