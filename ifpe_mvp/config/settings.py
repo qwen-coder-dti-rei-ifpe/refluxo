@@ -73,11 +73,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': config('DB_ENGINE', default='django.db.backends.postgresql'),
-        'NAME': config('DB_NAME', default='ifpe_mvp'),
+        'NAME': config('DB_NAME', default='postgres'),
         'USER': config('DB_USER', default='postgres'),
-        'PASSWORD': config('DB_PASSWORD', default='postgres'),
-        'HOST': config('DB_HOST', default='db'),
-        'PORT': config('DB_PORT', default='5432'),
+        'PASSWORD': config('DB_PASSWORD', default='Zl6BfAU366Cu9Zoa'),
+        'HOST': config('DB_HOST', default='db.xeodkrcoekfsonnwcuag.supabase.co'),
+        'PORT': config('DB_PORT', default='6543'),
     }
 }
 
