@@ -81,9 +81,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': config('POSTGRES_DATABASE', default='postgres'),
-        'USER': config('POSTGRES_USER', default='postgres'),
-        'PASSWORD': config('POSTGRES_PASSWORD', default=''),
-        'HOST': config('POSTGRES_HOST', default='localhost'),
+        'USER': config('POSTGRES_USER', default='postgres.xeodkrcoekfsonnwcuag'),
+        'PASSWORD': config('POSTGRES_PASSWORD', default='Zl6BfAU366Cu9Zoa'),
+        'HOST': config('POSTGRES_HOST', default='db.xeodkrcoekfsonnwcuag.supabase.co'),
         'PORT': config('POSTGRES_PORT', default='5432'),
         'CONN_MAX_AGE': 600,
         'OPTIONS': {
@@ -91,6 +91,9 @@ DATABASES = {
         },
     }
 }
+
+# URL do banco de dados para compatibilidade com outras ferramentas
+DATABASE_URL = config('DATABASE_URL', default='postgres://postgres.xeodkrcoekfsonnwcuag:Zl6BfAU366Cu9Zoa@aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require')
 
 # Validação de senhas do Django
 AUTH_PASSWORD_VALIDATORS = [

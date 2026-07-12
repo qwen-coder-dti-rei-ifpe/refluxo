@@ -1,7 +1,7 @@
 {
   "version": 2,
   "framework": null,
-  "installCommand": "pip install -r requirements.txt --break-system-packages && python manage.py makemigrations --noinput && python manage.py migrate --noinput && python setup_db.py && python manage.py collectstatic --noinput",
+  "installCommand": "pip install -r requirements.txt --break-system-packages && python manage.py makemigrations --noinput && python manage.py migrate --noinput && python manage.py collectstatic --noinput",
   "outputDirectory": "staticfiles",
   "env": {
     "DJANGO_SETTINGS_MODULE": "config.settings",
@@ -10,7 +10,8 @@
     "POSTGRES_HOST": "db.xeodkrcoekfsonnwcuag.supabase.co",
     "POSTGRES_PASSWORD": "Zl6BfAU366Cu9Zoa",
     "POSTGRES_USER": "postgres.xeodkrcoekfsonnwcuag",
-    "POSTGRES_PORT": "5432"
+    "POSTGRES_PORT": "5432",
+    "DATABASE_URL": "postgres://postgres.xeodkrcoekfsonnwcuag:Zl6BfAU366Cu9Zoa@aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require"
   },
   "routes": [
     {
@@ -27,6 +28,13 @@
     {
       "src": "config/wsgi.py",
       "use": "@vercel/python"
+    },
+    {
+      "src": "setup_db.py",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "staticfiles"
+      }
     }
   ]
 }
