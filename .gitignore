@@ -1,19 +1,6 @@
 ```
-# Compiled and build artifacts
-*.pyc
-__pycache__/
-*.o
-*.obj
-
-# Dependencies
-.venv/
-venv/
-node_modules/
-
 # Logs and temp files
 *.log
-*.tmp
-*.swp
 
 # Environment
 .env
@@ -22,15 +9,4 @@ node_modules/
 
 # Editors
 .vscode/
-.idea/
-
-# Coverage reports
-.coverage
-coverage/
-htmlcov/
-
-# Distribution artifacts
-dist/
-build/
-*.egg-info/
 ```
