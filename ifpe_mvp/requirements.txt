@@ -26,3 +26,6 @@ whitenoise==6.7.0
 # Testes
 pytest==8.3.3
 pytest-django==4.9.0
+
+# Vercel runtime
+vercel

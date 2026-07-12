@@ -1,7 +1,41 @@
 ```
 # Dependencies
-ifpe_mvp/requirements.txt
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 
-# Environment
-.env.example
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Environment files
+.env
+.env.local
+*.env.*
+
+# Logs
+*.log
+
+# Editor/IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# Coverage reports
+.coverage
+coverage/
+htmlcov/
+
+# Python cache
+*.pyc
+__pycache__/
+.Python
+*.so
+*.py~, *~
 ```
