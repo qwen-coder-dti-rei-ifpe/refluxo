@@ -1,12 +1,5 @@
-```
-# Logs and temp files
-*.log
+(build_files.sh is a shell script, which is a source file, so no need to add anything to .gitignore)
 
-# Environment
-.env
-.env.local
-*.env.*
+```text
 
-# Editors
-.vscode/
 ```
