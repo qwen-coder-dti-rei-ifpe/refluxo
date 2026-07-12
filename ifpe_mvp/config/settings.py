@@ -15,6 +15,10 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 
+# Add Vercel domains to allowed hosts in production
+if DEBUG is False:
+    ALLOWED_HOSTS += ['*.vercel.app']
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
