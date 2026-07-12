@@ -30,7 +30,7 @@
       "use": "@vercel/python"
     },
     {
-      "src": "setup_db.py",
+      "src": "setup_db.sh",
       "use": "@vercel/static-build",
       "config": {
         "distDir": "staticfiles"
