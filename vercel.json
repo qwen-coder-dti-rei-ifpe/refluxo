@@ -1,11 +1,16 @@
 {
   "version": 2,
   "framework": null,
-  "installCommand": "pip install -r requirements.txt --break-system-packages && python manage.py makemigrations --noinput && python manage.py migrate --noinput && python setup_db.py && python manage.py collectstatic --noinput ",
+  "installCommand": "pip install -r requirements.txt --break-system-packages && python manage.py makemigrations --noinput && python manage.py migrate --noinput && python setup_db.py && python manage.py collectstatic --noinput",
   "outputDirectory": "staticfiles",
   "env": {
     "DJANGO_SETTINGS_MODULE": "config.settings",
-    "PYTHON_VERSION": "3.12"
+    "PYTHON_VERSION": "3.12",
+    "POSTGRES_DATABASE": "postgres",
+    "POSTGRES_HOST": "db.xeodkrcoekfsonnwcuag.supabase.co",
+    "POSTGRES_PASSWORD": "Zl6BfAU366Cu9Zoa",
+    "POSTGRES_URL": "postgres://postgres.xeodkrcoekfsonnwcuag:Zl6BfAU366Cu9Zoa@aws-0-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require&supa=base-pooler.x",
+    "POSTGRES_USER": "postgres"
   },
   "routes": [
     {
