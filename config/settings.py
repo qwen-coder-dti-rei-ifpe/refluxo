@@ -6,6 +6,7 @@ incluindo apps instalados, middlewares, banco de dados, etc.
 """
 from pathlib import Path
 from decouple import config
+import dj_database_url
 
 # Constrói o caminho base do projeto
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -75,9 +77,13 @@ TEMPLATES = [
 # Ponto de entrada da aplicação WSGI
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Configuração do banco de dados SQLite (padrão para desenvolvimento e Vercel)
+# Configuração do banco de dados PostgreSQL (produção) ou SQLite (desenvolvimento)
 DATABASES = {
-    'default': {
+    'default': dj_database_url.config(
+        default=config('DATABASE_URL', default='sqlite:///db.sqlite3'),
+        conn_max_age=600,
+        ssl_require=True
+    ) if config('DATABASE_URL', default=None) else {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
@@ -140,3 +146,6 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
+
+# Modelo de usuário personalizado (comentado temporariamente para permitir migrations iniciais)
+# AUTH_USER_MODEL = 'core.Usuario'

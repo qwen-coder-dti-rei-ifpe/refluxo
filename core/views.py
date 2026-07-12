@@ -1,14 +1,35 @@
 """
-Views do app core - ViewSets para Estudante e Endereco.
+Views do app core - ViewSets para Estudante e Endereco, e views de autenticação.
 
 Este módulo contém as views da API REST para operações CRUD
-com estudantes e endereços.
+com estudantes e endereços, além de views personalizadas para login.
 """
 from rest_framework import viewsets, filters
 from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import render
+from django.contrib.auth.views import LoginView
 from .models import Estudante, Endereco
 from .serializers import EstudanteSerializer, EnderecoSerializer
+from .forms import LoginForm
+
+
+class CustomLoginView(LoginView):
+    """
+    View personalizada para login com autopreenchimento de credenciais.
+    Preenche automaticamente os campos com valores de demonstração.
+    """
+    form_class = LoginForm
+    template_name = 'registration/login.html'
+    
+    def get_initial(self):
+        """
+        Retorna dados iniciais para autopreencher o formulário de login.
+        """
+        initial = super().get_initial()
+        # Autopreenche com credenciais de demonstração
+        initial['username'] = '12345678900'
+        initial['password'] = '123'
+        return initial
 
 
 def home_view(request):
