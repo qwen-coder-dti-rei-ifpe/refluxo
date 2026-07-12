@@ -9,8 +9,8 @@
     "POSTGRES_DATABASE": "postgres",
     "POSTGRES_HOST": "db.xeodkrcoekfsonnwcuag.supabase.co",
     "POSTGRES_PASSWORD": "Zl6BfAU366Cu9Zoa",
-    "POSTGRES_URL": "postgres://postgres.xeodkrcoekfsonnwcuag:Zl6BfAU366Cu9Zoa@aws-0-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require&supa=base-pooler.x",
-    "POSTGRES_USER": "postgres"
+    "POSTGRES_USER": "postgres.xeodkrcoekfsonnwcuag",
+    "POSTGRES_PORT": "5432"
   },
   "routes": [
     {

@@ -6,7 +6,6 @@ incluindo apps instalados, middlewares, banco de dados, etc.
 """
 from pathlib import Path
 from decouple import config
-import dj_database_url
 
 # Constrói o caminho base do projeto
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -77,45 +76,21 @@ TEMPLATES = [
 # Ponto de entrada da aplicação WSGI
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Configuração do banco de dados PostgreSQL (produção) ou SQLite (desenvolvimento)
-# Usa DATABASE_URL se disponível, caso contrário tenta variáveis individuais ou SQLite
-if config('DATABASE_URL', default=None):
-    DATABASES = {
-        'default': dj_database_url.config(
-            conn_max_age=600,
-            ssl_require=True
-        )
+# Configuração do banco de dados PostgreSQL
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('POSTGRES_DATABASE', default='postgres'),
+        'USER': config('POSTGRES_USER', default='postgres'),
+        'PASSWORD': config('POSTGRES_PASSWORD', default=''),
+        'HOST': config('POSTGRES_HOST', default='localhost'),
+        'PORT': config('POSTGRES_PORT', default='5432'),
+        'CONN_MAX_AGE': 600,
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
     }
-elif config('POSTGRES_URL', default=None):
-    DATABASES = {
-        'default': dj_database_url.config(
-            url=config('POSTGRES_URL'),
-            conn_max_age=600,
-            ssl_require=True
-        )
-    }
-elif config('POSTGRES_HOST', default=None):
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': config('POSTGRES_DATABASE', default='postgres'),
-            'USER': config('POSTGRES_USER', default='postgres'),
-            'PASSWORD': config('POSTGRES_PASSWORD', default=''),
-            'HOST': config('POSTGRES_HOST', default='localhost'),
-            'PORT': config('POSTGRES_PORT', default='5432'),
-            'CONN_MAX_AGE': 600,
-            'OPTIONS': {
-                'sslmode': 'require',
-            },
-        }
-    }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+}
 
 # Validação de senhas do Django
 AUTH_PASSWORD_VALIDATORS = [
@@ -175,5 +150,5 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-# Modelo de usuário personalizado (comentado temporariamente para permitir migrations iniciais)
-# AUTH_USER_MODEL = 'core.Usuario'
+# Modelo de usuário personalizado
+AUTH_USER_MODEL = 'core.Usuario'
