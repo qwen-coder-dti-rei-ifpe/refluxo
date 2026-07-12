@@ -1,1 +1,1 @@
-Nothing needs to be added to .gitignore since the changes only include a shell script (`setup_db.sh`) and a configuration file (`vercel.json`), which are source/config files that should not be ignored.
+Nothing needs to be added to the .gitignore file based on the provided changes. The modification of 'setup_db.sh' does not introduce any new patterns that require ignoring.
