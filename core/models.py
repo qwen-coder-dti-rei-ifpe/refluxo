@@ -1,5 +1,5 @@
 """
-Models do app core - Modelos básicos de Estudante e Endereço.
+Models do app core - Modelos de Estudante e Endereço.
 
 Este módulo contém os modelos fundamentais para o sistema de inscrições,
 incluindo dados do estudante e informações de endereço.

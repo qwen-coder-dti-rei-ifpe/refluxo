@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -75,13 +76,24 @@ TEMPLATES = [
 # Ponto de entrada da aplicação WSGI
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Configuração do banco de dados SQLite (padrão para desenvolvimento e Vercel)
+# Configuração do banco de dados PostgreSQL
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('POSTGRES_DATABASE', default='postgres'),
+        'USER': config('POSTGRES_USER', default='postgres.xeodkrcoekfsonnwcuag'),
+        'PASSWORD': config('POSTGRES_PASSWORD', default='Zl6BfAU366Cu9Zoa'),
+        'HOST': config('POSTGRES_HOST', default='db.xeodkrcoekfsonnwcuag.supabase.co'),
+        'PORT': config('POSTGRES_PORT', default='5432'),
+        'CONN_MAX_AGE': 600,
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
     }
 }
+
+# URL do banco de dados para compatibilidade com outras ferramentas
+DATABASE_URL = config('DATABASE_URL', default='postgres://postgres.xeodkrcoekfsonnwcuag:Zl6BfAU366Cu9Zoa@aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require')
 
 # Validação de senhas do Django
 AUTH_PASSWORD_VALIDATORS = [
@@ -140,3 +152,6 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
+
+# Modelo de usuário personalizado
+AUTH_USER_MODEL = 'core.Usuario'

@@ -1,32 +1,40 @@
 {
   "version": 2,
+  "framework": null,
+  "installCommand": "pip install -r requirements.txt --break-system-packages && python manage.py makemigrations --noinput && python manage.py migrate --noinput && python manage.py collectstatic --noinput",
   "outputDirectory": "staticfiles",
   "env": {
     "DJANGO_SETTINGS_MODULE": "config.settings",
-    "PYTHON_VERSION": "3.12"
+    "PYTHON_VERSION": "3.12",
+    "POSTGRES_DATABASE": "postgres",
+    "POSTGRES_HOST": "db.xeodkrcoekfsonnwcuag.supabase.co",
+    "POSTGRES_PASSWORD": "Zl6BfAU366Cu9Zoa",
+    "POSTGRES_USER": "postgres.xeodkrcoekfsonnwcuag",
+    "POSTGRES_PORT": "5432",
+    "DATABASE_URL": "postgres://postgres.xeodkrcoekfsonnwcuag:Zl6BfAU366Cu9Zoa@aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require"
   },
-  "builds": [
-    {
-      "src": "config/wsgi.py",
-      "use": "@vercel/python",
-      "config": { "maxLambdaSize": "15mb", "runtime": "python3.12" }
-    },
-    {
-      "src": "build_files.sh",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "staticfiles"
-      }
-    }
-  ],
   "routes": [
     {
       "src": "/static/(.*)",
-      "dest": "/static/$1"
+      "headers": { "cache-control": "s-maxage=31536000,immutable" },
+      "continue": true
     },
     {
       "src": "/(.*)",
       "dest": "config/wsgi.py"
+    }
+  ],
+  "builds": [
+    {
+      "src": "config/wsgi.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "setup_db.py",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "staticfiles"
+      }
     }
   ]
 }
