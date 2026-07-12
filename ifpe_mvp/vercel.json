@@ -1,9 +1,15 @@
 {
   "version": 2,
+  "outputDirectory": "staticfiles",
+  "env": {
+    "DJANGO_SETTINGS_MODULE": "config.settings",
+    "PYTHON_VERSION": "3.12"
+  },
   "builds": [
     {
-      "src": "api/index.py",
-      "use": "@vercel/python"
+      "src": "config/wsgi.py",
+      "use": "@vercel/python",
+      "config": { "maxLambdaSize": "15mb", "runtime": "python3.12" }
     },
     {
       "src": "build_files.sh",
@@ -19,15 +25,8 @@
       "dest": "/static/$1"
     },
     {
-      "src": "/media/(.*)",
-      "dest": "/media/$1"
-    },
-    {
       "src": "/(.*)",
-      "dest": "api/index.py"
+      "dest": "config/wsgi.py"
     }
-  ],
-  "env": {
-    "DJANGO_SETTINGS_MODULE": "config.settings"
-  }
+  ]
 }
