@@ -1,7 +1,7 @@
 {
   "version": 2,
   "framework": null,
-  "installCommand": "pip install -r requirements.txt --break-system-packages && python manage.py makemigrations --noinput && python manage.py migrate --noinput && python manage.py collectstatic --noinput",
+  "installCommand": "cp .env.example .env && pip install -r requirements.txt --break-system-packages && python manage.py makemigrations --noinput && python manage.py migrate --noinput && python manage.py collectstatic --noinput",
   "outputDirectory": "staticfiles",
   "env": {
     "DJANGO_SETTINGS_MODULE": "config.settings",
@@ -28,13 +28,6 @@
     {
       "src": "config/wsgi.py",
       "use": "@vercel/python"
-    },
-    {
-      "src": "setup_db.py",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "staticfiles"
-      }
     }
   ]
 }

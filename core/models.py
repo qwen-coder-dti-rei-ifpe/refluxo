@@ -1,11 +1,28 @@
 """
-Models do app core - Modelos de Estudante e Endereço.
+Models do app core - Modelos de Usuario, Estudante e Endereço.
 
 Este módulo contém os modelos fundamentais para o sistema de inscrições,
-incluindo dados do estudante e informações de endereço.
+incluindo usuário personalizado, dados do estudante e informações de endereço.
 """
 from django.db import models
 from django.core.validators import MinValueValidator
+from django.contrib.auth.models import AbstractUser
+
+
+class Usuario(AbstractUser):
+    """
+    Modelo de usuário personalizado para autenticação no sistema.
+    Estende o usuário padrão do Django com campos adicionais se necessário.
+    """
+    # Campos adicionais podem ser adicionados aqui conforme necessidade
+    cpf = models.CharField(max_length=14, blank=True, unique=True, verbose_name="CPF")
+    
+    class Meta:
+        verbose_name = "Usuário"
+        verbose_name_plural = "Usuários"
+
+    def __str__(self):
+        return self.username or self.email
 
 
 class Estudante(models.Model):
