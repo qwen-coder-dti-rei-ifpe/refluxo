@@ -18,6 +18,7 @@ class CustomLoginView(LoginView):
     """
     View personalizada para login com autopreenchimento de credenciais.
     Preenche automaticamente os campos com valores de demonstração.
+    Redireciona pedagogos para o dashboard do pedagogo.
     """
     form_class = LoginForm
     template_name = 'registration/login.html'
@@ -31,6 +32,16 @@ class CustomLoginView(LoginView):
         initial['username'] = '12345678900'
         initial['password'] = '123'
         return initial
+    
+    def get_success_url(self):
+        """
+        Redireciona usuários pedagogo para o dashboard do pedagogo.
+        Outros usuários vão para o admin ou URL padrão.
+        """
+        user = self.request.user
+        if hasattr(user, 'is_pedagogo') and user.is_pedagogo:
+            return '/pedagogo/dashboard/'
+        return super().get_success_url()
 
 
 def home_view(request):

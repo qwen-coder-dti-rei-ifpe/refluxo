@@ -85,7 +85,8 @@ DATABASES = {
         'PASSWORD': config('POSTGRES_PASSWORD', default='Zl6BfAU366Cu9Zoa'),
         'HOST': config('POSTGRES_HOST', default='aws-0-us-east-1.pooler.supabase.com'),
         'PORT': config('POSTGRES_PORT', default='5432'),
-        'CONN_MAX_AGE': 600,
+        'CONN_MAX_AGE': 0,
+        'CONN_HEALTH_CHECKS': True,
         'OPTIONS': {
             'sslmode': 'require',
         },
