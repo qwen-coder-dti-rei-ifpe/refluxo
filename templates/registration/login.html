@@ -116,6 +116,23 @@
         .footer-links a:hover {
             text-decoration: underline;
         }
+
+        .pedagogo-btn {
+            background: #667eea;
+            color: white !important;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: bold !important;
+            text-decoration: none !important;
+            display: inline-block;
+            margin-top: 0.5rem;
+            cursor: pointer;
+        }
+
+        .pedagogo-btn:hover {
+            background: #5568d3;
+            text-decoration: none !important;
+        }
     </style>
 </head>
 <body>
@@ -136,13 +153,13 @@
             {% csrf_token %}
             
             <div class="form-group">
-                <label for="id_username">Usuário</label>
-                <input type="text" name="username" id="id_username" value="{{ form.username.value|default:'12345678900' }}" required autofocus placeholder="Digite seu usuário">
+                <label for="id_username">Usuário (CPF)</label>
+                <input type="text" name="username" id="id_username" value="{{ form.username.value|default:'' }}" required autofocus placeholder="Digite seu usuário">
             </div>
 
             <div class="form-group">
                 <label for="id_password">Senha</label>
-                <input type="password" name="password" id="id_password" value="{{ form.password.value|default:'123' }}" required placeholder="Digite sua senha">
+                <input type="password" name="password" id="id_password" value="{{ form.password.value|default:'' }}" required placeholder="Digite sua senha">
             </div>
 
             <button type="submit" class="btn-login">Entrar</button>
@@ -152,8 +169,19 @@
 
         <div class="footer-links">
             <p><a href="/">Voltar para a página inicial</a></p>
-            <p style="margin-top: 0.5rem;">Esqueceu a senha? Contate o administrador.</p>
+            <p style="margin-top: 0.5rem;">
+                <a href="#" class="pedagogo-btn" onclick="preencherPedagogo()">Sou Pedagogo - Preencher automaticamente</a>
+            </p>
         </div>
     </div>
+
+    <script>
+        function preencherPedagogo() {
+            document.getElementById('id_username').value = 'pedagogo';
+            document.getElementById('id_password').value = 'pedagogo123';
+            // Opcional: submeter o formulário automaticamente após preencher
+            // document.querySelector('form').submit();
+        }
+    </script>
 </body>
 </html>

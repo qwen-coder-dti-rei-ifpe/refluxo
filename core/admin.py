@@ -1,10 +1,38 @@
 from django.contrib import admin
 from django.contrib.auth.models import User, Group
 from django.utils.html import format_html
-from .models import Estudante, Endereco
+from .models import Estudante, Endereco, Usuario
 
 # Desregistrar modelos padrão para limpar o admin
 admin.site.unregister(Group)
+
+@admin.register(Usuario)
+class UsuarioAdmin(admin.ModelAdmin):
+    list_display = ('username', 'email', 'is_pedagogo', 'is_staff', 'is_superuser', 'date_joined')
+    list_filter = ('is_pedagogo', 'is_staff', 'is_superuser', 'is_active')
+    search_fields = ('username', 'email', 'cpf')
+    readonly_fields = ('date_joined', 'last_login')
+    
+    fieldsets = (
+        ('Informações de Login', {
+            'fields': ('username', 'password', 'email', 'cpf')
+        }),
+        ('Permissões', {
+            'fields': ('is_pedagogo', 'is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')
+        }),
+        ('Datas Importantes', {
+            'fields': ('last_login', 'date_joined'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def save_model(self, request, obj, form, change):
+        """Criptografa a senha ao salvar"""
+        if not change:  # Se for novo usuário
+            from django.contrib.auth.hashers import make_password
+            obj.password = make_password(obj.password)
+        super().save_model(request, obj, form, change)
+
 
 @admin.register(Estudante)
 class EstudanteAdmin(admin.ModelAdmin):
@@ -86,9 +114,19 @@ class CustomAdminSite(admin.AdminSite):
         """Retorna lista de aplicações filtrada por grupo de usuário"""
         app_list = super().get_app_list(request)
         
-        # Se for superuser, mostra tudo
+        # Se for superuser ou pedagogo, mostra tudo
         if request.user.is_superuser:
             return app_list
+        
+        # Pedagogo pode ver inscrições e análises
+        if hasattr(request.user, 'is_pedagogo') and request.user.is_pedagogo:
+            # Filtra para mostrar apenas apps relevantes para pedagogo
+            filtered_apps = []
+            for app in app_list:
+                # Mostra Core (Estudante, Endereco) e Inscricoes
+                if app['name'] in ['Core', 'Inscricoes', 'Inscrições']:
+                    filtered_apps.append(app)
+            return filtered_apps if filtered_apps else app_list
         
         # Filtra baseado nos grupos do usuário
         if hasattr(request.user, 'groups'):
@@ -96,13 +134,17 @@ class CustomAdminSite(admin.AdminSite):
             
             # Pedagogo: vê apenas inscrições para avaliação
             if 'Pedagogo' in group_names:
-                app_list = [app for app in app_list if app['name'] == 'Core']
+                app_list = [app for app in app_list if app['name'] in ['Core', 'Inscricoes', 'Inscrições']]
             
             # Controlador: vê apenas editais e períodos
             elif 'Controlador' in group_names:
                 app_list = [app for app in app_list if app['name'] == 'Core']
         
         return app_list
+    
+    def has_permission(self, request):
+        """Permite que qualquer usuário logado acesse o admin"""
+        return request.user.is_active
 
 # Substituir o admin site padrão pelo customizado
 admin.site.__class__ = CustomAdminSite

@@ -83,9 +83,10 @@ DATABASES = {
         'NAME': config('POSTGRES_DATABASE', default='postgres'),
         'USER': config('POSTGRES_USER', default='postgres.xeodkrcoekfsonnwcuag'),
         'PASSWORD': config('POSTGRES_PASSWORD', default='Zl6BfAU366Cu9Zoa'),
-        'HOST': config('POSTGRES_HOST', default='db.xeodkrcoekfsonnwcuag.supabase.co'),
-        'PORT': config('POSTGRES_PORT', default='5432'),
-        'CONN_MAX_AGE': 600,
+        'HOST': config('POSTGRES_HOST', default='aws-0-us-east-1.pooler.supabase.com'),
+        'PORT': config('POSTGRES_PORT', default='6543'),  # Transaction mode pooler port
+        'CONN_MAX_AGE': 0,  # Close connections immediately after each request
+        'CONN_HEALTH_CHECKS': True,
         'OPTIONS': {
             'sslmode': 'require',
         },
@@ -93,7 +94,7 @@ DATABASES = {
 }
 
 # URL do banco de dados para compatibilidade com outras ferramentas
-DATABASE_URL = config('DATABASE_URL', default='postgres://postgres.xeodkrcoekfsonnwcuag:Zl6BfAU366Cu9Zoa@aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require')
+DATABASE_URL = config('DATABASE_URL', default='postgres://postgres.xeodkrcoekfsonnwcuag:Zl6BfAU366Cu9Zoa@aws-0-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require')
 
 # Validação de senhas do Django
 AUTH_PASSWORD_VALIDATORS = [
@@ -155,3 +156,8 @@ AUTHENTICATION_BACKENDS = [
 
 # Modelo de usuário personalizado
 AUTH_USER_MODEL = 'core.Usuario'
+
+# URL de redirecionamento após login
+LOGIN_REDIRECT_URL = 'pedagogo_dashboard'
+LOGIN_URL = 'login'
+LOGOUT_REDIRECT_URL = 'login'
