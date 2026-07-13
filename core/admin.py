@@ -1,10 +1,38 @@
 from django.contrib import admin
 from django.contrib.auth.models import User, Group
 from django.utils.html import format_html
-from .models import Estudante, Endereco
+from .models import Estudante, Endereco, Usuario
 
 # Desregistrar modelos padrão para limpar o admin
 admin.site.unregister(Group)
+
+@admin.register(Usuario)
+class UsuarioAdmin(admin.ModelAdmin):
+    list_display = ('username', 'email', 'is_pedagogo', 'is_staff', 'is_superuser', 'date_joined')
+    list_filter = ('is_pedagogo', 'is_staff', 'is_superuser', 'is_active')
+    search_fields = ('username', 'email', 'cpf')
+    readonly_fields = ('date_joined', 'last_login')
+    
+    fieldsets = (
+        ('Informações de Login', {
+            'fields': ('username', 'password', 'email', 'cpf')
+        }),
+        ('Permissões', {
+            'fields': ('is_pedagogo', 'is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')
+        }),
+        ('Datas Importantes', {
+            'fields': ('last_login', 'date_joined'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def save_model(self, request, obj, form, change):
+        """Criptografa a senha ao salvar"""
+        if not change:  # Se for novo usuário
+            from django.contrib.auth.hashers import make_password
+            obj.password = make_password(obj.password)
+        super().save_model(request, obj, form, change)
+
 
 @admin.register(Estudante)
 class EstudanteAdmin(admin.ModelAdmin):

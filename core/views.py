@@ -6,8 +6,9 @@ com estudantes e endereços, além de views personalizadas para login.
 """
 from rest_framework import viewsets, filters
 from django_filters.rest_framework import DjangoFilterBackend
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.views import LoginView
+from django.contrib.auth.decorators import login_required
 from .models import Estudante, Endereco
 from .serializers import EstudanteSerializer, EnderecoSerializer
 from .forms import LoginForm
@@ -37,6 +38,49 @@ def home_view(request):
     View para página inicial do programa.
     """
     return render(request, 'home.html')
+
+
+@login_required
+def pedagogo_dashboard_view(request):
+    """
+    View para dashboard do pedagogo - lista todos os períodos (editais) do programa.
+    Apenas usuários com is_pedagogo=True podem acessar.
+    """
+    # Verifica se o usuário é pedagogo
+    if not hasattr(request.user, 'is_pedagogo') or not request.user.is_pedagogo:
+        # Se não for pedagogo, redireciona para home ou mostra erro
+        return render(request, 'core/sem_permissao.html')
+    
+    from inscricoes.models import Edital
+    editais = Edital.objects.all().order_by('-criado_em')
+    
+    context = {
+        'editais': editais,
+    }
+    
+    return render(request, 'core/pedagogo_dashboard.html', context)
+
+
+@login_required
+def pedagogo_edital_detalhes_view(request, edital_id):
+    """
+    View para mostrar detalhes de um edital específico com todas as submissões dos estudantes.
+    Apenas usuários com is_pedagogo=True podem acessar.
+    """
+    # Verifica se o usuário é pedagogo
+    if not hasattr(request.user, 'is_pedagogo') or not request.user.is_pedagogo:
+        return render(request, 'core/sem_permissao.html')
+    
+    from inscricoes.models import Edital, Inscricao
+    edital = get_object_or_404(Edital, pk=edital_id)
+    inscricoes = Inscricao.objects.filter(edital=edital).select_related('estudante').order_by('-criado_em')
+    
+    context = {
+        'edital': edital,
+        'inscricoes': inscricoes,
+    }
+    
+    return render(request, 'core/pedagogo_edital_detalhes.html', context)
 
 
 def buscar_cpf_view(request):

@@ -19,7 +19,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-from core.views import home_view, buscar_cpf_view, CustomLoginView
+from core.views import home_view, buscar_cpf_view, CustomLoginView, pedagogo_dashboard_view, pedagogo_edital_detalhes_view
 
 urlpatterns = [
     # Página inicial do programa
@@ -30,6 +30,10 @@ urlpatterns = [
     
     # Login personalizado com autopreenchimento
     path('login/', CustomLoginView.as_view(), name='login'),
+    
+    # Área do Pedagogo
+    path('pedagogo/dashboard/', pedagogo_dashboard_view, name='pedagogo_dashboard'),
+    path('pedagogo/edital/<int:edital_id>/', pedagogo_edital_detalhes_view, name='pedagogo_edital_detalhes'),
     
     # Admin Django
     path('admin/', admin.site.urls),

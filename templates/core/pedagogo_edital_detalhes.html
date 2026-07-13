@@ -1,0 +1,98 @@
+{% extends 'admin/base_site.html' %}
+
+{% block title %}Submissões - {{ edital.numero }}{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">Submissões dos Estudantes - {{ edital.numero }}</h1>
+{% endblock %}
+
+{% block content %}
+<div style="max-width: 1400px; margin: 0 auto;">
+    <div style="background: white; border-radius: 8px; padding: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <div style="margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid #417690;">
+            <h2 style="color: #417690; margin-bottom: 0.5rem;">{{ edital.titulo }}</h2>
+            <p style="color: #666; margin: 0;">{{ edital.descricao|truncatewords:30 }}</p>
+            <p style="margin-top: 0.5rem;">
+                <strong>Status:</strong> 
+                <span style="padding: 4px 8px; border-radius: 4px; background: {% if edital.status == 'ATIVO' %}#4caf50{% elif edital.status == 'SUSPENSO' %}#ff9800{% else %}#f44336{% endif %}; color: white; font-size: 0.85rem;">
+                    {{ edital.get_status_display }}
+                </span>
+            </p>
+        </div>
+        
+        <div style="margin-bottom: 1.5rem;">
+            <a href="{% url 'pedagogo_dashboard' %}" 
+               style="display: inline-block; padding: 8px 16px; background: #f5f5f5; color: #333; text-decoration: none; border-radius: 4px; margin-right: 0.5rem;">
+                ← Voltar aos Períodos
+            </a>
+            <a href="/admin/" 
+               style="display: inline-block; padding: 8px 16px; background: #417690; color: white; text-decoration: none; border-radius: 4px;">
+                Admin
+            </a>
+        </div>
+        
+        <h3 style="color: #333; margin-bottom: 1rem;">
+            Total de Submissões: {{ inscricoes.count }}
+        </h3>
+        
+        {% if inscricoes %}
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem;">
+                    <thead>
+                        <tr style="background: #f5f5f5;">
+                            <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Estudante</th>
+                            <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Matrícula</th>
+                            <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Curso</th>
+                            <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Campus</th>
+                            <th style="padding: 12px; text-align: center; border-bottom: 2px solid #ddd;">Status</th>
+                            <th style="padding: 12px; text-align: center; border-bottom: 2px solid #ddd;">Classificação</th>
+                            <th style="padding: 12px; text-align: center; border-bottom: 2px solid #ddd;">Submetido em</th>
+                            <th style="padding: 12px; text-align: center; border-bottom: 2px solid #ddd;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inscricao in inscricoes %}
+                        <tr style="{% cycle '' 'background: #f9f9f9;' %}">
+                            <td style="padding: 12px; border-bottom: 1px solid #eee;">
+                                <strong>{{ inscricao.estudante.nome_completo }}</strong><br>
+                                <small style="color: #666;">CPF: {{ inscricao.estudante.cpf }}</small>
+                            </td>
+                            <td style="padding: 12px; border-bottom: 1px solid #eee;">{{ inscricao.estudante.matricula }}</td>
+                            <td style="padding: 12px; border-bottom: 1px solid #eee;">{{ inscricao.estudante.curso }}</td>
+                            <td style="padding: 12px; border-bottom: 1px solid #eee;">{{ inscricao.estudante.campus }}</td>
+                            <td style="padding: 12px; text-align: center; border-bottom: 1px solid #eee;">
+                                <span style="padding: 4px 8px; border-radius: 4px; background: {% if inscricao.status == 'SUBMETIDA' %}#2196f3{% elif inscricao.status == 'EM_ANALISE' %}#ff9800{% elif inscricao.status == 'DEFERIDA' %}#4caf50{% elif inscricao.status == 'INDEFERIDA' %}#f44336{% else %}#9e9e9e{% endif %}; color: white; font-size: 0.8rem;">
+                                    {{ inscricao.get_status_display }}
+                                </span>
+                            </td>
+                            <td style="padding: 12px; text-align: center; border-bottom: 1px solid #eee;">
+                                <span style="padding: 4px 8px; border-radius: 4px; background: {% if inscricao.classificacao == 'CONTEMPLADO' %}#4caf50{% elif inscricao.classificacao == 'ELEGIVEL' %}#8bc34a{% elif inscricao.classificacao == 'NAO_CONTEMPLADO' %}#f44336{% elif inscricao.classificacao == 'COM_PENDENCIA' %}#ff9800{% else %}#9e9e9e{% endif %}; color: white; font-size: 0.8rem;">
+                                    {{ inscricao.get_classificacao_display }}
+                                </span>
+                            </td>
+                            <td style="padding: 12px; text-align: center; border-bottom: 1px solid #eee;">
+                                {% if inscricao.submetida_em %}
+                                    {{ inscricao.submetida_em|date:"d/m/Y H:i" }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td style="padding: 12px; text-align: center; border-bottom: 1px solid #eee;">
+                                <a href="/admin/inscricoes/inscricao/{{ inscricao.id }}/change/" 
+                                   style="display: inline-block; padding: 6px 12px; background: #417690; color: white; text-decoration: none; border-radius: 4px; font-size: 0.85rem;">
+                                    Ver Detalhes
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p style="color: #666; padding: 3rem; text-align: center; background: #f9f9f9; border-radius: 8px;">
+                Nenhuma submissão encontrada para este período/edital.
+            </p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

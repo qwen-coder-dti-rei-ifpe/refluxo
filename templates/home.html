@@ -203,6 +203,9 @@
     <footer>
         <div class="footer-links">
             <a href="/admin/" class="footer-link admin">Administração</a>
+            {% if user.is_authenticated and user.is_pedagogo %}
+                <a href="{% url 'pedagogo_dashboard' %}" class="footer-link" style="background: #667eea; border-color: #667eea;">Área do Pedagogo</a>
+            {% endif %}
         </div>
         <p style="color: white; margin-top: 1.5rem; opacity: 0.8; font-size: 0.9rem;">
             &copy; {% now "Y" %} Programa de Apoio e Manutenção Acadêmica - Todos os direitos reservados
