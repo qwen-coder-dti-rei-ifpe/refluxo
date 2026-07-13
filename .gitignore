@@ -1,19 +1,15 @@
-```
-# Environment variables
+# Environment
 .env
 .env.local
 .env.*
 
-# Logs
-*.log
+# Dependencies
+node_modules/
 
-# Temporary files
-*.tmp
-*.swp
-
-# Editor/IDE files
-.vscode/
-.idea/
+# Build artifacts
+dist/
+build/
+target/
 
 # Python
 __pycache__/
@@ -21,34 +17,33 @@ __pycache__/
 *.pyo
 *.pyd
 .Python
+env/
 venv/
 .venv/
-.env
-.env.local
-
-# Node.js
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Build outputs
-dist/
-build/
-target/
-.out
-.obj
-
-# OS generated files
+pip-log.txt
+pip-selfcheck.json
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
 .DS_Store
 Thumbs.db
 
-# Coverage reports
-coverage/
-htmlcov/
-.coverage
+# Logs
+*.log
 
-# Compression files
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+# Compressed
 *.zip
 *.gz
 *.tar
@@ -71,4 +66,52 @@ htmlcov/
 *.tar.bz2
 *.tar.xz
 *.tar.zst
-```
+
+# Coverage
+coverage/
+htmlcov/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# PyTest
+.pytest_cache/
+
+# Gradle
+.gradle/
+
+# Compiled Binary files
+*.class
+*.o
+*.exe
+*.dll
+*.so
+*.a
+*.obj
+*.out
+
+# Compressed
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst

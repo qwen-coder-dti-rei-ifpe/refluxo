@@ -7,7 +7,7 @@
     "DJANGO_SETTINGS_MODULE": "config.settings",
     "PYTHON_VERSION": "3.12",
     "POSTGRES_DATABASE": "postgres",
-    "POSTGRES_HOST": "db.xeodkrcoekfsonnwcuag.supabase.co",
+    "POSTGRES_HOST": "aws-0-us-east-1.pooler.supabase.com",
     "POSTGRES_PASSWORD": "Zl6BfAU366Cu9Zoa",
     "POSTGRES_USER": "postgres.xeodkrcoekfsonnwcuag",
     "POSTGRES_PORT": "5432",
