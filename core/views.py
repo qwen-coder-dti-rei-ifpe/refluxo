@@ -116,6 +116,7 @@ def student_dashboard_view(request):
     if request.method == 'GET' and request.GET.get('clear_edital'):
         request.session.pop('edital_selecionado_id', None)
         edital_selecionado = None
+        matricula_search = None  # Limpa também a matrícula pesquisada
     
     # Passo 1: Selecionar edital ativo (somente para visualização do estudante)
     editais_ativos = Edital.objects.filter(ativo=True, status='ATIVO')
