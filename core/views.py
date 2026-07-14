@@ -99,7 +99,7 @@ def pedagogo_dashboard_view(request):
 def student_dashboard_view(request):
     """
     View para dashboard do estudante.
-    Permite ao estudante buscar por matrícula para preencher campos para submissão.
+    Primeiro o estudante deve selecionar um edital ativo, depois pode buscar por matrícula.
     """
     from inscricoes.models import Edital, Inscricao
     
@@ -108,25 +108,55 @@ def student_dashboard_view(request):
         return redirect('/dashboard/pedagogo/')
     
     matricula_search = None
-    edital_disponivel = None
+    edital_selecionado = None
     inscricao_existente = None
     message = None
     
+    # Verifica se deve limpar o edital selecionado (quando volta para seleção)
+    if request.method == 'GET' and request.GET.get('clear_edital'):
+        request.session.pop('edital_selecionado_id', None)
+        edital_selecionado = None
+        matricula_search = None  # Limpa também a matrícula pesquisada
+    
+    # Passo 1: Selecionar edital ativo (somente para visualização do estudante)
+    editais_ativos = Edital.objects.filter(ativo=True, status='ATIVO')
+    
     if request.method == 'POST':
-        matricula_search = request.POST.get('matricula', '').strip()
-        
-        if matricula_search:
-            # Buscar estudante pelo CPF (que é o username) e matrícula
-            try:
-                estudante = Estudante.objects.get(cpf=request.user.username, matricula=matricula_search)
-                
-                # Verificar se há edital ativo
-                edital_disponivel = Edital.objects.filter(ativo=True).first()
-                
-                if edital_disponivel:
-                    # Verificar se já existe inscrição
+        # Verifica se está limpando a seleção do edital
+        if request.POST.get('clear_edital'):
+            request.session.pop('edital_selecionado_id', None)
+            edital_selecionado = None
+        # Verifica se está selecionando um edital
+        elif 'edital_id' in request.POST:
+            edital_id = request.POST.get('edital_id')
+            if edital_id:
+                try:
+                    edital_selecionado = Edital.objects.get(id=edital_id, ativo=True, status='ATIVO')
+                    # Armazena o edital selecionado na sessão
+                    request.session['edital_selecionado_id'] = edital_id
+                    message = "Edital selecionado! Agora você pode buscar sua matrícula."
+                except Edital.DoesNotExist:
+                    message = "Edital não encontrado ou não está ativo."
+        # Verifica se está buscando por matrícula
+        elif 'matricula' in request.POST:
+            matricula_search = request.POST.get('matricula', '').strip()
+            
+            # Obtém o edital selecionado da sessão
+            edital_id = request.session.get('edital_selecionado_id')
+            if edital_id:
+                try:
+                    edital_selecionado = Edital.objects.get(id=edital_id, ativo=True, status='ATIVO')
+                except Edital.DoesNotExist:
+                    edital_selecionado = None
+            
+            if matricula_search and edital_selecionado:
+                # Buscar estudante pelo CPF (que é o username) e matrícula
+                try:
+                    estudante = Estudante.objects.get(cpf=request.user.username, matricula=matricula_search)
+                    
+                    # Verificar se já existe inscrição para este edital
                     inscricao_existente = Inscricao.objects.filter(
-                        edital=edital_disponivel,
+                        edital=edital_selecionado,
                         estudante=estudante
                     ).first()
                     
@@ -134,21 +164,31 @@ def student_dashboard_view(request):
                         message = "Você já possui uma submissão para este edital."
                     else:
                         message = "Matrícula encontrada! Preencha os dados abaixo para enviar sua submissão."
-                else:
-                    message = "Não há editais ativos no momento."
-                    
-            except Estudante.DoesNotExist:
-                message = "Matrícula não encontrada para o seu CPF."
+                        
+                except Estudante.DoesNotExist:
+                    message = "Matrícula não encontrada para o seu CPF."
+            elif not edital_selecionado:
+                message = "Por favor, selecione um edital ativo antes de buscar a matrícula."
     else:
-        # Tenta carregar automaticamente a matrícula do estudante logado
-        try:
-            estudante = Estudante.objects.get(cpf=request.user.username)
-            matricula_search = estudante.matricula
-            edital_disponivel = Edital.objects.filter(ativo=True).first()
-            
-            if edital_disponivel:
+        # Tenta carregar o edital selecionado da sessão
+        edital_id = request.session.get('edital_selecionado_id')
+        if edital_id:
+            try:
+                edital_selecionado = Edital.objects.get(id=edital_id, ativo=True, status='ATIVO')
+            except Edital.DoesNotExist:
+                # Se o edital não existe mais ou não está ativo, limpa a sessão
+                request.session.pop('edital_selecionado_id', None)
+                edital_selecionado = None
+        
+        # Se já tem edital selecionado, tenta carregar automaticamente a matrícula do estudante
+        if edital_selecionado:
+            try:
+                estudante = Estudante.objects.get(cpf=request.user.username)
+                matricula_search = estudante.matricula
+                
+                # Verificar se já existe inscrição
                 inscricao_existente = Inscricao.objects.filter(
-                    edital=edital_disponivel,
+                    edital=edital_selecionado,
                     estudante=estudante
                 ).first()
                 
@@ -156,12 +196,13 @@ def student_dashboard_view(request):
                     message = "Você já possui uma submissão para este edital."
                 else:
                     message = "Sua matrícula foi encontrada. Há um edital ativo disponível!"
-        except Estudante.DoesNotExist:
-            pass
+            except Estudante.DoesNotExist:
+                pass
     
     context = {
         'matricula_search': matricula_search,
-        'edital': edital_disponivel,
+        'edital': edital_selecionado,
+        'editais_ativos': editais_ativos,
         'inscricao': inscricao_existente,
         'message': message,
     }

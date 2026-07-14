@@ -202,8 +202,15 @@
         <section class="access-card">
             <h2>Área do Estudante</h2>
             <p style="color: #555; margin-bottom: 1.5rem;">Consulte o status da sua inscrição e acompanhe o processo de avaliação.</p>
-            <a href="{% url 'login' %}?next=/jornada-estudante/" class="access-button">Buscar por CPF</a>
+            <a href="{% url 'login' %}?next=/jornada-estudante/" class="access-button">Acessar</a>
         </section>
+
+        <!-- Back Button -->
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <a href="javascript:history.back()" class="footer-link" style="background: rgba(255,255,255,0.1);">
+                ← Voltar à página anterior
+            </a>
+        </div>
 
         <section class="info-section">
             <h2>Sobre o Programa</h2>
@@ -211,8 +218,6 @@
             
             <h3 style="color: #667eea; margin: 1.5rem 0 1rem 0;">Principais Benefícios:</h3>
             <ul>
-                <li><strong>Bolsa Permanência:</strong> Auxílio financeiro mensal para custeio de despesas básicas.</li>
-                <li><strong>Auxílio Moradia:</strong> Suporte para estudantes que residem fora de sua cidade de origem.</li>
                 <li><strong>Auxílio Alimentação:</strong> Complementação para despesas com alimentação no campus.</li>
                 <li><strong>Apoio Pedagógico:</strong> Acompanhamento acadêmico personalizado para melhoria do rendimento.</li>
                 <li><strong>Auxílio Transporte:</strong> Reembolso para deslocamento casa-universidade.</li>
