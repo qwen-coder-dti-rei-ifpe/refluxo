@@ -113,7 +113,7 @@ def student_dashboard_view(request):
     message = None
     
     # Passo 1: Selecionar edital ativo (somente para visualização do estudante)
-    editais_ativos = Edital.objects.filter(ativo=True)
+    editais_ativos = Edital.objects.filter(ativo=True, status='ATIVO')
     
     if request.method == 'POST':
         # Verifica se está selecionando um edital
@@ -121,7 +121,7 @@ def student_dashboard_view(request):
             edital_id = request.POST.get('edital_id')
             if edital_id:
                 try:
-                    edital_selecionado = Edital.objects.get(id=edital_id, ativo=True)
+                    edital_selecionado = Edital.objects.get(id=edital_id, ativo=True, status='ATIVO')
                     # Armazena o edital selecionado na sessão
                     request.session['edital_selecionado_id'] = edital_id
                     message = "Edital selecionado! Agora você pode buscar sua matrícula."
@@ -135,7 +135,7 @@ def student_dashboard_view(request):
             edital_id = request.session.get('edital_selecionado_id')
             if edital_id:
                 try:
-                    edital_selecionado = Edital.objects.get(id=edital_id, ativo=True)
+                    edital_selecionado = Edital.objects.get(id=edital_id, ativo=True, status='ATIVO')
                 except Edital.DoesNotExist:
                     edital_selecionado = None
             
@@ -164,7 +164,7 @@ def student_dashboard_view(request):
         edital_id = request.session.get('edital_selecionado_id')
         if edital_id:
             try:
-                edital_selecionado = Edital.objects.get(id=edital_id, ativo=True)
+                edital_selecionado = Edital.objects.get(id=edital_id, ativo=True, status='ATIVO')
             except Edital.DoesNotExist:
                 # Se o edital não existe mais ou não está ativo, limpa a sessão
                 request.session.pop('edital_selecionado_id', None)
