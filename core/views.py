@@ -112,12 +112,21 @@ def student_dashboard_view(request):
     inscricao_existente = None
     message = None
     
+    # Verifica se deve limpar o edital selecionado (quando volta para seleção)
+    if request.method == 'GET' and request.GET.get('clear_edital'):
+        request.session.pop('edital_selecionado_id', None)
+        edital_selecionado = None
+    
     # Passo 1: Selecionar edital ativo (somente para visualização do estudante)
     editais_ativos = Edital.objects.filter(ativo=True, status='ATIVO')
     
     if request.method == 'POST':
+        # Verifica se está limpando a seleção do edital
+        if request.POST.get('clear_edital'):
+            request.session.pop('edital_selecionado_id', None)
+            edital_selecionado = None
         # Verifica se está selecionando um edital
-        if 'edital_id' in request.POST:
+        elif 'edital_id' in request.POST:
             edital_id = request.POST.get('edital_id')
             if edital_id:
                 try:
@@ -168,6 +177,7 @@ def student_dashboard_view(request):
             except Edital.DoesNotExist:
                 # Se o edital não existe mais ou não está ativo, limpa a sessão
                 request.session.pop('edital_selecionado_id', None)
+                edital_selecionado = None
         
         # Se já tem edital selecionado, tenta carregar automaticamente a matrícula do estudante
         if edital_selecionado:
