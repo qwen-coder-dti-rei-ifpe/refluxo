@@ -27,11 +27,20 @@ class CustomLoginView(LoginView):
     def get_initial(self):
         """
         Retorna dados iniciais para autopreencher o formulário de login.
+        Verifica o parâmetro 'tipo' na URL para decidir quais credenciais usar.
         """
         initial = super().get_initial()
-        # Autopreenche com credenciais de demonstração
-        initial['username'] = '12345678900'
-        initial['password'] = '123'
+        tipo = self.request.GET.get('tipo', 'estudante')
+        
+        if tipo == 'pedagogo':
+            # Credenciais de teste para pedagogo
+            initial['username'] = 'pedagogo'
+            initial['password'] = 'pedagogo123'
+        else:
+            # Credenciais de teste para estudante
+            initial['username'] = '12345678900'
+            initial['password'] = '123'
+        
         return initial
     
     def get_success_url(self):
