@@ -18,6 +18,28 @@
             display: flex;
             flex-direction: column;
             color: #333;
+            position: relative;
+        }
+        
+        .pedagogo-top-link {
+            position: absolute;
+            top: 1.5rem;
+            right: 2rem;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            padding: 0.8rem 1.5rem;
+            border: 2px solid white;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: bold;
+            z-index: 100;
+        }
+        
+        .pedagogo-top-link:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
         }
         
         .container {
@@ -170,6 +192,7 @@
     </style>
 </head>
 <body>
+    <a href="{% url 'login' %}?next=/pedagogo/dashboard/" class="pedagogo-top-link">Área do Pedagogo</a>
     <div class="container">
         <header>
             <h1>Programa de Apoio e Manutenção Acadêmica</h1>
@@ -209,7 +232,6 @@
     <footer>
         <div class="footer-links">
             <a href="/admin/" class="footer-link admin">Administração</a>
-            <a href="{% url 'login' %}?next=/pedagogo/dashboard/" class="footer-link" style="background: #667eea; border-color: #667eea;">Área do Pedagogo</a>
         </div>
         <p style="color: white; margin-top: 1.5rem; opacity: 0.8; font-size: 0.9rem;">
             &copy; {% now "Y" %} Programa de Apoio e Manutenção Acadêmica - Todos os direitos reservados
