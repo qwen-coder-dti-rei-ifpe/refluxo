@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard do Estudante{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mb-4">Dashboard do Estudante</h2>
+            
+            {% if message %}
+            <div class="alert alert-info" role="alert">
+                {{ message }}
+            </div>
+            {% endif %}
+            
+            <!-- Formulário de busca por matrícula -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Buscar Matrícula</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-8">
+                                <label for="matricula" class="form-label">Número da Matrícula</label>
+                                <input type="text" class="form-control" id="matricula" name="matricula" 
+                                       value="{{ matricula_search|default:'' }}" placeholder="Digite sua matrícula" required>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">Buscar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Seção de Edital Ativo -->
+            {% if edital %}
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Edital Ativo: {{ edital.nome }}</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Descrição:</strong> {{ edital.descricao|default:"Sem descrição" }}</p>
+                    <p><strong>Data de Início:</strong> {{ edital.data_inicio|date:"d/m/Y" }}</p>
+                    <p><strong>Data de Fim:</strong> {{ edital.data_fim|date:"d/m/Y" }}</p>
+                    
+                    {% if inscricao %}
+                        <div class="alert alert-success">
+                            <strong>Você já se inscreveu neste edital!</strong>
+                            <p>Status: {{ inscricao.get_status_display|default:"Enviado" }}</p>
+                            <p>Data de inscrição: {{ inscricao.criado_em|date:"d/m/Y H:i" }}</p>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <strong>Atenção!</strong> Você ainda não se inscreveu neste edital.
+                        </div>
+                        <a href="{% url 'jornada_estudante' %}" class="btn btn-success">
+                            Preencher Submissão
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-warning" role="alert">
+                Não há editais ativos no momento. Verifique novamente mais tarde.
+            </div>
+            {% endif %}
+            
+            <!-- Informações do Estudante (se encontrado) -->
+            {% if matricula_search and not edital %}
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Sua Informação</h5>
+                </div>
+                <div class="card-body">
+                    <p>Matrícula pesquisada: <strong>{{ matricula_search }}</strong></p>
+                    <p>Para visualizar ou submeter documentos, aguarde a abertura de um novo edital.</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

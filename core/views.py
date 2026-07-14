@@ -46,21 +46,21 @@ class CustomLoginView(LoginView):
     def get_success_url(self):
         """
         Redireciona usuários para seus dashboards específicos baseados no tipo de usuário.
-        - Estudantes: redireciona para /jornada-estudante/ (página de matrícula)
-        - Pedagogos: redireciona para /pedagogo/dashboard/
+        - Estudantes: redireciona para /dashboard/student/
+        - Pedagogos: redireciona para /dashboard/pedagogo/
         - Outros: usa a URL padrão ou admin
         """
         user = self.request.user
         
         # Verifica se é pedagogo
         if hasattr(user, 'is_pedagogo') and user.is_pedagogo:
-            return '/pedagogo/dashboard/'
+            return '/dashboard/pedagogo/'
         
         # Verifica se é estudante (busca pelo CPF do usuário no modelo Estudante)
         from core.models import Estudante
         if hasattr(user, 'cpf') and user.cpf:
             if Estudante.objects.filter(cpf=user.cpf).exists():
-                return '/jornada-estudante/'
+                return '/dashboard/student/'
         
         # Caso contrário, usa a URL padrão do Django
         return super().get_success_url()
@@ -82,8 +82,8 @@ def pedagogo_dashboard_view(request):
     """
     # Verifica se o usuário é pedagogo
     if not hasattr(request.user, 'is_pedagogo') or not request.user.is_pedagogo:
-        # Se não for pedagogo, redireciona para home ou mostra erro
-        return render(request, 'core/sem_permissao.html')
+        # Se não for pedagogo, redireciona para dashboard do estudante
+        return redirect('/dashboard/student/')
     
     from inscricoes.models import Edital
     editais = Edital.objects.all().order_by('-criado_em')
@@ -93,6 +93,80 @@ def pedagogo_dashboard_view(request):
     }
     
     return render(request, 'core/pedagogo_dashboard.html', context)
+
+
+@login_required
+def student_dashboard_view(request):
+    """
+    View para dashboard do estudante.
+    Permite ao estudante buscar por matrícula para preencher campos para submissão.
+    """
+    from inscricoes.models import Edital, Inscricao
+    
+    # Verifica se é pedagogo, se for redireciona
+    if hasattr(request.user, 'is_pedagogo') and request.user.is_pedagogo:
+        return redirect('/dashboard/pedagogo/')
+    
+    matricula_search = None
+    edital_disponivel = None
+    inscricao_existente = None
+    message = None
+    
+    if request.method == 'POST':
+        matricula_search = request.POST.get('matricula', '').strip()
+        
+        if matricula_search:
+            # Buscar estudante pelo CPF (que é o username) e matrícula
+            try:
+                estudante = Estudante.objects.get(cpf=request.user.username, matricula=matricula_search)
+                
+                # Verificar se há edital ativo
+                edital_disponivel = Edital.objects.filter(ativo=True).first()
+                
+                if edital_disponivel:
+                    # Verificar se já existe inscrição
+                    inscricao_existente = Inscricao.objects.filter(
+                        edital=edital_disponivel,
+                        estudante=estudante
+                    ).first()
+                    
+                    if inscricao_existente:
+                        message = "Você já possui uma submissão para este edital."
+                    else:
+                        message = "Matrícula encontrada! Preencha os dados abaixo para enviar sua submissão."
+                else:
+                    message = "Não há editais ativos no momento."
+                    
+            except Estudante.DoesNotExist:
+                message = "Matrícula não encontrada para o seu CPF."
+    else:
+        # Tenta carregar automaticamente a matrícula do estudante logado
+        try:
+            estudante = Estudante.objects.get(cpf=request.user.username)
+            matricula_search = estudante.matricula
+            edital_disponivel = Edital.objects.filter(ativo=True).first()
+            
+            if edital_disponivel:
+                inscricao_existente = Inscricao.objects.filter(
+                    edital=edital_disponivel,
+                    estudante=estudante
+                ).first()
+                
+                if inscricao_existente:
+                    message = "Você já possui uma submissão para este edital."
+                else:
+                    message = "Sua matrícula foi encontrada. Há um edital ativo disponível!"
+        except Estudante.DoesNotExist:
+            pass
+    
+    context = {
+        'matricula_search': matricula_search,
+        'edital': edital_disponivel,
+        'inscricao': inscricao_existente,
+        'message': message,
+    }
+    
+    return render(request, 'dashboard/student.html', context)
 
 
 @login_required
