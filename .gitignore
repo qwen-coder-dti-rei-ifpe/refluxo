@@ -1,1 +1,1 @@
-Nothing needs to be added to the .gitignore file based on the provided changes. The only modified file is a template HTML file (`templates/dashboard/student.html`), which is a source file that should not be ignored.
+Nothing needs to be added to the .gitignore file since only a template file (templates/home.html) was modified and no build artifacts, dependencies, or temporary files were included in the changes.
