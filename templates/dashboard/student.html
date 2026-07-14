@@ -2,6 +2,15 @@
 
 {% block title %}Dashboard do Estudante{% endblock %}
 
+{% block extra_css %}
+<style>
+    body {
+        background: none !important;
+        background-color: #fff !important;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-5">
     <div class="row">
@@ -16,11 +25,6 @@
             
             <!-- Passo 1: Seleção de Edital Ativo -->
             <div class="card mb-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="javascript:history.back()" class="btn btn-outline-secondary btn-sm">
-                        ← Voltar
-                    </a>
-                </div>
                 <div class="card-header bg-success text-white">
                     <h5 class="mb-0">Passo 1: Selecione um Edital Ativo</h5>
                 </div>
@@ -60,11 +64,6 @@
             <!-- Passo 2: Busca por Matrícula (somente se edital selecionado) -->
             {% if edital %}
             <div class="card mb-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{% url 'student_dashboard' %}?clear_edital=1" class="btn btn-outline-secondary btn-sm">
-                        ← Voltar para Seleção de Edital
-                    </a>
-                </div>
                 <div class="card-header bg-success text-white">
                     <h5 class="mb-0">Passo 2: Buscar Matrícula</h5>
                 </div>
@@ -90,11 +89,6 @@
             <!-- Informações do Estudante (se encontrado) -->
             {% if matricula_search and not edital %}
             <div class="card">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{% url 'student_dashboard' %}" class="btn btn-outline-secondary btn-sm">
-                        ← Voltar para Seleção de Edital
-                    </a>
-                </div>
                 <div class="card-header bg-info text-white">
                     <h5 class="mb-0">Sua Informação</h5>
                 </div>
