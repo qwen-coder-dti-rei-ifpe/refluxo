@@ -45,12 +45,24 @@ class CustomLoginView(LoginView):
     
     def get_success_url(self):
         """
-        Redireciona usuários pedagogo para o dashboard do pedagogo.
-        Outros usuários vão para o admin ou URL padrão.
+        Redireciona usuários para seus dashboards específicos baseados no tipo de usuário.
+        - Estudantes: redireciona para /jornada-estudante/ (página de matrícula)
+        - Pedagogos: redireciona para /pedagogo/dashboard/
+        - Outros: usa a URL padrão ou admin
         """
         user = self.request.user
+        
+        # Verifica se é pedagogo
         if hasattr(user, 'is_pedagogo') and user.is_pedagogo:
             return '/pedagogo/dashboard/'
+        
+        # Verifica se é estudante (busca pelo CPF do usuário no modelo Estudante)
+        from core.models import Estudante
+        if hasattr(user, 'cpf') and user.cpf:
+            if Estudante.objects.filter(cpf=user.cpf).exists():
+                return '/jornada-estudante/'
+        
+        # Caso contrário, usa a URL padrão do Django
         return super().get_success_url()
 
 
