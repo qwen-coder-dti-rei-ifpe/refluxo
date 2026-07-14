@@ -76,7 +76,8 @@
                             <div class="col-md-8">
                                 <label for="matricula" class="form-label">Número da Matrícula</label>
                                 <input type="text" class="form-control" id="matricula" name="matricula" 
-                                       value="{{ matricula_search|default:'' }}" placeholder="Digite sua matrícula" required>
+                                       value="{{ matricula_search|default:'' }}" placeholder="Digite sua matrícula" required readonly>
+                                <small class="form-text text-muted">Sua matrícula é carregada automaticamente e não pode ser editada.</small>
                             </div>
                             <div class="col-md-4 d-flex align-items-end">
                                 <button type="submit" class="btn btn-primary w-100">Buscar</button>
