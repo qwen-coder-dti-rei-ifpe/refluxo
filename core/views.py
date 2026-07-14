@@ -162,8 +162,35 @@ def student_dashboard_view(request):
                     
                     if inscricao_existente:
                         message = "Você já possui uma submissão para este edital."
+                        # Redireciona para a jornada com dados preenchidos
+                        return redirect('jornada_estudante')
                     else:
                         message = "Matrícula encontrada! Preencha os dados abaixo para enviar sua submissão."
+                        # Armazena dados do estudante na sessão para autopreenchimento
+                        request.session['estudanteDados'] = {
+                            'nome_completo': estudante.nome_completo,
+                            'cpf': estudante.cpf,
+                            'idade': estudante.idade,
+                            'raca': estudante.raca,
+                            'sexo': estudante.sexo,
+                            'matricula': estudante.matricula,
+                            'campus': estudante.campus,
+                            'curso': estudante.curso,
+                            'turno': estudante.turno,
+                            'periodo': estudante.periodo,
+                            'eh_cotista': estudante.eh_cotista,
+                            'moradia_estudantil': estudante.moradia_estudantil,
+                        }
+                        # Se tiver endereço, armazena também
+                        if hasattr(estudante, 'endereco') and estudante.endereco:
+                            request.session['enderecoDados'] = {
+                                'cep': estudante.endereco.cep,
+                                'bairro': estudante.endereco.bairro,
+                                'cidade': estudante.endereco.cidade,
+                                'estado': estudante.endereco.estado,
+                            }
+                        # Redireciona para step 3 (jornada do estudante) com formulário autopreenchido
+                        return redirect('jornada_estudante')
                         
                 except Estudante.DoesNotExist:
                     message = "Matrícula não encontrada para o seu CPF."
@@ -237,7 +264,20 @@ def jornada_estudante_view(request):
     """
     View para o formulário de jornada do estudante.
     Permite ao estudante preencher seus dados em um fluxo contínuo.
+    Autopreenche os campos se houver dados na sessão (provenientes da busca por matrícula).
     """
+    # Verifica se há dados na sessão para autopreenchimento
+    initial_data = {}
+    if hasattr(request.session, 'get'):
+        estudante_dados = request.session.get('estudanteDados', {})
+        endereco_dados = request.session.get('enderecoDados', {})
+        
+        # Mescla os dados do estudante e endereço
+        if estudante_dados:
+            initial_data.update(estudante_dados)
+        if endereco_dados:
+            initial_data.update(endereco_dados)
+    
     if request.method == 'POST':
         form = JornadaForm(request.POST)
         if form.is_valid():
@@ -274,10 +314,15 @@ def jornada_estudante_view(request):
                 }
             )
             
+            # Limpar dados da sessão após salvar
+            request.session.pop('estudanteDados', None)
+            request.session.pop('enderecoDados', None)
+            
             messages.success(request, 'Jornada concluída com sucesso! Seus dados foram salvos.')
             return redirect('buscar_cpf')
     else:
-        form = JornadaForm()
+        # Usa dados iniciais da sessão se disponíveis
+        form = JornadaForm(initial=initial_data if initial_data else None)
     
     context = {
         'form': form,

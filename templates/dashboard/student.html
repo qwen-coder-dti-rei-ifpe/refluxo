@@ -65,13 +65,12 @@
                         ← Voltar para Seleção de Edital
                     </a>
                 </div>
-                <div class="card-header bg-primary text-white">
+                <div class="card-header bg-success text-white">
                     <h5 class="mb-0">Passo 2: Buscar Matrícula</h5>
                 </div>
                 <div class="card-body">
                     <form method="post">
                         {% csrf_token %}
-                        <input type="hidden" name="clear_edital" value="1">
                         <div class="row">
                             <div class="col-md-8">
                                 <label for="matricula" class="form-label">Número da Matrícula</label>
@@ -80,44 +79,10 @@
                                 <small class="form-text text-muted">Digite sua matrícula para buscar suas informações.</small>
                             </div>
                             <div class="col-md-4 d-flex align-items-end">
-                                <button type="submit" class="btn btn-primary w-100">Buscar</button>
+                                <button type="submit" class="btn btn-danger w-100">Buscar</button>
                             </div>
                         </div>
                     </form>
-                </div>
-            </div>
-            
-            <!-- Informações do Edital e Inscrição -->
-            <div class="card mb-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <a href="{% url 'student_dashboard' %}?clear_edital=1" class="btn btn-outline-secondary btn-sm">
-                        ← Voltar para Seleção de Edital
-                    </a>
-                </div>
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">Edital Ativo: {{ edital.numero }} - {{ edital.titulo }}</h5>
-                </div>
-                <div class="card-body">
-                    <p><strong>Descrição:</strong> {{ edital.descricao|default:"Sem descrição" }}</p>
-                    
-                    {% if inscricao %}
-                        <div class="alert alert-success">
-                            <strong>Você já se inscreveu neste edital!</strong>
-                            <p>Status: {{ inscricao.get_status_display|default:"Enviado" }}</p>
-                            <p>Data de inscrição: {{ inscricao.criado_em|date:"d/m/Y H:i" }}</p>
-                        </div>
-                    {% elif matricula_search %}
-                        <div class="alert alert-warning">
-                            <strong>Atenção!</strong> Você ainda não se inscreveu neste edital.
-                        </div>
-                        <a href="{% url 'jornada_estudante' %}" class="btn btn-success">
-                            Preencher Submissão
-                        </a>
-                    {% else %}
-                        <div class="alert alert-info">
-                            <strong>Informe sua matrícula</strong> para verificar sua situação neste edital.
-                        </div>
-                    {% endif %}
                 </div>
             </div>
             {% endif %}
