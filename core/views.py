@@ -112,7 +112,7 @@ def student_dashboard_view(request):
     inscricao_existente = None
     message = None
     
-    # Passo 1: Selecionar edital ativo
+    # Passo 1: Selecionar edital ativo (somente para visualização do estudante)
     editais_ativos = Edital.objects.filter(ativo=True)
     
     if request.method == 'POST':
