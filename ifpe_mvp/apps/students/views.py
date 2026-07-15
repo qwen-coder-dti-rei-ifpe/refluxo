@@ -15,6 +15,7 @@ def student_search(request):
     """
     form = StudentSearchForm(request.GET or None)
     student = None
+    period_ativo = None
     
     if request.GET and form.is_valid():
         tipo_busca = form.cleaned_data['tipo_busca']
@@ -26,8 +27,21 @@ def student_search(request):
             elif tipo_busca == 'CPF':
                 student = Student.objects.get(cpf=valor_busca)
             
-            # Redireciona para o dashboard do estudante encontrado
-            return redirect('student_detail', pk=student.pk)
+            # Redireciona para a página de cards (Step 3) para continuar a inscrição
+            # Primeiro precisamos encontrar o período de inscrição ativo
+            from enrollments.models import EnrollmentPeriod
+            from django.utils import timezone
+            period_ativo = EnrollmentPeriod.objects.filter(
+                ativo=True,
+                data_fim__gte=timezone.now()
+            ).order_by('-data_inicio').first()
+            
+            if period_ativo and student:
+                # Redireciona diretamente para o Step 3 (cards)
+                return redirect('enrollment_dashboard', pk=period_ativo.pk)
+            elif not period_ativo:
+                messages.info(request, 'Não há período de inscrição ativo no momento.')
+                return redirect('students:dashboard')
         except Student.DoesNotExist:
             messages.warning(request, 'Estudante não encontrado. Realize o cadastro.')
             return redirect('student_create')
@@ -35,6 +49,7 @@ def student_search(request):
     context = {
         'form': form,
         'student': student,
+        'period_ativo': period_ativo,
     }
     return render(request, 'students/student_search.html', context)
 

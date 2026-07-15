@@ -17,7 +17,7 @@ urlpatterns = [
     
     # Apps do projeto
     path('', include('apps.core.urls')),
-    path('students/', include('apps.students.urls')),
+    path('students/', include('apps.students.urls', namespace='students')),
     path('family/', include('apps.family.urls')),
     path('enrollments/', include('apps.enrollments.urls')),
     path('api/v1/', include('apps.api.urls')),

@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     'core',
     'integrations',
     'inscricoes',
+    'enrollments',
+    'students',
+    'family',
 ]
 
 # Middlewares processam requisições e respostas

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Editais - IFPE{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-file-alt"></i> Editais de Inscrição</h2>
+        <p class="text-muted">Períodos de inscrição para o Programa de Apoio e Manutenção Acadêmica</p>
+    </div>
+</div>
+
+{% if periods %}
+<div class="row g-4">
+    {% for period in periods %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 {% if period.esta_aberto %}border-success{% endif %}">
+            <div class="card-header {% if period.esta_aberto %}bg-success{% else %}bg-secondary{% endif %} text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>{{ period.titulo }}</span>
+                    {% if period.esta_aberto %}
+                        <span class="badge bg-light text-dark">ABERTO</span>
+                    {% else %}
+                        <span class="badge bg-light text-dark">FECHADO</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                <p>{{ period.descricao|truncatewords:20 }}</p>
+                <hr>
+                <p class="mb-2">
+                    <strong><i class="fas fa-calendar-alt"></i> Período:</strong><br>
+                    {{ period.data_inicio|date:"d/m/Y H:i" }} até<br>
+                    {{ period.data_fim|date:"d/m/Y H:i" }}
+                </p>
+                <p class="mb-2">
+                    <strong>Status:</strong> 
+                    <span class="badge {% if period.status == 'ABERTO' %}bg-success{% elif period.status == 'FECHADO' %}bg-danger{% else %}bg-warning{% endif %}">
+                        {{ period.get_status_display }}
+                    </span>
+                </p>
+            </div>
+            <div class="card-footer">
+                {% if period.esta_aberto %}
+                    <a href="{% url 'enrollment_dashboard' period.pk %}" class="btn btn-success w-100">
+                        <i class="fas fa-arrow-right"></i> Acessar Inscrição
+                    </a>
+                {% else %}
+                    <button class="btn btn-secondary w-100" disabled>
+                        <i class="fas fa-lock"></i> Inscrições Fechadas
+                    </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="fas fa-info-circle"></i>
+    Não há editais abertos no momento. Verifique novamente mais tarde.
+</div>
+{% endif %}
+{% endblock %}

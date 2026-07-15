@@ -1,0 +1,351 @@
+{% extends 'base.html' %}
+
+{% block title %}Dados de Membros Familiares - IFPE{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        min-height: 100vh;
+    }
+    
+    .form-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding: 2rem 0;
+    }
+    
+    .form-header h1 {
+        color: #27ae60;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+        padding: 2rem;
+    }
+    
+    .member-card {
+        background: #f7fafc;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #27ae60;
+    }
+    
+    .section-title {
+        color: #27ae60;
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1rem;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #4a5568;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .form-control, .form-select {
+        border: 2px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 0.75rem;
+        transition: border-color 0.3s;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-color: #27ae60;
+        box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+    }
+    
+    .btn-save {
+        background: linear-gradient(to right, #27ae60, #2ecc71);
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+    }
+    
+    .back-btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: white;
+        color: #27ae60;
+        border: 2px solid #27ae60;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s;
+        z-index: 1000;
+    }
+    
+    .back-btn:hover {
+        background: #27ae60;
+        color: white;
+    }
+    
+    .add-member-btn {
+        background: #27ae60;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .add-member-btn:hover {
+        background: #219a52;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<a href="{% url 'step3_cards' enrollment.pk %}" class="back-btn">
+    <i class="fas fa-arrow-left"></i> Voltar
+</a>
+
+<div class="container py-4">
+    <div class="form-header">
+        <h1><i class="fas fa-users"></i> Dados de Membros Familiares</h1>
+        <p>Cadastre todos os membros do seu grupo familiar</p>
+    </div>
+    
+    <div class="form-container">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- Lista de Membros -->
+            <div id="members-list">
+                {% for member in family_members %}
+                <div class="member-card">
+                    <h4 class="section-title">
+                        <i class="fas fa-user"></i> Membro {{ forloop.counter }}
+                    </h4>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="nome_{{ member.id }}">Nome *</label>
+                                <input type="text" class="form-control" id="nome_{{ member.id }}" 
+                                       name="membros[{{ forloop.counter0 }}][nome]" 
+                                       value="{{ member.nome|default:'' }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="cpf_{{ member.id }}">CPF *</label>
+                                <input type="text" class="form-control" id="cpf_{{ member.id }}" 
+                                       name="membros[{{ forloop.counter0 }}][cpf]" 
+                                       value="{{ member.cpf|default:'' }}" required placeholder="000.000.000-00">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="data_nascimento_{{ member.id }}">Data de Nascimento *</label>
+                                <input type="date" class="form-control" id="data_nascimento_{{ member.id }}" 
+                                       name="membros[{{ forloop.counter0 }}][data_nascimento]" 
+                                       value="{{ member.data_nascimento|date:'Y-m-d'|default:'' }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="idade_{{ member.id }}">Idade</label>
+                                <input type="number" class="form-control" id="idade_{{ member.id }}" 
+                                       name="membros[{{ forloop.counter0 }}][idade]" 
+                                       value="{{ member.idade|default:'' }}">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="grau_parentesco_{{ member.id }}">Grau de Parentesco *</label>
+                                <select class="form-select" id="grau_parentesco_{{ member.id }}" 
+                                        name="membros[{{ forloop.counter0 }}][grau_parentesco]" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="PAI" {% if member.grau_parentesco == 'PAI' %}selected{% endif %}>Pai</option>
+                                    <option value="MAE" {% if member.grau_parentesco == 'MAE' %}selected{% endif %}>Mãe</option>
+                                    <option value="IRMAO" {% if member.grau_parentesco == 'IRMAO' %}selected{% endif %}>Irmão(ã)</option>
+                                    <option value="AVO" {% if member.grau_parentesco == 'AVO' %}selected{% endif %}>Avô/Avó</option>
+                                    <option value="TIO" {% if member.grau_parentesco == 'TIO' %}selected{% endif %}>Tio(a)</option>
+                                    <option value="PRIMO" {% if member.grau_parentesco == 'PRIMO' %}selected{% endif %}>Primo(a)</option>
+                                    <option value="FILHO" {% if member.grau_parentesco == 'FILHO' %}selected{% endif %}>Filho(a)</option>
+                                    <option value="CONJUGE" {% if member.grau_parentesco == 'CONJUGE' %}selected{% endif %}>Cônjuge</option>
+                                    <option value="OUTRO" {% if member.grau_parentesco == 'OUTRO' %}selected{% endif %}>Outro</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label for="escolaridade_{{ member.id }}">Escolaridade</label>
+                                <select class="form-select" id="escolaridade_{{ member.id }}" 
+                                        name="membros[{{ forloop.counter0 }}][escolaridade]">
+                                    <option value="">Selecione...</option>
+                                    <option value="ANALFABETO" {% if member.escolaridade == 'ANALFABETO' %}selected{% endif %}>Analfabeto</option>
+                                    <option value="FUNDAMENTAL_INCOMPLETO" {% if member.escolaridade == 'FUNDAMENTAL_INCOMPLETO' %}selected{% endif %}>Ensino Fundamental incompleto</option>
+                                    <option value="FUNDAMENTAL_COMPLETO" {% if member.escolaridade == 'FUNDAMENTAL_COMPLETO' %}selected{% endif %}>Ensino Fundamental completo</option>
+                                    <option value="MEDIO_INCOMPLETO" {% if member.escolaridade == 'MEDIO_INCOMPLETO' %}selected{% endif %}>Ensino Médio incompleto</option>
+                                    <option value="MEDIO_COMPLETO" {% if member.escolaridade == 'MEDIO_COMPLETO' %}selected{% endif %}>Ensino Médio completo</option>
+                                    <option value="SUPERIOR_INCOMPLETO" {% if member.escolaridade == 'SUPERIOR_INCOMPLETO' %}selected{% endif %}>Ensino Superior incompleto</option>
+                                    <option value="SUPERIOR_COMPLETO" {% if member.escolaridade == 'SUPERIOR_COMPLETO' %}selected{% endif %}>Ensino Superior completo</option>
+                                    <option value="POS_GRADUACAO" {% if member.escolaridade == 'POS_GRADUACAO' %}selected{% endif %}>Pós-graduação</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="vinculo_empregaticio_{{ member.id }}">Vínculo Empregatício</label>
+                                <select class="form-select" id="vinculo_empregaticio_{{ member.id }}" 
+                                        name="membros[{{ forloop.counter0 }}][vinculo_empregaticio]">
+                                    <option value="">Selecione...</option>
+                                    <option value="CLT" {% if member.vinculo_empregaticio == 'CLT' %}selected{% endif %}>CLT</option>
+                                    <option value="AUTONOMO" {% if member.vinculo_empregaticio == 'AUTONOMO' %}selected{% endif %}>Autônomo</option>
+                                    <option value="EMPRESARIO" {% if member.vinculo_empregaticio == 'EMPRESARIO' %}selected{% endif %}>Empresário</option>
+                                    <option value="DESEMPREGADO" {% if member.vinculo_empregaticio == 'DESEMPREGADO' %}selected{% endif %}>Desempregado</option>
+                                    <option value="ESTUDANTE" {% if member.vinculo_empregaticio == 'ESTUDANTE' %}selected{% endif %}>Estudante</option>
+                                    <option value="APOSENTADO" {% if member.vinculo_empregaticio == 'APOSENTADO' %}selected{% endif %}>Aposentado</option>
+                                    <option value="PENSIONISTA" {% if member.vinculo_empregaticio == 'PENSIONISTA' %}selected{% endif %}>Pensionista</option>
+                                    <option value="OUTRO" {% if member.vinculo_empregaticio == 'OUTRO' %}selected{% endif %}>Outro</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="rendimento_mensal_{{ member.id }}">Rendimento Mensal (R$)</label>
+                                <input type="text" class="form-control" id="rendimento_mensal_{{ member.id }}" 
+                                       name="membros[{{ forloop.counter0 }}][rendimento_mensal]" 
+                                       value="{{ member.rendimento_mensal|default:'0.00' }}">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="cpf_anexo_{{ member.id }}">CPF Anexo</label>
+                                <input type="file" class="form-control" id="cpf_anexo_{{ member.id }}" 
+                                       name="membros[{{ forloop.counter0 }}][cpf_anexo]">
+                                {% if member.cpf_anexo %}
+                                    <small class="text-success"><i class="fas fa-check"></i> Arquivo enviado</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <div class="form-check mt-4">
+                                    <input class="form-check-input" type="checkbox" 
+                                           id="possui_agravo_saude_{{ member.id }}" 
+                                           name="membros[{{ forloop.counter0 }}][possui_agravo_saude]" 
+                                           {% if member.possui_agravo_saude %}checked{% endif %}>
+                                    <label class="form-check-label" for="possui_agravo_saude_{{ member.id }}">
+                                        Possui agravo de saúde?
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <div class="form-check mt-4">
+                                    <input class="form-check-input" type="checkbox" 
+                                           id="possui_necessidade_especifica_{{ member.id }}" 
+                                           name="membros[{{ forloop.counter0 }}][possui_necessidade_especifica]" 
+                                           {% if member.possui_necessidade_especifica %}checked{% endif %}>
+                                    <label class="form-check-label" for="possui_necessidade_especifica_{{ member.id }}">
+                                        Possui necessidade específica?
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Nenhum membro familiar cadastrado ainda. Adicione pelo menos um membro.
+                </div>
+                {% endfor %}
+            </div>
+            
+            <button type="button" class="add-member-btn mb-4" onclick="addMember()">
+                <i class="fas fa-plus"></i> Adicionar Novo Membro
+            </button>
+            
+            <!-- Botões de ação -->
+            <div class="text-center mt-4">
+                <a href="{% url 'step3_cards' enrollment.pk %}" class="btn btn-secondary me-3">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-save btn-lg">
+                    <i class="fas fa-save"></i> Salvar Dados
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+let memberCount = {{ family_members|length }};
+
+function addMember() {
+    const membersList = document.getElementById('members-list');
+    const newMemberHtml = `
+        <div class="member-card">
+            <h4 class="section-title">
+                <i class="fas fa-user"></i> Membro ${memberCount + 1}
+            </h4>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Nome *</label>
+                        <input type="text" class="form-control" name="membros[${memberCount}][nome]" required>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>CPF *</label>
+                        <input type="text" class="form-control" name="membros[${memberCount}][cpf]" required placeholder="000.000.000-00">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <label>Data de Nascimento *</label>
+                        <input type="date" class="form-control" name="membros[${memberCount}][data_nascimento]" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    membersList.insertAdjacentHTML('beforeend', newMemberHtml);
+    memberCount++;
+}
+</script>
+{% endblock %}
