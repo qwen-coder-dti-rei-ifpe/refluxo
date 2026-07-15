@@ -178,7 +178,7 @@
 {% endblock %}
 
 {% block content %}
-<a href="{% url 'enrollment_dashboard' period.pk %}" class="back-btn">
+<a href="{% url 'student_dashboard' %}" class="back-btn">
     <i class="fas fa-arrow-left"></i> Voltar
 </a>
 
@@ -300,7 +300,7 @@
     <!-- Botões de ação -->
     <div class="row mt-5">
         <div class="col-12 text-center">
-            <a href="{% url 'enrollment_dashboard' period.pk %}" class="btn btn-secondary btn-lg me-3">
+            <a href="{% url 'student_dashboard' %}" class="btn btn-secondary btn-lg me-3">
                 <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
             </a>
             {% if all_completed %}

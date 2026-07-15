@@ -169,7 +169,7 @@
 <div class="container py-4">
     <!-- Progress Indicator -->
     <div class="progress-indicator">
-        <a href="{% url 'enrollment_dashboard' period.pk %}" class="progress-step completed" title="Visão Geral">
+        <a href="{% url 'step3_cards' %}" class="progress-step completed" title="Visão Geral">
             <i class="fas fa-check"></i>
         </a>
         <div class="progress-line completed"></div>
@@ -486,13 +486,13 @@
             
             <!-- Botões de ação -->
             <div class="text-center mt-4">
-                <a href="{% url 'enrollment_dashboard' period.pk %}" class="btn btn-secondary me-3">
+                <a href="{% url 'step3_cards' %}" class="btn btn-secondary me-3">
                     <i class="fas fa-arrow-left"></i> Voltar
                 </a>
                 <button type="submit" class="btn btn-save btn-lg me-3">
                     <i class="fas fa-save"></i> Salvar e Próximo
                 </button>
-                <a href="{% url 'address_data_form' period.pk %}" class="btn btn-success">
+                <a href="{% url 'address_data_form' enrollment.pk %}" class="btn btn-success">
                     <i class="fas fa-arrow-right"></i> Próximo: Endereço
                 </a>
             </div>
