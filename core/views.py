@@ -254,7 +254,7 @@ def step3_cards_view(request):
     
     try:
         edital = Edital.objects.get(id=edital_id, ativo=True, status='ATIVO')
-        # Redireciona para o enrollment_dashboard usando o ID do edital como pk
+        # Redireciona para a URL de cards do enrollments usando o ID do edital como pk
         return redirect('enrollment_dashboard', pk=edital_id)
     except Edital.DoesNotExist:
         request.session.pop('edital_selecionado_id', None)

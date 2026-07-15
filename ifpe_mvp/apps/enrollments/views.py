@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from .models import EnrollmentPeriod, Enrollment
-from students.models import Student
+from ifpe_mvp.apps.students.models import Student
 
 
 def enrollment_period_list(request):
@@ -23,7 +23,26 @@ def enrollment_period_list(request):
 @login_required
 def enrollment_dashboard(request, pk):
     """Dashboard com blocos dos eixos para atualização da inscrição (Step 3 - Cards)."""
-    period = get_object_or_404(EnrollmentPeriod, pk=pk)
+    from inscricoes.models import Edital
+    
+    # Tenta obter como EnrollmentPeriod primeiro, senão tenta como Edital
+    try:
+        period = EnrollmentPeriod.objects.get(pk=pk)
+    except EnrollmentPeriod.DoesNotExist:
+        # Se não encontrar EnrollmentPeriod, tenta buscar como Edital
+        edital = get_object_or_404(Edital, pk=pk)
+        # Cria ou obtém um EnrollmentPeriod correspondente ao Edital
+        period, created = EnrollmentPeriod.objects.get_or_create(
+            pk=pk,
+            defaults={
+                'titulo': edital.titulo,
+                'descricao': edital.descricao or '',
+                'data_inicio': edital.data_inicio or timezone.now(),
+                'data_fim': edital.data_fim or (edital.data_inicio + timezone.timedelta(days=30)) if edital.data_inicio else timezone.now() + timezone.timedelta(days=30),
+                'status': 'ABERTO' if edital.status == 'ATIVO' else 'FECHADO',
+                'ativo': edital.ativo,
+            }
+        )
     
     # Verifica se o período está aberto
     if not period.esta_aberto():
