@@ -48,12 +48,19 @@ def enrollment_dashboard(request, pk):
     if not period.esta_aberto():
         messages.warning(request, 'Este período de inscrição está fechado.')
     
-    # Tenta obter a inscrição existente do usuário
+    # Obtém ou cria o estudante e a inscrição
     try:
         student = request.user.student
-        enrollment = Enrollment.objects.get(student=student, enrollment_period=period)
-    except (Student.DoesNotExist, Enrollment.DoesNotExist):
-        enrollment = None
+    except Student.DoesNotExist:
+        messages.error(request, 'Você precisa cadastrar seus dados de estudante primeiro.')
+        return redirect('student_create')
+    
+    # Obtém ou cria a inscrição
+    enrollment, created = Enrollment.objects.get_or_create(
+        student=student,
+        enrollment_period=period,
+        defaults={'status': 'RASCUNHO'}
+    )
     
     context = {
         'period': period,
