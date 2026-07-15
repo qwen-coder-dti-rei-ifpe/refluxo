@@ -1,0 +1,447 @@
+{% extends 'base.html' %}
+
+{% block title %}Passo 5: Dados de Endereço - IFPE{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        min-height: 100vh;
+    }
+    
+    .progress-indicator {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+    }
+    
+    .progress-step {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .progress-step.active {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: white;
+    }
+    
+    .progress-step.completed {
+        background: #27ae60;
+        color: white;
+    }
+    
+    .progress-step.pending {
+        background: #e2e8f0;
+        color: #718096;
+    }
+    
+    .progress-step:hover {
+        transform: scale(1.1);
+    }
+    
+    .progress-line {
+        width: 60px;
+        height: 3px;
+        background: #e2e8f0;
+        border-radius: 2px;
+    }
+    
+    .progress-line.completed {
+        background: #27ae60;
+    }
+    
+    .form-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding: 2rem 0;
+    }
+    
+    .form-header h1 {
+        color: #27ae60;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+        padding: 2rem;
+    }
+    
+    .form-section {
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .form-section:last-child {
+        border-bottom: none;
+    }
+    
+    .section-title {
+        color: #27ae60;
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #4a5568;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .form-control, .form-select {
+        border: 2px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 0.75rem;
+        transition: border-color 0.3s;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-color: #27ae60;
+        box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+    }
+    
+    .btn-save {
+        background: linear-gradient(to right, #27ae60, #2ecc71);
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+    }
+    
+    .back-btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: white;
+        color: #27ae60;
+        border: 2px solid #27ae60;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s;
+        z-index: 1000;
+    }
+    
+    .back-btn:hover {
+        background: #27ae60;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Progress Indicator -->
+    <div class="progress-indicator">
+        <a href="{% url 'step3_cards' %}" class="progress-step completed" title="Visão Geral">
+            <i class="fas fa-check"></i>
+        </a>
+        <div class="progress-line {% if enrollment.student %}completed{% endif %}"></div>
+        <a href="{% url 'student_data_form' enrollment.pk %}" class="progress-step {% if enrollment.student %}completed{% else %}pending{% endif %}" title="Dados do Estudante">4</a>
+        <div class="progress-line completed"></div>
+        <a href="{% url 'address_data_form' enrollment.pk %}" class="progress-step active" title="Dados de Endereço">5</a>
+        <div class="progress-line"></div>
+        <a href="{% url 'family_members_form' enrollment.pk %}" class="progress-step pending" title="Membros Familiares">6</a>
+        <div class="progress-line"></div>
+        <a href="{% url 'displacement_data_form' enrollment.pk %}" class="progress-step pending" title="Deslocamento">7</a>
+        <div class="progress-line"></div>
+        <a href="{% url 'enrollment_data_form' enrollment.pk %}" class="progress-step pending" title="Inscrição">8</a>
+    </div>
+
+    <div class="form-header">
+        <h1><i class="fas fa-home"></i> Passo 5: Dados de Endereço</h1>
+        <p>Preencha todas as informações residenciais e condições de moradia</p>
+    </div>
+    
+    <div class="form-container">
+        <form method="post">
+            {% csrf_token %}
+            
+            <!-- Endereço Básico -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fas fa-map-marker-alt"></i> Endereço Básico</h3>
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="cep">CEP *</label>
+                            <input type="text" class="form-control" id="cep" name="cep" 
+                                   value="{{ address.cep|default:'' }}" required placeholder="00000-000">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label for="bairro">Bairro *</label>
+                            <input type="text" class="form-control" id="bairro" name="bairro" 
+                                   value="{{ address.bairro|default:'' }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="cidade">Cidade *</label>
+                            <input type="text" class="form-control" id="cidade" name="cidade" 
+                                   value="{{ address.cidade|default:'' }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="estado">Estado *</label>
+                            <select class="form-select" id="estado" name="estado" required>
+                                <option value="">UF</option>
+                                <option value="AC" {% if address.estado == 'AC' %}selected{% endif %}>AC</option>
+                                <option value="AL" {% if address.estado == 'AL' %}selected{% endif %}>AL</option>
+                                <option value="AP" {% if address.estado == 'AP' %}selected{% endif %}>AP</option>
+                                <option value="AM" {% if address.estado == 'AM' %}selected{% endif %}>AM</option>
+                                <option value="BA" {% if address.estado == 'BA' %}selected{% endif %}>BA</option>
+                                <option value="CE" {% if address.estado == 'CE' %}selected{% endif %}>CE</option>
+                                <option value="DF" {% if address.estado == 'DF' %}selected{% endif %}>DF</option>
+                                <option value="ES" {% if address.estado == 'ES' %}selected{% endif %}>ES</option>
+                                <option value="GO" {% if address.estado == 'GO' %}selected{% endif %}>GO</option>
+                                <option value="MA" {% if address.estado == 'MA' %}selected{% endif %}>MA</option>
+                                <option value="MT" {% if address.estado == 'MT' %}selected{% endif %}>MT</option>
+                                <option value="MS" {% if address.estado == 'MS' %}selected{% endif %}>MS</option>
+                                <option value="MG" {% if address.estado == 'MG' %}selected{% endif %}>MG</option>
+                                <option value="PA" {% if address.estado == 'PA' %}selected{% endif %}>PA</option>
+                                <option value="PB" {% if address.estado == 'PB' %}selected{% endif %}>PB</option>
+                                <option value="PR" {% if address.estado == 'PR' %}selected{% endif %}>PR</option>
+                                <option value="PE" {% if address.estado == 'PE' %}selected{% endif %}>PE</option>
+                                <option value="PI" {% if address.estado == 'PI' %}selected{% endif %}>PI</option>
+                                <option value="RJ" {% if address.estado == 'RJ' %}selected{% endif %}>RJ</option>
+                                <option value="RN" {% if address.estado == 'RN' %}selected{% endif %}>RN</option>
+                                <option value="RS" {% if address.estado == 'RS' %}selected{% endif %}>RS</option>
+                                <option value="RO" {% if address.estado == 'RO' %}selected{% endif %}>RO</option>
+                                <option value="RR" {% if address.estado == 'RR' %}selected{% endif %}>RR</option>
+                                <option value="SC" {% if address.estado == 'SC' %}selected{% endif %}>SC</option>
+                                <option value="SP" {% if address.estado == 'SP' %}selected{% endif %}>SP</option>
+                                <option value="SE" {% if address.estado == 'SE' %}selected{% endif %}>SE</option>
+                                <option value="TO" {% if address.estado == 'TO' %}selected{% endif %}>TO</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="endereco_completo">Endereço Completo (Rua, Número, Complemento)</label>
+                            <textarea class="form-control" id="endereco_completo" name="endereco_completo" rows="2">{{ address.endereco_completo|default:'' }}</textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="ponto_referencia">Ponto de Referência</label>
+                            <input type="text" class="form-control" id="ponto_referencia" name="ponto_referencia" 
+                                   value="{{ address.ponto_referencia|default:'' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="horario_visita">Horário de Visita</label>
+                            <input type="text" class="form-control" id="horario_visita" name="horario_visita" 
+                                   value="{{ address.horario_visita|default:'' }}" placeholder="Ex: Manhã, Tarde, Noite">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Informações da Moradia -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fas fa-house-user"></i> Informações da Moradia</h3>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="telefone_celular">Telefone Celular</label>
+                            <input type="text" class="form-control" id="telefone_celular" name="telefone_celular" 
+                                   value="{{ address.telefone_celular|default:'' }}" placeholder="(00) 00000-0000">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="procurar_pessoa">Procurar por pessoa que more no endereço</label>
+                            <input type="text" class="form-control" id="procurar_pessoa" name="procurar_pessoa" 
+                                   value="{{ address.procurar_pessoa|default:'' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="com_que_mora">Com que você mora</label>
+                            <input type="text" class="form-control" id="com_que_mora" name="com_que_mora" 
+                                   value="{{ address.com_que_mora|default:'' }}" placeholder="Ex: Pais, irmãos, sozinho, etc.">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="condicoes_moradia">Condições de Moradia Familiar</label>
+                            <select class="form-select" id="condicoes_moradia" name="condicoes_moradia">
+                                <option value="">Selecione...</option>
+                                <option value="PROPRIA" {% if address.condicoes_moradia == 'PROPRIA' %}selected{% endif %}>Própria</option>
+                                <option value="ALUGADA" {% if address.condicoes_moradia == 'ALUGADA' %}selected{% endif %}>Alugada</option>
+                                <option value="CEDIDA" {% if address.condicoes_moradia == 'CEDIDA' %}selected{% endif %}>Cedida</option>
+                                <option value="OCUPACAO" {% if address.condicoes_moradia == 'OCUPACAO' %}selected{% endif %}>Ocupação</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="regiao_moradia">Região da Moradia</label>
+                            <select class="form-select" id="regiao_moradia" name="regiao_moradia">
+                                <option value="">Selecione...</option>
+                                <option value="URBANA" {% if address.regiao_moradia == 'URBANA' %}selected{% endif %}>Urbana</option>
+                                <option value="RURAL" {% if address.regiao_moradia == 'RURAL' %}selected{% endif %}>Rural</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="abastecimento_agua">Abastecimento de Água</label>
+                            <select class="form-select" id="abastecimento_agua" name="abastecimento_agua">
+                                <option value="">Selecione...</option>
+                                <option value="REDE_GERAL" {% if address.abastecimento_agua == 'REDE_GERAL' %}selected{% endif %}>Rede geral</option>
+                                <option value="POCO_ARTESIANO" {% if address.abastecimento_agua == 'POCO_ARTESIANO' %}selected{% endif %}>Poço artesiano</option>
+                                <option value="CACIMBA" {% if address.abastecimento_agua == 'CACIMBA' %}selected{% endif %}>Cacimba</option>
+                                <option value="RIO_LAGOA" {% if address.abastecimento_agua == 'RIO_LAGOA' %}selected{% endif %}>Rio ou lagoa</option>
+                                <option value="OUTRO" {% if address.abastecimento_agua == 'OUTRO' %}selected{% endif %}>Outro</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="material_construcao">Material de Construção</label>
+                            <select class="form-select" id="material_construcao" name="material_construcao">
+                                <option value="">Selecione...</option>
+                                <option value="ALVENARIA" {% if address.material_construcao == 'ALVENARIA' %}selected{% endif %}>Alvenaria/tijolo</option>
+                                <option value="MADEIRA" {% if address.material_construcao == 'MADEIRA' %}selected{% endif %}>Madeira</option>
+                                <option value="MISTA" {% if address.material_construcao == 'MISTA' %}selected{% endif %}>Mista</option>
+                                <option value="TAIPA" {% if address.material_construcao == 'TAIPA' %}selected{% endif %}>Taipa</option>
+                                <option value="OUTRO" {% if address.material_construcao == 'OUTRO' %}selected{% endif %}>Outro</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="saneamento">Saneamento</label>
+                            <select class="form-select" id="saneamento" name="saneamento">
+                                <option value="">Selecione...</option>
+                                <option value="REDE_GERAL" {% if address.saneamento == 'REDE_GERAL' %}selected{% endif %}>Rede geral de esgoto</option>
+                                <option value="FOSSA_SEPTICA" {% if address.saneamento == 'FOSSA_SEPTICA' %}selected{% endif %}>Fossa séptica</option>
+                                <option value="FOSSA_RUDIMENTAR" {% if address.saneamento == 'FOSSA_RUDIMENTAR' %}selected{% endif %}>Fossa rudimentar</option>
+                                <option value="A_CEU_ABERTO" {% if address.saneamento == 'A_CEU_ABERTO' %}selected{% endif %}>A céu aberto</option>
+                                <option value="OUTRO" {% if address.saneamento == 'OUTRO' %}selected{% endif %}>Outro</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contato de Referência -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fas fa-address-book"></i> Contato de Referência</h3>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="contato_referencia_nome">Nome do Contato de Referência</label>
+                            <input type="text" class="form-control" id="contato_referencia_nome" name="contato_referencia_nome" 
+                                   value="{{ address.contato_referencia_nome|default:'' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="contato_referencia_telefone">Telefone do Contato</label>
+                            <input type="text" class="form-control" id="contato_referencia_telefone" name="contato_referencia_telefone" 
+                                   value="{{ address.contato_referencia_telefone|default:'' }}" placeholder="(00) 00000-0000">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mudança para Estudar -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fas fa-truck-moving"></i> Mudança para Estudar</h3>
+                
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="mudou_endereco_estudar" name="mudou_endereco_estudar" 
+                                       {% if address.mudou_endereco_estudar %}checked{% endif %}>
+                                <label class="form-check-label" for="mudou_endereco_estudar">
+                                    Mudou do endereço para estudar no IFPE?
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="endereco_anterior">Endereço Anterior</label>
+                            <textarea class="form-control" id="endereco_anterior" name="endereco_anterior" rows="3">{{ address.endereco_anterior|default:'' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botões de ação -->
+            <div class="text-center mt-4">
+                <a href="{% url 'student_data_form' enrollment.pk %}" class="btn btn-secondary me-3">
+                    <i class="fas fa-arrow-left"></i> Voltar: Estudante
+                </a>
+                <a href="{% url 'family_members_form' enrollment.pk %}" class="btn btn-success me-3">
+                    <i class="fas fa-arrow-right"></i> Próximo: Família
+                </a>
+                <button type="submit" class="btn btn-save btn-lg">
+                    <i class="fas fa-save"></i> Salvar Dados
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

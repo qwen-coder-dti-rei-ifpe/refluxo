@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard de Inscrição - IFPE{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="fas fa-clipboard-list"></i> {{ period.titulo }}</h2>
+        <p class="text-muted">{{ period.descricao }}</p>
+        
+        {% if can_edit %}
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                Inscrições abertas até {{ period.data_fim|date:"d/m/Y H:i" }}
+            </div>
+        {% else %}
+            <div class="alert alert-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                Este período de inscrição está fechado.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Dashboard com blocos dos eixos -->
+<div class="row g-4">
+    <!-- Eixo 1: Informações do Estudante -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100">
+            <div class="card-header text-center">
+                <i class="fas fa-user-graduate fa-2x mb-2"></i>
+                <h5>Informações do Estudante</h5>
+            </div>
+            <div class="card-body text-center">
+                <p class="text-muted">Dados pessoais, acadêmicos e bancários</p>
+                {% if enrollment and can_edit %}
+                    <a href="{% url 'student_update' enrollment.student.pk %}" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                {% elif enrollment %}
+                    <button class="btn btn-secondary" disabled>
+                        <i class="fas fa-lock"></i> Bloqueado
+                    </button>
+                {% else %}
+                    <span class="text-muted">Não preenchido</span>
+                {% endif %}
+            </div>
+            {% if enrollment %}
+            <div class="card-footer">
+                <small>Status: 
+                    {% if enrollment.student %}
+                        <span class="text-success"><i class="fas fa-check"></i> Preenchido</span>
+                    {% else %}
+                        <span class="text-danger"><i class="fas fa-times"></i> Pendente</span>
+                    {% endif %}
+                </small>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Eixo 2: Informações de Endereço -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100">
+            <div class="card-header text-center">
+                <i class="fas fa-home fa-2x mb-2"></i>
+                <h5>Endereço</h5>
+            </div>
+            <div class="card-body text-center">
+                <p class="text-muted">Dados residenciais e condições de moradia</p>
+                {% if can_edit %}
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addressModal">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                {% else %}
+                    <button class="btn btn-secondary" disabled>
+                        <i class="fas fa-lock"></i> Bloqueado
+                    </button>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <small>Status: 
+                    {% if enrollment and enrollment.address %}
+                        <span class="text-success"><i class="fas fa-check"></i> Preenchido</span>
+                    {% else %}
+                        <span class="text-danger"><i class="fas fa-times"></i> Pendente</span>
+                    {% endif %}
+                </small>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Eixo 3: Informações Familiares -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100">
+            <div class="card-header text-center">
+                <i class="fas fa-users fa-2x mb-2"></i>
+                <h5>Grupo Familiar</h5>
+            </div>
+            <div class="card-body text-center">
+                <p class="text-muted">Membros da família e renda familiar</p>
+                {% if can_edit %}
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#familyModal">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                {% else %}
+                    <button class="btn btn-secondary" disabled>
+                        <i class="fas fa-lock"></i> Bloqueado
+                    </button>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <small>Status: 
+                    {% if enrollment %}
+                        <span class="text-success"><i class="fas fa-check"></i> Preenchido</span>
+                    {% else %}
+                        <span class="text-danger"><i class="fas fa-times"></i> Pendente</span>
+                    {% endif %}
+                </small>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Eixo 4: Informações de Inscrição -->
+    <div class="col-md-6 col-lg-3">
+        <div class="card h-100">
+            <div class="card-header text-center">
+                <i class="fas fa-file-signature fa-2x mb-2"></i>
+                <h5>Inscrição</h5>
+            </div>
+            <div class="card-body text-center">
+                <p class="text-muted">Dados socioeconômicos e declaração</p>
+                {% if enrollment and can_edit %}
+                    <a href="{% url 'enrollment_update' enrollment.pk %}" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                {% elif enrollment %}
+                    <button class="btn btn-secondary" disabled>
+                        <i class="fas fa-lock"></i> Bloqueado
+                    </button>
+                {% else %}
+                    <a href="{% url 'enrollment_create' period.pk %}" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Criar
+                    </a>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <small>Status: 
+                    {% if enrollment %}
+                        <span class="badge bg-{% if enrollment.status == 'SUBMETIDA' %}success{% elif enrollment.status == 'EM_ANALISE' %}warning{% else %}secondary{% endif %}">
+                            {{ enrollment.get_status_display }}
+                        </span>
+                    {% else %}
+                        <span class="text-danger"><i class="fas fa-times"></i> Não iniciada</span>
+                    {% endif %}
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Botões de ação -->
+{% if enrollment and can_edit %}
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{% url 'enrollment_submit' enrollment.pk %}" class="btn btn-success btn-lg">
+            <i class="fas fa-paper-plane"></i> Submeter Inscrição
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

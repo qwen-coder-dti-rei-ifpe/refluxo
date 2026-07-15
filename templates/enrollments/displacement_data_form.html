@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block title %}Dados de Deslocamento - IFPE{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        min-height: 100vh;
+    }
+    
+    .form-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding: 2rem 0;
+    }
+    
+    .form-header h1 {
+        color: #27ae60;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+        padding: 2rem;
+    }
+    
+    .form-section {
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .form-section:last-child {
+        border-bottom: none;
+    }
+    
+    .section-title {
+        color: #27ae60;
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #4a5568;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .form-control, .form-select {
+        border: 2px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 0.75rem;
+        transition: border-color 0.3s;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-color: #27ae60;
+        box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+    }
+    
+    .btn-save {
+        background: linear-gradient(to right, #27ae60, #2ecc71);
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+    }
+    
+    .back-btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: white;
+        color: #27ae60;
+        border: 2px solid #27ae60;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s;
+        z-index: 1000;
+    }
+    
+    .back-btn:hover {
+        background: #27ae60;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<a href="{% url 'step3_cards' enrollment.pk %}" class="back-btn">
+    <i class="fas fa-arrow-left"></i> Voltar
+</a>
+
+<div class="container py-4">
+    <div class="form-header">
+        <h1><i class="fas fa-bus"></i> Dados de Deslocamento</h1>
+        <p>Informe suas informações sobre transporte e trajeto diário</p>
+    </div>
+    
+    <div class="form-container">
+        <form method="post">
+            {% csrf_token %}
+            
+            <!-- Informações de Transporte -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fas fa-subway"></i> Informações de Transporte</h3>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="tipo_transporte">Tipo de Transporte *</label>
+                            <select class="form-select" id="tipo_transporte" name="tipo_transporte" required>
+                                <option value="">Selecione...</option>
+                                <option value="ONIBUS" {% if displacement.tipo_transporte == 'ONIBUS' %}selected{% endif %}>Ônibus</option>
+                                <option value="METRO" {% if displacement.tipo_transporte == 'METRO' %}selected{% endif %}>Metrô</option>
+                                <option value="CARRO" {% if displacement.tipo_transporte == 'CARRO' %}selected{% endif %}>Carro próprio</option>
+                                <option value="MOTO" {% if displacement.tipo_transporte == 'MOTO' %}selected{% endif %}>Motocicleta</option>
+                                <option value="BICICLETA" {% if displacement.tipo_transporte == 'BICICLETA' %}selected{% endif %}>Bicicleta</option>
+                                <option value="A_PE" {% if displacement.tipo_transporte == 'A_PE' %}selected{% endif %}>A pé</option>
+                                <option value="VAN" {% if displacement.tipo_transporte == 'VAN' %}selected{% endif %}>Van/Kombi</option>
+                                <option value="OUTRO" {% if displacement.tipo_transporte == 'OUTRO' %}selected{% endif %}>Outro</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="valor_mensal_transporte">Valor Mensal com Transporte (R$)</label>
+                            <input type="text" class="form-control" id="valor_mensal_transporte" name="valor_mensal_transporte" 
+                                   value="{{ displacement.valor_mensal_transporte|default:'0.00' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="trajeto_percorrido">Trajeto Percorrido Diariamente *</label>
+                            <textarea class="form-control" id="trajeto_percorrido" name="trajeto_percorrido" rows="4" required>{{ displacement.trajeto_percorrido|default:'' }}</textarea>
+                            <small class="text-muted">Descreva o trajeto que você faz diariamente para chegar ao campus (Ex: Casa → Ponto de ônibus → Campus)</small>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="observacoes">Observações</label>
+                            <textarea class="form-control" id="observacoes" name="observacoes" rows="3">{{ displacement.observacoes|default:'' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botões de ação -->
+            <div class="text-center mt-4">
+                <a href="{% url 'step3_cards' enrollment.pk %}" class="btn btn-secondary me-3">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-save btn-lg">
+                    <i class="fas fa-save"></i> Salvar Dados
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
