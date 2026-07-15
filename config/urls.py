@@ -20,7 +20,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-from core.views import home_view, buscar_cpf_view, CustomLoginView, pedagogo_dashboard_view, pedagogo_edital_detalhes_view, jornada_estudante_view, student_dashboard_view
+from core.views import home_view, buscar_cpf_view, CustomLoginView, pedagogo_dashboard_view, pedagogo_edital_detalhes_view, jornada_estudante_view, student_dashboard_view, step3_cards_view
 
 urlpatterns = [
     # Página inicial do programa
@@ -40,6 +40,9 @@ urlpatterns = [
     
     # Jornada do Estudante (fluxo de preenchimento completo)
     path('jornada-estudante/', jornada_estudante_view, name='jornada_estudante'),
+    
+    # Step 3 - Cards de navegação da jornada
+    path('step3-cards/', step3_cards_view, name='step3_cards'),
     
     # Área do Pedagogo
     path('dashboard/pedagogo/', pedagogo_dashboard_view, name='pedagogo_dashboard'),

@@ -162,8 +162,8 @@ def student_dashboard_view(request):
                     
                     if inscricao_existente:
                         message = "Você já possui uma submissão para este edital."
-                        # Redireciona para a jornada com dados preenchidos
-                        return redirect('jornada_estudante')
+                        # Redireciona para Step 3 (cards)
+                        return redirect('step3_cards')
                     else:
                         message = "Matrícula encontrada! Preencha os dados abaixo para enviar sua submissão."
                         # Armazena dados do estudante na sessão para autopreenchimento
@@ -189,8 +189,8 @@ def student_dashboard_view(request):
                                 'cidade': estudante.endereco.cidade,
                                 'estado': estudante.endereco.estado,
                             }
-                        # Redireciona para step 3 (jornada do estudante) com formulário autopreenchido
-                        return redirect('jornada_estudante')
+                        # Redireciona para Step 3 (cards)
+                        return redirect('step3_cards')
                         
                 except Estudante.DoesNotExist:
                     message = "Matrícula não encontrada para o seu CPF."
@@ -235,6 +235,31 @@ def student_dashboard_view(request):
     }
     
     return render(request, 'dashboard/student.html', context)
+
+
+@login_required
+def step3_cards_view(request):
+    """
+    View para Step 3 - Cards de navegação da jornada do estudante.
+    Redireciona para o dashboard de enrollment correspondente.
+    """
+    from inscricoes.models import Edital
+    
+    # Obtém o edital selecionado da sessão
+    edital_id = request.session.get('edital_selecionado_id')
+    
+    if not edital_id:
+        messages.warning(request, 'Por favor, selecione um edital primeiro.')
+        return redirect('student_dashboard')
+    
+    try:
+        edital = Edital.objects.get(id=edital_id, ativo=True, status='ATIVO')
+        # Redireciona para o enrollment_dashboard usando o ID do edital como pk
+        return redirect('enrollment_dashboard', pk=edital_id)
+    except Edital.DoesNotExist:
+        request.session.pop('edital_selecionado_id', None)
+        messages.warning(request, 'Edital não encontrado ou não está mais ativo.')
+        return redirect('student_dashboard')
 
 
 @login_required
