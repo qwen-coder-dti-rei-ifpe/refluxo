@@ -22,7 +22,7 @@ def enrollment_period_list(request):
 
 @login_required
 def enrollment_dashboard(request, pk):
-    """Dashboard com blocos dos eixos para atualização da inscrição."""
+    """Dashboard com blocos dos eixos para atualização da inscrição (Step 3 - Cards)."""
     period = get_object_or_404(EnrollmentPeriod, pk=pk)
     
     # Verifica se o período está aberto
@@ -41,7 +41,163 @@ def enrollment_dashboard(request, pk):
         'enrollment': enrollment,
         'can_edit': period.esta_aberto(),
     }
-    return render(request, 'enrollments/enrollment_dashboard.html', context)
+    return render(request, 'enrollments/step3_cards.html', context)
+
+
+@login_required
+def step3_cards(request, pk):
+    """Página de cards (Step 3) - Redireciona para o dashboard de cards."""
+    return redirect('enrollment_dashboard', pk=pk)
+
+
+@login_required
+def student_data_form(request, pk):
+    """Step 4: Formulário de Dados do Estudante."""
+    period = get_object_or_404(EnrollmentPeriod, pk=pk)
+    
+    try:
+        student = request.user.student
+        enrollment = Enrollment.objects.get(student=student, enrollment_period=period)
+    except (Student.DoesNotExist, Enrollment.DoesNotExist):
+        enrollment = Enrollment.objects.create(
+            student=request.user.student,
+            enrollment_period=period,
+            status='RASCUNHO'
+        )
+    
+    if request.method == 'POST':
+        # Salvar dados do estudante
+        student = request.user.student
+        student.nome_completo = request.POST.get('nome_completo', student.nome_completo)
+        student.cpf = request.POST.get('cpf', student.cpf)
+        student.save()
+        
+        messages.success(request, 'Dados do estudante salvos com sucesso!')
+        return redirect('address_data_form', pk=pk)
+    
+    context = {
+        'period': period,
+        'enrollment': enrollment,
+        'step': 4,
+        'total_steps': 8,
+    }
+    return render(request, 'enrollments/student_data_form.html', context)
+
+
+@login_required
+def address_data_form(request, pk):
+    """Step 5: Formulário de Dados de Endereço."""
+    period = get_object_or_404(EnrollmentPeriod, pk=pk)
+    
+    try:
+        student = request.user.student
+        enrollment = Enrollment.objects.get(student=student, enrollment_period=period)
+    except (Student.DoesNotExist, Enrollment.DoesNotExist):
+        enrollment = Enrollment.objects.create(
+            student=request.user.student,
+            enrollment_period=period,
+            status='RASCUNHO'
+        )
+    
+    if request.method == 'POST':
+        # Salvar dados de endereço
+        messages.success(request, 'Dados de endereço salvos com sucesso!')
+        return redirect('family_members_form', pk=pk)
+    
+    context = {
+        'period': period,
+        'enrollment': enrollment,
+        'step': 5,
+        'total_steps': 8,
+    }
+    return render(request, 'enrollments/address_data_form.html', context)
+
+
+@login_required
+def family_members_form(request, pk):
+    """Step 6: Formulário de Dados de Membros Familiares."""
+    period = get_object_or_404(EnrollmentPeriod, pk=pk)
+    
+    try:
+        student = request.user.student
+        enrollment = Enrollment.objects.get(student=student, enrollment_period=period)
+    except (Student.DoesNotExist, Enrollment.DoesNotExist):
+        enrollment = Enrollment.objects.create(
+            student=request.user.student,
+            enrollment_period=period,
+            status='RASCUNHO'
+        )
+    
+    if request.method == 'POST':
+        # Salvar dados de membros familiares
+        messages.success(request, 'Dados de membros familiares salvos com sucesso!')
+        return redirect('displacement_data_form', pk=pk)
+    
+    context = {
+        'period': period,
+        'enrollment': enrollment,
+        'step': 6,
+        'total_steps': 8,
+    }
+    return render(request, 'enrollments/family_members_form.html', context)
+
+
+@login_required
+def displacement_data_form(request, pk):
+    """Step 7: Formulário de Dados de Deslocamento."""
+    period = get_object_or_404(EnrollmentPeriod, pk=pk)
+    
+    try:
+        student = request.user.student
+        enrollment = Enrollment.objects.get(student=student, enrollment_period=period)
+    except (Student.DoesNotExist, Enrollment.DoesNotExist):
+        enrollment = Enrollment.objects.create(
+            student=request.user.student,
+            enrollment_period=period,
+            status='RASCUNHO'
+        )
+    
+    if request.method == 'POST':
+        # Salvar dados de deslocamento
+        messages.success(request, 'Dados de deslocamento salvos com sucesso!')
+        return redirect('enrollment_data_form', pk=pk)
+    
+    context = {
+        'period': period,
+        'enrollment': enrollment,
+        'step': 7,
+        'total_steps': 8,
+    }
+    return render(request, 'enrollments/displacement_data_form.html', context)
+
+
+@login_required
+def enrollment_data_form(request, pk):
+    """Step 8: Formulário de Dados de Inscrição."""
+    period = get_object_or_404(EnrollmentPeriod, pk=pk)
+    
+    try:
+        student = request.user.student
+        enrollment = Enrollment.objects.get(student=student, enrollment_period=period)
+    except (Student.DoesNotExist, Enrollment.DoesNotExist):
+        enrollment = Enrollment.objects.create(
+            student=request.user.student,
+            enrollment_period=period,
+            status='RASCUNHO'
+        )
+    
+    if request.method == 'POST':
+        # Salvar dados de inscrição
+        messages.success(request, 'Dados de inscrição salvos com sucesso!')
+        return redirect('enrollment_dashboard', pk=pk)
+    
+    context = {
+        'period': period,
+        'enrollment': enrollment,
+        'step': 8,
+        'total_steps': 8,
+    }
+    return render(request, 'enrollments/enrollment_data_form.html', context)
 
 
 @login_required
