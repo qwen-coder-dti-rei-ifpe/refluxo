@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'inscricoes',
     'ifpe_mvp.apps.enrollments',
     'ifpe_mvp.apps.students',
+    'ifpe_mvp.apps.family',
 ]
 
 # Middlewares processam requisições e respostas

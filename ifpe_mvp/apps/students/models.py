@@ -4,6 +4,7 @@ Models do aplicativo Students - Modelo de Estudante com todos os campos necessá
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
+from django.conf import settings
 
 
 class Student(models.Model):
@@ -66,7 +67,7 @@ class Student(models.Model):
     
     # Relacionamento com usuário Django
     user = models.OneToOneField(
-        User, 
+        settings.AUTH_USER_MODEL, 
         on_delete=models.CASCADE, 
         related_name='student',
         verbose_name=_('Usuário'),
