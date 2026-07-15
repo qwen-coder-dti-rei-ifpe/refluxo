@@ -1,12 +1,17 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard do Estudante{% endblock %}
+{% block title %}Dashboard do Estudante - PAMA{% endblock %}
 
 {% block extra_css %}
 <style>
     body {
         background: none !important;
         background-color: #fff !important;
+    }
+    .pama-full-name {
+        font-size: 0.9rem;
+        color: #6c757d;
+        font-weight: normal;
     }
 </style>
 {% endblock %}
@@ -16,6 +21,7 @@
     <div class="row">
         <div class="col-md-12">
             <h2 class="mb-4">Dashboard do Estudante</h2>
+            <p class="text-muted mb-4">Programa de Apoio e Manutenção Acadêmica (PAMA)</p>
             
             {% if message %}
             <div class="alert alert-info" role="alert">
