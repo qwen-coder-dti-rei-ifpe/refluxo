@@ -53,7 +53,7 @@ def enrollment_dashboard(request, pk):
         student = request.user.student
     except Student.DoesNotExist:
         messages.error(request, 'Você precisa cadastrar seus dados de estudante primeiro.')
-        return redirect('student_create')
+        return redirect('students:student_create')
     
     # Obtém ou cria a inscrição
     enrollment, created = Enrollment.objects.get_or_create(
@@ -239,7 +239,7 @@ def enrollment_create(request, pk):
         student = request.user.student
     except Student.DoesNotExist:
         messages.error(request, 'Você precisa cadastrar seus dados de estudante primeiro.')
-        return redirect('student_create')
+        return redirect('students:student_create')
     
     # Cria inscrição vazia
     enrollment = Enrollment.objects.create(

@@ -4,6 +4,8 @@ URLs do aplicativo Students
 from django.urls import path
 from . import views
 
+app_name = 'students'
+
 urlpatterns = [
     # Busca de estudante (pública para consulta)
     path('search/', views.student_search, name='student_search'),
