@@ -37,8 +37,8 @@ def enrollment_dashboard(request, pk):
             defaults={
                 'titulo': edital.titulo,
                 'descricao': edital.descricao or '',
-                'data_inicio': edital.data_inicio or timezone.now(),
-                'data_fim': edital.data_fim or (edital.data_inicio + timezone.timedelta(days=30)) if edital.data_inicio else timezone.now() + timezone.timedelta(days=30),
+                'data_inicio': edital.periodo_inscricao_abertura or timezone.now(),
+                'data_fim': edital.periodo_inscricao_fechamento or (edital.periodo_inscricao_abertura + timezone.timedelta(days=30)) if edital.periodo_inscricao_abertura else timezone.now() + timezone.timedelta(days=30),
                 'status': 'ABERTO' if edital.status == 'ATIVO' else 'FECHADO',
                 'ativo': edital.ativo,
             }
