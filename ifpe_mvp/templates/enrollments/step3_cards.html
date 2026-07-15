@@ -1,0 +1,318 @@
+{% extends 'base.html' %}
+
+{% block title %}Etapa 3: Preenchimento da Inscrição - IFPE{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        min-height: 100vh;
+    }
+    
+    .step-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding: 2rem 0;
+    }
+    
+    .step-header h1 {
+        color: #27ae60;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .step-header p {
+        color: #4a5568;
+        font-size: 1.1rem;
+    }
+    
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+    
+    .info-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+        padding: 2rem;
+        text-align: center;
+        transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
+        border: 2px solid transparent;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    
+    .info-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(39, 174, 96, 0.2);
+        border-color: #27ae60;
+    }
+    
+    .card-icon {
+        font-size: 3.5rem;
+        margin-bottom: 1rem;
+        color: #27ae60;
+    }
+    
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.75rem;
+    }
+    
+    .card-description {
+        color: #718096;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+    }
+    
+    .card-status {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-top: auto;
+    }
+    
+    .status-pendente {
+        background-color: #fed7d7;
+        color: #c53030;
+    }
+    
+    .status-preenchido {
+        background-color: #c6f6d5;
+        color: #276749;
+    }
+    
+    .status-completo {
+        background-color: #bee3f8;
+        color: #2b6cb0;
+    }
+    
+    .progress-indicator {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .progress-step {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+    
+    .progress-step.active {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: white;
+    }
+    
+    .progress-step.completed {
+        background: #27ae60;
+        color: white;
+    }
+    
+    .progress-step.pending {
+        background: #e2e8f0;
+        color: #718096;
+    }
+    
+    .progress-line {
+        width: 60px;
+        height: 3px;
+        background: #e2e8f0;
+        border-radius: 2px;
+    }
+    
+    .progress-line.completed {
+        background: #27ae60;
+    }
+    
+    .back-btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: white;
+        color: #27ae60;
+        border: 2px solid #27ae60;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s;
+        z-index: 1000;
+    }
+    
+    .back-btn:hover {
+        background: #27ae60;
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .cards-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .progress-line {
+            width: 30px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<a href="{% url 'enrollment_dashboard' period.pk %}" class="back-btn">
+    <i class="fas fa-arrow-left"></i> Voltar
+</a>
+
+<div class="container py-4">
+    <div class="step-header">
+        <div class="progress-indicator">
+            <div class="progress-step completed"><i class="fas fa-check"></i></div>
+            <div class="progress-line completed"></div>
+            <div class="progress-step completed"><i class="fas fa-check"></i></div>
+            <div class="progress-line completed"></div>
+            <div class="progress-step active">3</div>
+        </div>
+        <h1><i class="fas fa-file-signature"></i> Etapa 3: Preenchimento da Inscrição</h1>
+        <p>Preencha todas as informações solicitadas nos cartões abaixo</p>
+    </div>
+    
+    <div class="cards-grid">
+        <!-- Card 1: Dados do Estudante -->
+        <a href="{% url 'student_data_form' enrollment.pk %}" class="info-card" style="text-decoration: none; color: inherit;">
+            <div>
+                <div class="card-icon">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <h3 class="card-title">Dados do Estudante</h3>
+                <p class="card-description">
+                    Informações pessoais, acadêmicas e bancárias do estudante
+                </p>
+            </div>
+            <span class="card-status {% if enrollment.student %}status-preenchido{% else %}status-pendente{% endif %}">
+                {% if enrollment.student %}
+                    <i class="fas fa-check"></i> Preenchido
+                {% else %}
+                    <i class="fas fa-clock"></i> Pendente
+                {% endif %}
+            </span>
+        </a>
+        
+        <!-- Card 2: Dados de Endereço -->
+        <a href="{% url 'address_data_form' enrollment.pk %}" class="info-card" style="text-decoration: none; color: inherit;">
+            <div>
+                <div class="card-icon">
+                    <i class="fas fa-home"></i>
+                </div>
+                <h3 class="card-title">Dados de Endereço</h3>
+                <p class="card-description">
+                    Informações residenciais e condições de moradia
+                </p>
+            </div>
+            <span class="card-status {% if enrollment.address %}status-preenchido{% else %}status-pendente{% endif %}">
+                {% if enrollment.address %}
+                    <i class="fas fa-check"></i> Preenchido
+                {% else %}
+                    <i class="fas fa-clock"></i> Pendente
+                {% endif %}
+            </span>
+        </a>
+        
+        <!-- Card 3: Dados de Membros Familiares -->
+        <a href="{% url 'family_members_form' enrollment.pk %}" class="info-card" style="text-decoration: none; color: inherit;">
+            <div>
+                <div class="card-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="card-title">Dados de Membros Familiares</h3>
+                <p class="card-description">
+                    Informações sobre o grupo familiar e renda
+                </p>
+            </div>
+            <span class="card-status {% if enrollment_has_family %}status-preenchido{% else %}status-pendente{% endif %}">
+                {% if enrollment_has_family %}
+                    <i class="fas fa-check"></i> Preenchido
+                {% else %}
+                    <i class="fas fa-clock"></i> Pendente
+                {% endif %}
+            </span>
+        </a>
+        
+        <!-- Card 4: Dados de Deslocamento -->
+        <a href="{% url 'displacement_data_form' enrollment.pk %}" class="info-card" style="text-decoration: none; color: inherit;">
+            <div>
+                <div class="card-icon">
+                    <i class="fas fa-bus"></i>
+                </div>
+                <h3 class="card-title">Dados de Deslocamento</h3>
+                <p class="card-description">
+                    Informações sobre transporte e trajeto diário
+                </p>
+            </div>
+            <span class="card-status {% if enrollment.displacement %}status-preenchido{% else %}status-pendente{% endif %}">
+                {% if enrollment.displacement %}
+                    <i class="fas fa-check"></i> Preenchido
+                {% else %}
+                    <i class="fas fa-clock"></i> Pendente
+                {% endif %}
+            </span>
+        </a>
+        
+        <!-- Card 5: Dados de Inscrição -->
+        <a href="{% url 'enrollment_data_form' enrollment.pk %}" class="info-card" style="text-decoration: none; color: inherit;">
+            <div>
+                <div class="card-icon">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <h3 class="card-title">Dados de Inscrição</h3>
+                <p class="card-description">
+                    Informações socioeconômicas e declaração final
+                </p>
+            </div>
+            <span class="card-status {% if enrollment_complete %}status-completo{% elif enrollment_incomplete %}status-pendente{% else %}status-pendente{% endif %}">
+                {% if enrollment_complete %}
+                    <i class="fas fa-check"></i> Completo
+                {% else %}
+                    <i class="fas fa-clock"></i> Pendente
+                {% endif %}
+            </span>
+        </a>
+    </div>
+    
+    <!-- Botões de ação -->
+    <div class="row mt-5">
+        <div class="col-12 text-center">
+            <a href="{% url 'enrollment_dashboard' period.pk %}" class="btn btn-secondary btn-lg me-3">
+                <i class="fas fa-arrow-left"></i> Voltar ao Dashboard
+            </a>
+            {% if all_completed %}
+            <a href="{% url 'enrollment_submit' enrollment.pk %}" class="btn btn-success btn-lg">
+                <i class="fas fa-paper-plane"></i> Submeter Inscrição
+            </a>
+            {% else %}
+            <button class="btn btn-success btn-lg" disabled>
+                <i class="fas fa-lock"></i> Complete todos os campos para submeter
+            </button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

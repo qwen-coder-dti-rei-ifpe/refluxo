@@ -1,0 +1,281 @@
+{% extends 'base.html' %}
+
+{% block title %}Dados de Inscrição - IFPE{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        min-height: 100vh;
+    }
+    
+    .form-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding: 2rem 0;
+    }
+    
+    .form-header h1 {
+        color: #27ae60;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+        padding: 2rem;
+    }
+    
+    .form-section {
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .form-section:last-child {
+        border-bottom: none;
+    }
+    
+    .section-title {
+        color: #27ae60;
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.25rem;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #4a5568;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .form-control, .form-select {
+        border: 2px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 0.75rem;
+        transition: border-color 0.3s;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-color: #27ae60;
+        box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+    }
+    
+    .btn-save {
+        background: linear-gradient(to right, #27ae60, #2ecc71);
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+    }
+    
+    .back-btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background: white;
+        color: #27ae60;
+        border: 2px solid #27ae60;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s;
+        z-index: 1000;
+    }
+    
+    .back-btn:hover {
+        background: #27ae60;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<a href="{% url 'step3_cards' enrollment.pk %}" class="back-btn">
+    <i class="fas fa-arrow-left"></i> Voltar
+</a>
+
+<div class="container py-4">
+    <div class="form-header">
+        <h1><i class="fas fa-clipboard-list"></i> Dados de Inscrição</h1>
+        <p>Preencha as informações socioeconômicas e declaração final</p>
+    </div>
+    
+    <div class="form-container">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- Informações do Programa -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fas fa-file-alt"></i> Informações do Programa</h3>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="indice_vulnerabilidade">Índice de Vulnerabilidade Estudantil</label>
+                            <input type="text" class="form-control" id="indice_vulnerabilidade" name="indice_vulnerabilidade" 
+                                   value="{{ enrollment.indice_vulnerabilidade|default:'' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <div class="form-check mt-4">
+                                <input class="form-check-input" type="checkbox" id="foi_beneficiado_ultima_edicao" 
+                                       name="foi_beneficiado_ultima_edicao" 
+                                       {% if enrollment.foi_beneficiado_ultima_edicao %}checked{% endif %}>
+                                <label class="form-check-label" for="foi_beneficiado_ultima_edicao">
+                                    Foi beneficiado na última edição do programa?
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <div class="form-check mt-4">
+                                <input class="form-check-input" type="checkbox" id="foi_beneficiado_beneficio_eventual" 
+                                       name="foi_beneficiado_beneficio_eventual" 
+                                       {% if enrollment.foi_beneficiado_beneficio_eventual %}checked{% endif %}>
+                                <label class="form-check-label" for="foi_beneficiado_beneficio_eventual">
+                                    Foi beneficiado na última edição do benefício eventual?
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <div class="form-check mt-4">
+                                <input class="form-check-input" type="checkbox" id="auxilio_digital" 
+                                       name="auxilio_digital" 
+                                       {% if enrollment.auxilio_digital %}checked{% endif %}>
+                                <label class="form-check-label" for="auxilio_digital">
+                                    Solicita auxílio digital?
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Renda Familiar -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fas fa-money-bill-wave"></i> Renda Familiar</h3>
+                
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="renda_bruta_familiar">Renda Bruta Familiar (R$)</label>
+                            <input type="text" class="form-control" id="renda_bruta_familiar" name="renda_bruta_familiar" 
+                                   value="{{ enrollment.renda_bruta_familiar|default:'0.00' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="renda_per_capita">Renda Per Capita (R$)</label>
+                            <input type="text" class="form-control" id="renda_per_capita" name="renda_per_capita" 
+                                   value="{{ enrollment.renda_per_capita|default:'0.00' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="faixa_renda_per_capita">Faixa de Renda Per Capita</label>
+                            <select class="form-select" id="faixa_renda_per_capita" name="faixa_renda_per_capita">
+                                <option value="">Selecione...</option>
+                                <option value="ATE_05_SALARIOS" {% if enrollment.faixa_renda_per_capita == 'ATE_05_SALARIOS' %}selected{% endif %}>Até 0,5 salário mínimo</option>
+                                <option value="ATE_1_SALARIO" {% if enrollment.faixa_renda_per_capita == 'ATE_1_SALARIO' %}selected{% endif %}>Até 1 salário mínimo</option>
+                                <option value="ATE_15_SALARIOS" {% if enrollment.faixa_renda_per_capita == 'ATE_15_SALARIOS' %}selected{% endif %}>Até 1,5 salários mínimos</option>
+                                <option value="ACIMA_15_SALARIOS" {% if enrollment.faixa_renda_per_capita == 'ACIMA_15_SALARIOS' %}selected{% endif %}>Acima de 1,5 salários mínimos</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="renda_per_capita_extenso">Renda Per Capita (por extenso)</label>
+                            <input type="text" class="form-control" id="renda_per_capita_extenso" name="renda_per_capita_extenso" 
+                                   value="{{ enrollment.renda_per_capita_extenso|default:'' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="origem_renda_principal">Origem da Renda Principal</label>
+                            <select class="form-select" id="origem_renda_principal" name="origem_renda_principal">
+                                <option value="">Selecione...</option>
+                                <option value="TRABALHO" {% if enrollment.origem_renda_principal == 'TRABALHO' %}selected{% endif %}>Trabalho formal/informal</option>
+                                <option value="BENEFICIO_SOCIAL" {% if enrollment.origem_renda_principal == 'BENEFICIO_SOCIAL' %}selected{% endif %}>Benefício social</option>
+                                <option value="PENSAO" {% if enrollment.origem_renda_principal == 'PENSAO' %}selected{% endif %}>Pensão alimentícia</option>
+                                <option value="APOSENTADORIA" {% if enrollment.origem_renda_principal == 'APOSENTADORIA' %}selected{% endif %}>Aposentadoria</option>
+                                <option value="OUTROS" {% if enrollment.origem_renda_principal == 'OUTROS' %}selected{% endif %}>Outros</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Declaração e Submissão -->
+            <div class="form-section">
+                <h3 class="section-title"><i class="fas fa-clipboard-check"></i> Declaração Final</h3>
+                
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="relato_vida">Relato de Vida *</label>
+                            <textarea class="form-control" id="relato_vida" name="relato_vida" rows="5" required>{{ enrollment.relato_vida|default:'' }}</textarea>
+                            <small class="text-muted">Conte um pouco sobre sua história e situação</small>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="declaracao_veracidade" 
+                                       name="declaracao_veracidade" required
+                                       {% if enrollment.declaracao_veracidade %}checked{% endif %}>
+                                <label class="form-check-label" for="declaracao_veracidade">
+                                    Declaro que todas as informações fornecidas são verdadeiras *
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botões de ação -->
+            <div class="text-center mt-4">
+                <a href="{% url 'step3_cards' enrollment.pk %}" class="btn btn-secondary me-3">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+                <button type="submit" class="btn btn-save btn-lg">
+                    <i class="fas fa-save"></i> Salvar Dados
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
