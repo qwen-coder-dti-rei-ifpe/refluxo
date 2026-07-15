@@ -26,28 +26,7 @@ venv/
 ENV/
 env/
 .venv/
-env.bak/
-ENV.bak/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*.tmp
-
-# Logs
-*.log
-
-# Environment variables
-.env
-.env.local
-*.env.*
-
-# Coverage
-.coverage
-coverage/
-htmlcov/
+.env/
 
 # Django
 *.log
@@ -55,4 +34,13 @@ local_settings.py
 db.sqlite3
 db.sqlite3-journal
 
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
 ```
