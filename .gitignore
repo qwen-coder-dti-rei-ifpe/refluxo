@@ -1,1 +1,1 @@
-Nothing should be ignored based on the provided file changes. The only modified file is a template HTML file (`templates/enrollments/address_data_form.html`), which is source code and should not be ignored. No build artifacts, dependencies, or temporary files are present in the changes.
+Nothing should be ignored since the only modified file is a Python source file (.py) which is not a build artifact, dependency, or temporary file.

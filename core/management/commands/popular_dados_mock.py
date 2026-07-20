@@ -136,6 +136,21 @@ class Command(BaseCommand):
                 defaults=estudante_data
             )
             if created:
+                # Criar usuário para o estudante com senha padrão
+                usuario_username = estudante_data['cpf']
+                usuario_email = estudante_data['email_institucional']
+                usuario, _ = Usuario.objects.get_or_create(
+                    username=usuario_username,
+                    defaults={
+                        'email': usuario_email,
+                        'is_pedagogo': False,
+                        'is_active': True,
+                        'cpf': estudante_data['cpf'],
+                    }
+                )
+                usuario.set_password('ifpe2024')
+                usuario.save()
+                
                 # Criar endereço para o estudante
                 Endereco.objects.get_or_create(
                     estudante=estudante,
@@ -147,7 +162,7 @@ class Command(BaseCommand):
                         'telefone_celular': '81999999999',
                     }
                 )
-                self.stdout.write(f'Estudante criado: {estudante.nome_completo}')
+                self.stdout.write(f'Estudante criado: {estudante.nome_completo} (username: {usuario_username}, senha: ifpe2024)')
             else:
                 self.stdout.write(f'Estudante já existe: {estudante.nome_completo}')
         
@@ -186,4 +201,10 @@ class Command(BaseCommand):
         self.stdout.write(self.style.WARNING('\nCredenciais do Pedagogo:'))
         self.stdout.write('  Username: pedagogo')
         self.stdout.write('  Senha: pedagogo123')
+        self.stdout.write(self.style.WARNING('\nCredenciais dos Estudantes (senha padrão: ifpe2024):'))
+        self.stdout.write('  CPF 11111111111 - Username: 11111111111')
+        self.stdout.write('  CPF 22222222222 - Username: 22222222222')
+        self.stdout.write('  CPF 33333333333 - Username: 33333333333')
+        self.stdout.write('  CPF 44444444444 - Username: 44444444444')
+        self.stdout.write('  CPF 55555555555 - Username: 55555555555')
         self.stdout.write(self.style.SUCCESS('\nAcesse: http://localhost:8000/login/'))
