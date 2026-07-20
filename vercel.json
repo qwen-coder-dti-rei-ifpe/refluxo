@@ -1,7 +1,7 @@
 {
   "version": 2,
   "framework": null,
-  "installCommand": "cp .env.example .env && pip install -r requirements.txt --break-system-packages && python manage.py makemigrations --noinput && python manage.py migrate --noinput && ./popular_dados_mock.sh --noinput && python manage.py collectstatic --noinput",
+  "installCommand": "cp .env.example .env && pip install -r requirements.txt --break-system-packages && python manage.py makemigrations --noinput && python manage.py migrate --noinput && pytho manage.py popular_dados_mock --noinput && python manage.py collectstatic --noinput",
   "outputDirectory": "staticfiles",
   "env": {
     "DJANGO_SETTINGS_MODULE": "config.settings",
