@@ -3,7 +3,6 @@ Forms do aplicativo Students - Formulários para cadastro e edição de estudant
 """
 from django import forms
 from .models import Student
-from widget_tweaks.widgets import Widget
 
 
 class StudentForm(forms.ModelForm):

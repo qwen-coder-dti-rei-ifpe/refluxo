@@ -1,39 +1,24 @@
 ```
-# Python
-__pycache__/
+# Compiled Python files
 *.pyc
-*.pyo
-*.pyd
-
-# Virtual Environment
-venv/
-.venv/
-env/
-
-# Django
-*.log
-local_settings.py
+__pycache__/
 
 # Dependencies
-pip-log.txt
-pip-delete-this-directory.txt
-.tox/
-.coverage
-coverage/
-htmlcov/
+.venv/
+venv/
+node_modules/
 
-# IDE
-.vscode/
-.idea/
+# Logs and temp files
+*.log
+*.tmp
 *.swp
-*.swo
 
-# OS
-.DS_Store
-Thumbs.db
-
-# Environment variables
+# Environment
 .env
 .env.local
-*.env.*
+.env.*
+
+# Editors
+.vscode/
+.idea/
 ```
