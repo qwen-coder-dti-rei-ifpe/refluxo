@@ -31,8 +31,9 @@
             
             <!-- Passo 1: Seleção de Edital Ativo -->
             <div class="card mb-4">
-                <div class="card-header bg-success text-white">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Passo 1: Selecione um Edital Ativo</h5>
+                    <span class="badge bg-light text-success">Em andamento</span>
                 </div>
                 <div class="card-body">
                     {% if editais_ativos %}
@@ -70,8 +71,9 @@
             <!-- Passo 2: Busca por Matrícula (somente se edital selecionado) -->
             {% if edital %}
             <div class="card mb-4">
-                <div class="card-header bg-success text-white">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Passo 2: Buscar Matrícula</h5>
+                    <span class="badge bg-light text-success">Em andamento</span>
                 </div>
                 <div class="card-body">
                     <form method="post">
