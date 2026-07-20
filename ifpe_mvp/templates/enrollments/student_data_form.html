@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Passo 4: Dados do Estudante - IFPE{% endblock %}
+{% block title %}Passo 2: Dados do Estudante - IFPE{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -173,19 +173,19 @@
             <i class="fas fa-check"></i>
         </a>
         <div class="progress-line completed"></div>
-        <a href="{% url 'student_data_form' enrollment.pk %}" class="progress-step active" title="Dados do Estudante">4</a>
+        <a href="{% url 'student_data_form' enrollment.pk %}" class="progress-step active" title="Dados do Estudante">2</a>
         <div class="progress-line {% if enrollment.address %}completed{% endif %}"></div>
-        <a href="{% url 'address_data_form' enrollment.pk %}" class="progress-step {% if enrollment.address %}completed{% else %}pending{% endif %}" title="Dados de Endereço">5</a>
+        <a href="{% url 'address_data_form' enrollment.pk %}" class="progress-step {% if enrollment.address %}completed{% else %}pending{% endif %}" title="Dados de Endereço">3</a>
         <div class="progress-line"></div>
-        <a href="{% url 'family_members_form' enrollment.pk %}" class="progress-step pending" title="Membros Familiares">6</a>
+        <a href="{% url 'family_members_form' enrollment.pk %}" class="progress-step pending" title="Membros Familiares">4</a>
         <div class="progress-line"></div>
-        <a href="{% url 'displacement_data_form' enrollment.pk %}" class="progress-step pending" title="Deslocamento">7</a>
+        <a href="{% url 'displacement_data_form' enrollment.pk %}" class="progress-step pending" title="Deslocamento">5</a>
         <div class="progress-line"></div>
-        <a href="{% url 'enrollment_data_form' enrollment.pk %}" class="progress-step pending" title="Inscrição">8</a>
+        <a href="{% url 'enrollment_data_form' enrollment.pk %}" class="progress-step pending" title="Inscrição">6</a>
     </div>
 
     <div class="form-header">
-        <h1><i class="fas fa-user-graduate"></i> Passo 4: Dados do Estudante</h1>
+        <h1><i class="fas fa-user-graduate"></i> Passo 2: Dados do Estudante</h1>
         <p>Preencha todas as informações pessoais, acadêmicas e bancárias</p>
     </div>
     
@@ -487,12 +487,12 @@
             <!-- Botões de ação -->
             <div class="text-center mt-4">
                 <a href="{% url 'step3_cards' %}" class="btn btn-secondary me-3">
-                    <i class="fas fa-arrow-left"></i> Voltar
+                    <i class="fas fa-arrow-left"></i> Anterior: Início
                 </a>
-                <button type="submit" class="btn btn-save btn-lg me-3">
-                    <i class="fas fa-save"></i> Salvar e Próximo
+                <button type="submit" class="btn btn-save btn-lg">
+                    <i class="fas fa-save"></i> Salvar Dados
                 </button>
-                <a href="{% url 'address_data_form' enrollment.pk %}" class="btn btn-success">
+                <a href="{% url 'address_data_form' enrollment.pk %}" class="btn btn-primary ms-3">
                     <i class="fas fa-arrow-right"></i> Próximo: Endereço
                 </a>
             </div>
