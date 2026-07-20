@@ -19,6 +19,13 @@ DEBUG = config('DEBUG', default=True, cast=bool)
 # Hosts permitidos (configure para seu domínio em produção)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,.vercel.app').split(',')
 
+# CSRF Trusted Origins for Vercel deployment
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.vercel.app',
+    'http://localhost',
+    'http://127.0.0.1',
+]
+
 # Apps do projeto e apps de terceiros instalados
 INSTALLED_APPS = [
     'django.contrib.admin',
