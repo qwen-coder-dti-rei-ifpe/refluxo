@@ -79,7 +79,26 @@ def step3_cards(request, pk):
 @login_required
 def student_data_form(request, pk):
     """Step 4: Formulário de Dados do Estudante."""
-    period = get_object_or_404(EnrollmentPeriod, pk=pk)
+    from inscricoes.models import Edital
+    
+    # Tenta obter como EnrollmentPeriod primeiro, senão tenta como Edital
+    try:
+        period = EnrollmentPeriod.objects.get(pk=pk)
+    except EnrollmentPeriod.DoesNotExist:
+        # Se não encontrar EnrollmentPeriod, tenta buscar como Edital
+        edital = get_object_or_404(Edital, pk=pk)
+        # Cria ou obtém um EnrollmentPeriod correspondente ao Edital
+        period, created = EnrollmentPeriod.objects.get_or_create(
+            pk=pk,
+            defaults={
+                'titulo': edital.titulo,
+                'descricao': edital.descricao or '',
+                'data_inicio': edital.periodo_inscricao_abertura or timezone.now(),
+                'data_fim': edital.periodo_inscricao_fechamento or (edital.periodo_inscricao_abertura + timezone.timedelta(days=30)) if edital.periodo_inscricao_abertura else timezone.now() + timezone.timedelta(days=30),
+                'status': 'ABERTO' if edital.status == 'ATIVO' else 'FECHADO',
+                'ativo': edital.ativo,
+            }
+        )
     
     try:
         student = request.user.student
