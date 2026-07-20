@@ -1,80 +1,48 @@
 ```
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.py~
+
+# Virtual environments
+venv/
+.venv/
+env/
+.ENV/
+
+# Build artifacts
+build/
+dist/
+*.egg
+*.egg-info/
+
+# Testing
+.coverage
+coverage/
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+
+# Logs
+*.log
+
 # Environment variables
 .env
 .env.local
 *.env.*
 
-# Logs
-*.log
-
-# Temporary files
-*.tmp
+# Editors
+.vscode/
+.idea/
 *.swp
 *.swo
 
-# Build artifacts
-dist/
-build/
-target/
-
-# Dependencies
-node_modules/
-.venv/
-venv/
-__pycache__/
-*.egg-info/
-.Python
-
-# IDE specific
-.vscode/
-.idea/
-*.iml
-*.ipr
-*.iws
-
-# OS generated
+# OS
 .DS_Store
 Thumbs.db
 
-# Python specific
-*.pyc
-*.pyo
-*.pyd
-*.so
-*.egg
-
-# Coverage
-.coverage
-coverage/
-htmlcov/
-
-# Testing
-.pytest_cache/
-.mypy_cache/
-.nyc_output/
-coverage/lcov-report/
-
-# Compressed files
-*.zip
-*.gz
-*.tar
-*.tgz
-*.bz2
-*.xz
-*.7z
-*.rar
-*.zst
-*.lz4
-*.lzh
-*.cab
-*.arj
-*.rpm
-*.deb
-*.Z
-*.lz
-*.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
+# Dependencies
+node_modules/
 ```

@@ -28,12 +28,13 @@ class Command(BaseCommand):
                 'is_active': True,
             }
         )
+        # Sempre definir a senha (atualiza mesmo se usuário já existir)
+        pedagogo.set_password('123')
+        pedagogo.save()
         if created:
-            pedagogo.set_password('pedagogo123')
-            pedagogo.save()
-            self.stdout.write(self.style.SUCCESS('Usuário pedagogo criado: username=pedagogo, senha=pedagogo123'))
+            self.stdout.write(self.style.SUCCESS('Usuário pedagogo criado: username=pedagogo, senha=123'))
         else:
-            self.stdout.write('Usuário pedagogo já existe.')
+            self.stdout.write('Usuário pedagogo atualizado: senha redefinida para 123')
         
         # Criar editais
         self.stdout.write('\nCriando editais...')
@@ -136,35 +137,42 @@ class Command(BaseCommand):
                 defaults=estudante_data
             )
             if created:
-                # Criar usuário para o estudante com senha padrão
-                usuario_username = estudante_data['cpf']
-                usuario_email = estudante_data['email_institucional']
-                usuario, _ = Usuario.objects.get_or_create(
-                    username=usuario_username,
-                    defaults={
-                        'email': usuario_email,
-                        'is_pedagogo': False,
-                        'is_active': True,
-                        'cpf': estudante_data['cpf'],
-                    }
-                )
-                usuario.set_password('ifpe2024')
-                usuario.save()
-                
-                # Criar endereço para o estudante
-                Endereco.objects.get_or_create(
-                    estudante=estudante,
-                    defaults={
-                        'cep': '50000-000',
-                        'bairro': 'Centro',
-                        'cidade': 'Recife',
-                        'estado': 'PE',
-                        'telefone_celular': '81999999999',
-                    }
-                )
-                self.stdout.write(f'Estudante criado: {estudante.nome_completo} (username: {usuario_username}, senha: ifpe2024)')
+                # Atualizar dados do estudante se já existir
+                for key, value in estudante_data.items():
+                    setattr(estudante, key, value)
+                estudante.save()
+            
+            # Criar ou atualizar usuário para o estudante com senha padrão
+            usuario_username = estudante_data['cpf']
+            usuario_email = estudante_data['email_institucional']
+            usuario, user_created = Usuario.objects.get_or_create(
+                username=usuario_username,
+                defaults={
+                    'email': usuario_email,
+                    'is_pedagogo': False,
+                    'is_active': True,
+                    'cpf': estudante_data['cpf'],
+                }
+            )
+            # Sempre definir a senha (atualiza mesmo se usuário já existir)
+            usuario.set_password('123')
+            usuario.save()
+            
+            # Criar endereço para o estudante
+            Endereco.objects.get_or_create(
+                estudante=estudante,
+                defaults={
+                    'cep': '50000-000',
+                    'bairro': 'Centro',
+                    'cidade': 'Recife',
+                    'estado': 'PE',
+                    'telefone_celular': '81999999999',
+                }
+            )
+            if user_created:
+                self.stdout.write(f'Estudante criado: {estudante.nome_completo} (username: {usuario_username}, senha: 123)')
             else:
-                self.stdout.write(f'Estudante já existe: {estudante.nome_completo}')
+                self.stdout.write(f'Estudante atualizado: {estudante.nome_completo} (senha redefinida para 123)')
         
         # Criar inscrições mock para o edital 1
         self.stdout.write('\nCriando inscrições (submissões)...')
@@ -200,8 +208,8 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('\nDados mock criados com sucesso!'))
         self.stdout.write(self.style.WARNING('\nCredenciais do Pedagogo:'))
         self.stdout.write('  Username: pedagogo')
-        self.stdout.write('  Senha: pedagogo123')
-        self.stdout.write(self.style.WARNING('\nCredenciais dos Estudantes (senha padrão: ifpe2024):'))
+        self.stdout.write('  Senha: 123')
+        self.stdout.write(self.style.WARNING('\nCredenciais dos Estudantes (senha padrão: 123):'))
         self.stdout.write('  CPF 11111111111 - Username: 11111111111')
         self.stdout.write('  CPF 22222222222 - Username: 22222222222')
         self.stdout.write('  CPF 33333333333 - Username: 33333333333')
