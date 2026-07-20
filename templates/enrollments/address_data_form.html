@@ -260,8 +260,9 @@
                     
                     <div class="col-md-12">
                         <div class="form-group">
-                            <label for="endereco_completo">Endereço Completo (Rua, Número, Complemento)</label>
-                            <textarea class="form-control" id="endereco_completo" name="endereco_completo" rows="2">{{ address.endereco_completo|default:'' }}</textarea>
+                            <label for="endereco_completo">Endereço Completo</label>
+                            <input type="text" class="form-control" id="endereco_completo" name="endereco_completo" 
+                                   value="{{ address.endereco_completo|default:'' }}">
                         </div>
                     </div>
                     
@@ -288,6 +289,30 @@
                 <h3 class="section-title"><i class="fas fa-house-user"></i> Informações da Moradia</h3>
                 
                 <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="rua">Rua *</label>
+                            <input type="text" class="form-control" id="rua" name="rua" 
+                                   value="{{ address.rua|default:'' }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="numero">Número *</label>
+                            <input type="text" class="form-control" id="numero" name="numero" 
+                                   value="{{ address.numero|default:'' }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="complemento">Complemento</label>
+                            <input type="text" class="form-control" id="complemento" name="complemento" 
+                                   value="{{ address.complemento|default:'' }}">
+                        </div>
+                    </div>
+                    
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="telefone_celular">Telefone Celular</label>
@@ -432,14 +457,14 @@
             <!-- Botões de ação -->
             <div class="text-center mt-4">
                 <a href="{% url 'student_data_form' enrollment.pk %}" class="btn btn-secondary me-3">
-                    <i class="fas fa-arrow-left"></i> Voltar: Estudante
+                    <i class="fas fa-arrow-left"></i> Anterior: Estudante
                 </a>
-                <a href="{% url 'family_members_form' enrollment.pk %}" class="btn btn-success me-3">
-                    <i class="fas fa-arrow-right"></i> Próximo: Família
-                </a>
-                <button type="submit" class="btn btn-save btn-lg">
+                <button type="submit" class="btn btn-save btn-lg me-3">
                     <i class="fas fa-save"></i> Salvar Dados
                 </button>
+                <a href="{% url 'family_members_form' enrollment.pk %}" class="btn btn-success">
+                    <i class="fas fa-arrow-right"></i> Próximo: Família
+                </a>
             </div>
         </form>
     </div>
