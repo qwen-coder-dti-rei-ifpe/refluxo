@@ -487,12 +487,12 @@
             <!-- Botões de ação -->
             <div class="text-center mt-4">
                 <a href="{% url 'step3_cards' %}" class="btn btn-secondary me-3">
-                    <i class="fas fa-arrow-left"></i> Voltar
+                    <i class="fas fa-arrow-left"></i> Anterior: Início
                 </a>
-                <button type="submit" class="btn btn-save btn-lg me-3">
-                    <i class="fas fa-save"></i> Salvar e Próximo
+                <button type="submit" class="btn btn-save btn-lg">
+                    <i class="fas fa-save"></i> Salvar Dados
                 </button>
-                <a href="{% url 'address_data_form' enrollment.pk %}" class="btn btn-success">
+                <a href="{% url 'address_data_form' enrollment.pk %}" class="btn btn-primary ms-3">
                     <i class="fas fa-arrow-right"></i> Próximo: Endereço
                 </a>
             </div>
