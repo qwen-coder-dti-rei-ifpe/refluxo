@@ -172,8 +172,8 @@
         <a href="{% url 'step3_cards' %}" class="progress-step completed" title="Visão Geral">1</a>
         <div class="progress-line completed"></div>
         <a href="{% url 'student_data_form' enrollment.pk %}" class="progress-step active" title="Dados do Estudante">2</a>
-        <div class="progress-line {% if enrollment.address %}completed{% endif %}"></div>
-        <a href="{% url 'address_data_form' enrollment.pk %}" class="progress-step {% if enrollment.address %}completed{% else %}pending{% endif %}" title="Dados de Endereço">3</a>
+        <div class="progress-line"></div>
+        <a href="{% url 'address_data_form' enrollment.pk %}" class="progress-step pending" title="Dados de Endereço">3</a>
         <div class="progress-line"></div>
         <a href="{% url 'family_members_form' enrollment.pk %}" class="progress-step pending" title="Membros Familiares">4</a>
         <div class="progress-line"></div>
