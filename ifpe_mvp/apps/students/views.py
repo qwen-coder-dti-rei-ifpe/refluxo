@@ -41,7 +41,7 @@ def student_search(request):
                 return redirect('enrollment_dashboard', pk=period_ativo.pk)
             elif not period_ativo:
                 messages.info(request, 'Não há período de inscrição ativo no momento.')
-                return redirect('students:dashboard')
+                return redirect('dashboard')
         except Student.DoesNotExist:
             messages.warning(request, 'Estudante não encontrado. Realize o cadastro.')
             return redirect('student_create')

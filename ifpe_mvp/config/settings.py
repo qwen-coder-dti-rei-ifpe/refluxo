@@ -19,6 +19,13 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(','
 if DEBUG is False:
     ALLOWED_HOSTS += ['*.vercel.app']
 
+# CSRF Trusted Origins for Vercel deployment (must be set regardless of DEBUG)
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.vercel.app',
+    'http://localhost',
+    'http://127.0.0.1',
+]
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -105,6 +112,14 @@ LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'America/Recife'
 USE_I18N = True
 USE_TZ = True
+
+# Security settings for production
+if DEBUG is False:
+    # Ensure CSRF cookie is set properly for HTTPS
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_SAMESITE = 'Lax'
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
