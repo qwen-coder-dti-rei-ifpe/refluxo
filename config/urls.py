@@ -47,6 +47,11 @@ urlpatterns = [
     # Enrollment app URLs (fluxo de inscrição completo)
     path('enrollments/', include('ifpe_mvp.apps.enrollments.urls')),
     
+    # Students app URLs
+    path('students/', include('ifpe_mvp.apps.students.urls', namespace='students')),
+
+    # Family app URLs
+    path('family/', include('ifpe_mvp.apps.family.urls')),
     # Área do Pedagogo
     path('dashboard/pedagogo/', pedagogo_dashboard_view, name='pedagogo_dashboard'),
     path('pedagogo/edital/<int:edital_id>/', pedagogo_edital_detalhes_view, name='pedagogo_edital_detalhes'),

@@ -85,8 +85,13 @@ def student_data_form(request, pk):
         student = request.user.student
         enrollment = Enrollment.objects.get(student=student, enrollment_period=period)
     except (Student.DoesNotExist, Enrollment.DoesNotExist):
+        try:
+            student = request.user.student
+        except Student.DoesNotExist:
+            messages.error(request, 'Você precisa cadastrar seus dados de estudante primeiro.')
+            return redirect('students:student_create')
         enrollment = Enrollment.objects.create(
-            student=request.user.student,
+            student=student,
             enrollment_period=period,
             status='RASCUNHO'
         )
