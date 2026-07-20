@@ -128,6 +128,7 @@ def student_data_form(request, pk):
     context = {
         'period': period,
         'enrollment': enrollment,
+        'student': student,
         'step': 4,
         'total_steps': 8,
     }
@@ -157,6 +158,7 @@ def address_data_form(request, pk):
     context = {
         'period': period,
         'enrollment': enrollment,
+        'address': enrollment.address if enrollment.address else None,
         'step': 5,
         'total_steps': 8,
     }
@@ -183,9 +185,14 @@ def family_members_form(request, pk):
         messages.success(request, 'Dados de membros familiares salvos com sucesso!')
         return redirect('displacement_data_form', pk=pk)
     
+    # Get family members (all existing ones)
+    from ifpe_mvp.apps.family.models import FamilyMember
+    family_members = FamilyMember.objects.all()
+    
     context = {
         'period': period,
         'enrollment': enrollment,
+        'family_members': family_members,
         'step': 6,
         'total_steps': 8,
     }
@@ -215,6 +222,7 @@ def displacement_data_form(request, pk):
     context = {
         'period': period,
         'enrollment': enrollment,
+        'displacement': enrollment.displacement if enrollment.displacement else None,
         'step': 7,
         'total_steps': 8,
     }
