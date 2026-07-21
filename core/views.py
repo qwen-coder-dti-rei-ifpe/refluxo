@@ -47,14 +47,14 @@ class CustomLoginView(LoginView):
         """
         Redireciona usuários para seus dashboards específicos baseados no tipo de usuário.
         - Estudantes: redireciona para /dashboard/student/
-        - Pedagogos: redireciona para /dashboard/pedagogo/
+        - Assistentes sociais: redireciona para /dashboard/assistente/
         - Outros: usa a URL padrão ou admin
         """
         user = self.request.user
         
-        # Verifica se é pedagogo
-        if hasattr(user, 'is_pedagogo') and user.is_pedagogo:
-            return '/dashboard/pedagogo/'
+        # Verifica se é assistente social
+        if hasattr(user, 'is_assistente_social') and user.is_assistente_social:
+            return '/dashboard/assistente/'
         
         # Verifica se é estudante (busca pelo CPF do usuário no modelo Estudante)
         from core.models import Estudante
@@ -74,15 +74,15 @@ def home_view(request):
 
 
 @login_required
-def pedagogo_dashboard_view(request):
+def assistente_dashboard_view(request):
     """
-    View para dashboard do pedagogo - lista todos os períodos (editais) do programa.
-    Apenas usuários com is_pedagogo=True podem acessar.
+    View para dashboard do assistente social - lista todos os períodos (editais) do programa.
+    Apenas usuários com is_assistente_social=True podem acessar.
     Permite editar e deletar editais.
     """
-    # Verifica se o usuário é pedagogo
-    if not hasattr(request.user, 'is_pedagogo') or not request.user.is_pedagogo:
-        # Se não for pedagogo, redireciona para dashboard do estudante
+    # Verifica se o usuário é assistente social
+    if not hasattr(request.user, 'is_assistente_social') or not request.user.is_assistente_social:
+        # Se não for assistente social, redireciona para dashboard do estudante
         return redirect('/dashboard/student/')
     
     from inscricoes.models import Edital
@@ -103,9 +103,9 @@ def student_dashboard_view(request):
     """
     from inscricoes.models import Edital, Inscricao
     
-    # Verifica se é pedagogo, se for redireciona
-    if hasattr(request.user, 'is_pedagogo') and request.user.is_pedagogo:
-        return redirect('/dashboard/pedagogo/')
+    # Verifica se é assistente social, se for redireciona
+    if hasattr(request.user, 'is_assistente_social') and request.user.is_assistente_social:
+        return redirect('/dashboard/assistente/')
     
     matricula_search = None
     edital_selecionado = None
@@ -263,13 +263,13 @@ def step3_cards_view(request):
 
 
 @login_required
-def pedagogo_edital_detalhes_view(request, edital_id):
+def assistente_edital_detalhes_view(request, edital_id):
     """
     View para mostrar detalhes de um edital específico com todas as submissões dos estudantes.
-    Apenas usuários com is_pedagogo=True podem acessar.
+    Apenas usuários com is_assistente_social=True podem acessar.
     """
-    # Verifica se o usuário é pedagogo
-    if not hasattr(request.user, 'is_pedagogo') or not request.user.is_pedagogo:
+    # Verifica se o usuário é assistente social
+    if not hasattr(request.user, 'is_assistente_social') or not request.user.is_assistente_social:
         return render(request, 'core/sem_permissao.html')
     
     from inscricoes.models import Edital, Inscricao

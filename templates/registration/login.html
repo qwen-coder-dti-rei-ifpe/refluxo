@@ -171,7 +171,7 @@
             <p><a href="javascript:history.back()" style="color: #27ae60;">← Voltar à página anterior</a></p>
             <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;">
                 <button onclick="preencherAutomaticamente('estudante')" class="pedagogo-btn" style="background: #48bb78;">Sou Estudante - Preencher automaticamente</button>
-                <button onclick="preencherAutomaticamente('pedagogo')" class="pedagogo-btn">Sou Pedagogo - Preencher automaticamente</button>
+                <button onclick="preencherAutomaticamente('assistente')" class="pedagogo-btn">Sou Assistente Social - Preencher automaticamente</button>
             </div>
         </div>
     </div>
@@ -187,8 +187,8 @@
             if (tipo === 'estudante') {
                 document.getElementById('id_username').value = '12345678900';
                 document.getElementById('id_password').value = '12345678';
-            } else if (tipo === 'pedagogo') {
-                document.getElementById('id_username').value = 'pedagogo';
+            } else if (tipo === 'assistente') {
+                document.getElementById('id_username').value = 'assistente social';
                 document.getElementById('id_password').value = '12345678';
             }
         }

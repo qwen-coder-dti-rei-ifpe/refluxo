@@ -8,8 +8,8 @@ admin.site.unregister(Group)
 
 @admin.register(Usuario)
 class UsuarioAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'is_pedagogo', 'is_staff', 'is_superuser', 'date_joined')
-    list_filter = ('is_pedagogo', 'is_staff', 'is_superuser', 'is_active')
+    list_display = ('username', 'email', 'is_assistente_social', 'is_staff', 'is_superuser', 'date_joined')
+    list_filter = ('is_assistente_social', 'is_staff', 'is_superuser', 'is_active')
     search_fields = ('username', 'email', 'cpf')
     readonly_fields = ('date_joined', 'last_login')
     
@@ -18,7 +18,7 @@ class UsuarioAdmin(admin.ModelAdmin):
             'fields': ('username', 'password', 'email', 'cpf')
         }),
         ('Permissões', {
-            'fields': ('is_pedagogo', 'is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')
+            'fields': ('is_assistente_social', 'is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')
         }),
         ('Datas Importantes', {
             'fields': ('last_login', 'date_joined'),
@@ -114,13 +114,13 @@ class CustomAdminSite(admin.AdminSite):
         """Retorna lista de aplicações filtrada por grupo de usuário"""
         app_list = super().get_app_list(request)
         
-        # Se for superuser ou pedagogo, mostra tudo
+        # Se for superuser ou assistente social, mostra tudo
         if request.user.is_superuser:
             return app_list
         
-        # Pedagogo pode ver inscrições e análises
-        if hasattr(request.user, 'is_pedagogo') and request.user.is_pedagogo:
-            # Filtra para mostrar apenas apps relevantes para pedagogo
+        # Assistente social pode ver inscrições e análises
+        if hasattr(request.user, 'is_assistente_social') and request.user.is_assistente_social:
+            # Filtra para mostrar apenas apps relevantes para assistente social
             filtered_apps = []
             for app in app_list:
                 # Mostra Core (Estudante, Endereco) e Inscricoes
@@ -132,8 +132,8 @@ class CustomAdminSite(admin.AdminSite):
         if hasattr(request.user, 'groups'):
             group_names = [group.name for group in request.user.groups.all()]
             
-            # Pedagogo: vê apenas inscrições para avaliação
-            if 'Pedagogo' in group_names:
+            # Assistente Social: vê apenas inscrições para avaliação
+            if 'Assistente Social' in group_names:
                 app_list = [app for app in app_list if app['name'] in ['Core', 'Inscricoes', 'Inscrições']]
             
             # Controlador: vê apenas editais e períodos
