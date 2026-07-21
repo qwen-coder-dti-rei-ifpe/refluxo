@@ -177,18 +177,21 @@
     </div>
 
     <script>
-        function preencherAutomaticamente(tipo) {
-            document.getElementById('id_username').value = '';
+        // Auto-fill on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('id_username').value = '12345678900';
             document.getElementById('id_password').value = '12345678';
-            
+        });
+
+        function preencherAutomaticamente(tipo) {
             if (tipo === 'estudante') {
-                // Focus on username field for student to enter their CPF
-                document.getElementById('id_username').focus();
-                alert('Senha preenchida automaticamente como 12345678. Digite seu CPF no campo de usuário.');
+                document.getElementById('id_username').value = '12345678900';
+                document.getElementById('id_password').value = '12345678';
+                alert('Dados de estudante preenchidos automaticamente. CPF: 12345678900, Senha: 12345678');
             } else if (tipo === 'pedagogo') {
-                // Focus on username field for pedagogo to enter their CPF
-                document.getElementById('id_username').focus();
-                alert('Senha preenchida automaticamente como 12345678. Digite seu CPF no campo de usuário.');
+                document.getElementById('id_username').value = 'pedagogo';
+                document.getElementById('id_password').value = '12345678';
+                alert('Dados de pedagogo preenchidos automaticamente. Usuário: pedagogo, Senha: 12345678');
             }
         }
     </script>
