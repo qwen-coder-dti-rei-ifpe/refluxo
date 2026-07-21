@@ -18,6 +18,28 @@
             display: flex;
             flex-direction: column;
             color: #333;
+            position: relative;
+        }
+        
+        .pedagogo-top-link {
+            position: absolute;
+            top: 1.5rem;
+            right: 2rem;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            padding: 0.8rem 1.5rem;
+            border: 2px solid white;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: bold;
+            z-index: 100;
+        }
+        
+        .pedagogo-top-link:hover {
+            background: white;
+            color: #667eea;
+            transform: translateY(-2px);
         }
         
         .container {
@@ -170,12 +192,19 @@
     </style>
 </head>
 <body>
+    <a href="{% url 'login' %}?next=/pedagogo/dashboard/" class="pedagogo-top-link">Área do Pedagogo</a>
     <div class="container">
         <header>
             <h1>Programa de Apoio e Manutenção Acadêmica</h1>
             <p>Bem-vindo ao sistema de gestão do programa de apoio estudantil. Aqui você pode consultar informações sobre bolsas, auxílios e acompanhar o status das solicitações.</p>
         </header>
         
+        <section class="access-card">
+            <h2>Área do Estudante</h2>
+            <p style="color: #555; margin-bottom: 1.5rem;">Consulte o status da sua inscrição e acompanhe o processo de avaliação.</p>
+            <a href="{% url 'login' %}?next=/jornada-estudante/" class="access-button">Buscar por CPF</a>
+        </section>
+
         <section class="info-section">
             <h2>Sobre o Programa</h2>
             <p>O <strong>Programa de Apoio e Manutenção Acadêmica</strong> tem como objetivo garantir a permanência e o sucesso acadêmico dos estudantes em situação de vulnerabilidade socioeconômica, oferecendo suporte financeiro e pedagógico necessário para a conclusão dos cursos.</p>
@@ -192,24 +221,11 @@
             <h3 style="color: #667eea; margin: 1.5rem 0 1rem 0;">Como Funciona:</h3>
             <p>As seleções ocorrem semestralmente através de edital específico. Os estudantes interessados devem submeter sua candidatura com a documentação comprobatória de renda e situação socioeconômica. A análise é realizada por uma comissão multidisciplinar que avalia cada caso individualmente.</p>
         </section>
-        
-        <section class="access-card">
-            <h2>Área do Estudante</h2>
-            <p style="color: #555; margin-bottom: 1.5rem;">Consulte o status da sua inscrição e acompanhe o processo de avaliação.</p>
-            <a href="{% url 'buscar_cpf' %}" class="access-button">Buscar por CPF</a>
-        </section>
-
-        <section class="access-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-            <h2 style="color: white;">Área do Pedagogo</h2>
-            <p style="color: rgba(255,255,255,0.9); margin-bottom: 1.5rem;">Acesse o painel para gerenciar editais e analisar submissões dos estudantes.</p>
-            <a href="{% url 'login' %}?next=/pedagogo/dashboard/" class="access-button" style="background: white; color: #667eea;">Acessar como Pedagogo</a>
-        </section>
     </div>
     
     <footer>
         <div class="footer-links">
             <a href="/admin/" class="footer-link admin">Administração</a>
-            <a href="{% url 'login' %}?next=/pedagogo/dashboard/" class="footer-link" style="background: #667eea; border-color: #667eea;">Área do Pedagogo</a>
         </div>
         <p style="color: white; margin-top: 1.5rem; opacity: 0.8; font-size: 0.9rem;">
             &copy; {% now "Y" %} Programa de Apoio e Manutenção Acadêmica - Todos os direitos reservados
