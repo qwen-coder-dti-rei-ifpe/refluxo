@@ -1,54 +1,49 @@
-```
-# Python
+# Compiled and build artifacts
+*.pyc
 __pycache__/
-*.py[cod]
-*$py.class
+*.o
+*.obj
+*.class
+*.exe
+*.dll
 *.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
+*.a
+*.out
 
-# Virtual Environment
+# Dependencies
+.venv/
 venv/
+node_modules/
+dist/
+build/
+target/
+.mypy_cache/
+.pytest_cache/
+.gradle/
 
-# IDE
-.vscode/
-.idea/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Logs
+# Logs and temp files
 *.log
+*.tmp
+*.swp
+*.swo
 
-# Coverage
-.coverage
-coverage/
-htmlcov/
-
-# Environment variables
+# Environment
 .env
 .env.local
 *.env.*
 
-# Django specific
-*.mo
-*.pot
-local_settings.py
+# Editors
+.vscode/
+.idea/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
 
 # Compressed files
 *.zip
@@ -73,4 +68,3 @@ local_settings.py
 *.tar.bz2
 *.tar.xz
 *.tar.zst
-```
