@@ -50,8 +50,29 @@
                 <small class="text-muted">
                     Acesso restrito a estudantes e servidores do IFPE
                 </small>
+                <div class="mt-2">
+                    <button type="button" class="btn btn-sm btn-outline-primary me-2" onclick="preencherAutomaticamente('estudante')">
+                        <i class="fas fa-user-graduate"></i> Sou Estudante - Preencher automaticamente
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-success" onclick="preencherAutomaticamente('pedagogo')">
+                        <i class="fas fa-chalkboard-teacher"></i> Sou Pedagogo - Preencher automaticamente
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    function preencherAutomaticamente(tipo) {
+        document.getElementById('id_username').value = '12345678900';
+        document.getElementById('id_password').value = '12345678';
+        
+        if (tipo === 'estudante') {
+            alert('Dados de estudante preenchidos automaticamente. CPF: 12345678900, Senha: 12345678');
+        } else if (tipo === 'pedagogo') {
+            alert('Dados de pedagogo preenchidos automaticamente. CPF: 12345678900, Senha: 12345678');
+        }
+    }
+</script>
 {% endblock %}
