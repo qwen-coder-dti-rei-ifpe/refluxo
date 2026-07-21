@@ -28,6 +28,14 @@
     {
       "src": "config/wsgi.py",
       "use": "@vercel/python"
+    },
+
+    {
+      "src": "popular_dados_mock.sh",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "staticfiles"
+      }
     }
   ]
 }
