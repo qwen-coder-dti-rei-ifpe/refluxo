@@ -183,7 +183,7 @@
     </div>
 
     <div class="form-header">
-        <h1><i class="fas fa-home"></i> Passo 3: Dados de Endereço</h1>
+        <h1><i class="fas fa-home"></i> Passo 5: Dados de Endereço</h1>
         <p>Preencha todas as informações residenciais e condições de moradia</p>
     </div>
     
@@ -256,11 +256,27 @@
                         </div>
                     </div>
                     
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                         <div class="form-group">
-                            <label for="endereco_completo">Endereço Completo</label>
-                            <input type="text" class="form-control" id="endereco_completo" name="endereco_completo" 
-                                   value="{{ address.endereco_completo|default:'' }}">
+                            <label for="rua">Rua *</label>
+                            <input type="text" class="form-control" id="rua" name="rua" 
+                                   value="{{ address.rua|default:'' }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="numero">Número *</label>
+                            <input type="text" class="form-control" id="numero" name="numero" 
+                                   value="{{ address.numero|default:'' }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="complemento">Complemento</label>
+                            <input type="text" class="form-control" id="complemento" name="complemento" 
+                                   value="{{ address.complemento|default:'' }}">
                         </div>
                     </div>
                     
@@ -287,30 +303,6 @@
                 <h3 class="section-title"><i class="fas fa-house-user"></i> Informações da Moradia</h3>
                 
                 <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="rua">Rua *</label>
-                            <input type="text" class="form-control" id="rua" name="rua" 
-                                   value="{{ address.rua|default:'' }}" required>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="numero">Número *</label>
-                            <input type="text" class="form-control" id="numero" name="numero" 
-                                   value="{{ address.numero|default:'' }}" required>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="complemento">Complemento</label>
-                            <input type="text" class="form-control" id="complemento" name="complemento" 
-                                   value="{{ address.complemento|default:'' }}">
-                        </div>
-                    </div>
-                    
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="telefone_celular">Telefone Celular</label>
