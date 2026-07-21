@@ -1,7 +1,6 @@
 {
   "version": 2,
   "framework": null,
-  "installCommand": "./vercel_install.sh",
   "outputDirectory": "staticfiles",
   "env": {
     "DJANGO_SETTINGS_MODULE": "config.settings",
@@ -31,7 +30,7 @@
     },
 
     {
-      "src": "popular_dados_mock.sh",
+      "src": "vercel_install.sh",
       "use": "@vercel/static-build",
       "config": {
         "distDir": "staticfiles"
