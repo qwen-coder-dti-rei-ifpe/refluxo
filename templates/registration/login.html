@@ -170,10 +170,27 @@
         <div class="footer-links">
             <p><a href="javascript:history.back()" style="color: #27ae60;">← Voltar à página anterior</a></p>
             <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;">
-                <a href="/login/?tipo=estudante" class="pedagogo-btn" style="background: #48bb78;">Sou Estudante - Preencher automaticamente</a>
-                <a href="/login/?tipo=pedagogo" class="pedagogo-btn">Sou Pedagogo - Preencher automaticamente</a>
+                <button onclick="preencherAutomaticamente('estudante')" class="pedagogo-btn" style="background: #48bb78;">Sou Estudante - Preencher automaticamente</button>
+                <button onclick="preencherAutomaticamente('pedagogo')" class="pedagogo-btn">Sou Pedagogo - Preencher automaticamente</button>
             </div>
         </div>
     </div>
+
+    <script>
+        function preencherAutomaticamente(tipo) {
+            document.getElementById('id_username').value = '';
+            document.getElementById('id_password').value = '12345678';
+            
+            if (tipo === 'estudante') {
+                // Focus on username field for student to enter their CPF
+                document.getElementById('id_username').focus();
+                alert('Senha preenchida automaticamente como 12345678. Digite seu CPF no campo de usuário.');
+            } else if (tipo === 'pedagogo') {
+                // Focus on username field for pedagogo to enter their CPF
+                document.getElementById('id_username').focus();
+                alert('Senha preenchida automaticamente como 12345678. Digite seu CPF no campo de usuário.');
+            }
+        }
+    </script>
 </body>
 </html>
