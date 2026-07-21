@@ -1,0 +1,81 @@
+{% extends 'admin/base_site.html' %}
+
+{% block title %}Dashboard do Assistente Social{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">Área do Assistente Social - Programas e Períodos</h1>
+{% endblock %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto;">
+    <div style="background: white; border-radius: 8px; padding: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h2 style="color: #417690; margin-bottom: 1.5rem; border-bottom: 2px solid #417690; padding-bottom: 0.5rem;">
+            Períodos do Programa (Editais)
+        </h2>
+        
+        {% if editais %}
+            <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                <thead>
+                    <tr style="background: #f5f5f5;">
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Número</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Título</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Status</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Inscrições</th>
+                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Avaliação</th>
+                        <th style="padding: 12px; text-align: center; border-bottom: 2px solid #ddd;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for edital in editais %}
+                    <tr style="{% cycle '' 'background: #f9f9f9;' %}">
+                        <td style="padding: 12px; border-bottom: 1px solid #eee;">{{ edital.numero }}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #eee;">{{ edital.titulo }}</td>
+                        <td style="padding: 12px; border-bottom: 1px solid #eee;">
+                            <span style="padding: 4px 8px; border-radius: 4px; background: {% if edital.status == 'ATIVO' %}#4caf50{% elif edital.status == 'SUSPENSO' %}#ff9800{% else %}#f44336{% endif %}; color: white; font-size: 0.85rem;">
+                                {{ edital.get_status_display }}
+                            </span>
+                        </td>
+                        <td style="padding: 12px; border-bottom: 1px solid #eee;">
+                            {% if edital.periodo_inscricao_abertura and edital.periodo_inscricao_fechamento %}
+                                {{ edital.periodo_inscricao_abertura|date:"d/m/Y" }} até {{ edital.periodo_inscricao_fechamento|date:"d/m/Y" }}
+                            {% else %}
+                                Não definido
+                            {% endif %}
+                        </td>
+                        <td style="padding: 12px; border-bottom: 1px solid #eee;">
+                            {% if edital.periodo_avaliacao_abertura and edital.periodo_avaliacao_fechamento %}
+                                {{ edital.periodo_avaliacao_abertura|date:"d/m/Y" }} até {{ edital.periodo_avaliacao_fechamento|date:"d/m/Y" }}
+                            {% else %}
+                                Não definido
+                            {% endif %}
+                        </td>
+                        <td style="padding: 12px; text-align: center; border-bottom: 1px solid #eee;">
+                            <a href="{% url 'assistente_edital_detalhes' edital.id %}" 
+                               style="display: inline-block; padding: 8px 16px; background: #417690; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">
+                                Ver Submissões
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p style="color: #666; padding: 2rem; text-align: center; background: #f9f9f9; border-radius: 8px;">
+                Nenhum período/edital cadastrado no momento.
+            </p>
+        {% endif %}
+        
+        <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #ddd;">
+            <a href="javascript:history.back()" style="display: inline-block; padding: 8px 16px; background: #e0e0e0; color: #333; text-decoration: none; border-radius: 4px; margin-right: 1rem;">
+                ← Voltar
+            </a>
+            <a href="/admin/" style="display: inline-block; padding: 8px 16px; background: #f5f5f5; color: #333; text-decoration: none; border-radius: 4px; margin-right: 1rem;">
+                ← Voltar ao Admin
+            </a>
+            <a href="/" style="display: inline-block; padding: 8px 16px; background: #417690; color: white; text-decoration: none; border-radius: 4px;">
+                Ir para Home
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

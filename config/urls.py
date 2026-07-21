@@ -20,7 +20,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-from core.views import home_view, buscar_cpf_view, CustomLoginView, pedagogo_dashboard_view, pedagogo_edital_detalhes_view, jornada_estudante_view, student_dashboard_view, step3_cards_view
+from core.views import home_view, buscar_cpf_view, CustomLoginView, assistente_dashboard_view, assistente_edital_detalhes_view, jornada_estudante_view, student_dashboard_view, step3_cards_view
 
 urlpatterns = [
     # Página inicial do programa
@@ -52,9 +52,9 @@ urlpatterns = [
 
     # Family app URLs
     path('family/', include('ifpe_mvp.apps.family.urls')),
-    # Área do Pedagogo
-    path('dashboard/pedagogo/', pedagogo_dashboard_view, name='pedagogo_dashboard'),
-    path('pedagogo/edital/<int:edital_id>/', pedagogo_edital_detalhes_view, name='pedagogo_edital_detalhes'),
+    # Área do Assistente Social
+    path('dashboard/assistente/', assistente_dashboard_view, name='assistente_dashboard'),
+    path('assistente/edital/<int:edital_id>/', assistente_edital_detalhes_view, name='assistente_edital_detalhes'),
     
     # Admin Django
     path('admin/', admin.site.urls),

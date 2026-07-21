@@ -17,8 +17,8 @@ class Usuario(AbstractUser):
     # Campos adicionais podem ser adicionados aqui conforme necessidade
     cpf = models.CharField(max_length=14, blank=True, unique=True, verbose_name="CPF")
     
-    # Campo para definir se é pedagogo
-    is_pedagogo = models.BooleanField(default=False, verbose_name="É pedagogo")
+    # Campo para definir se é assistente social
+    is_assistente_social = models.BooleanField(default=False, verbose_name="É assistente social")
     
     class Meta:
         verbose_name = "Usuário"
