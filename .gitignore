@@ -1,56 +1,30 @@
 ```
-# Environment variables
+# Environment
 .env
 .env.local
-*.env.*
+.env.*
 
-# Logs
+# Logs and temp files
 *.log
-
-# Temporary files
 *.tmp
-*.swp
-*.swo
 
-# OS generated files
-.DS_Store
-Thumbs.db
+# Editors
+.vscode/
+.idea/
 
 # Dependencies
 node_modules/
 venv/
 .venv/
 __pycache__/
-*.egg-info/
+*.pyc
 
-# Build outputs
+# Build artifacts
 dist/
 build/
 target/
-*.pyc
-*.class
-*.o
-*.exe
-*.dll
-*.so
 
-# Coverage reports
-coverage/
-htmlcov/
-.coverage
-
-# IDE specific
-.vscode/
-.idea/
-*.iml
-
-# Compressed files
-*.zip
-*.gz
-*.tar
-*.tgz
-*.bz2
-*.xz
-*.7z
-*.rar
+# OS generated files
+.DS_Store
+Thumbs.db
 ```

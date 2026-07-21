@@ -1,7 +1,7 @@
 {
   "version": 2,
   "framework": null,
-  "installCommand": "python -m venv venv && source venv/bin/activate && cp .env.example .env && pip install -r requirements.txt && python manage.py makemigrations --noinput && python manage.py migrate --noinput && (python manage.py popular_dados_mock --noinput || echo 'Aviso: Não foi possível executar popular_dados_mock - dados podem já existir') && python manage.py collectstatic --noinput",
+  "installCommand": "./vercel_install.sh",
   "outputDirectory": "staticfiles",
   "env": {
     "DJANGO_SETTINGS_MODULE": "config.settings",
