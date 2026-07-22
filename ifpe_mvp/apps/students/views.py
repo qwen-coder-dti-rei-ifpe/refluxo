@@ -66,14 +66,15 @@ def student_search(request):
                     'data_nascimento': dados_api.get('data_nascimento', ''),  # birthday
                     'idade': dados_api.get('idade', ''),
                     'raca': dados_api.get('raca', ''),
-                    'sexo': dados_api.get('sexo', ''),  # gender (M/F)
+                    'sexo': dados_api.get('sexo', ''),  # gender (M/F -> MASCULINO/FEMININO)
+                    'genero': dados_api.get('sexo', ''),  # Gênero igual ao sexo para pré-preenchimento
                     'matricula': dados_api.get('matricula', ''),
                     'campus': dados_api.get('campus', ''),
                     'curso': dados_api.get('curso', ''),
                     'turno': dados_api.get('turno', ''),
-                    'periodo': dados_api.get('currentPeriod', ''),  # currentPeriod
+                    'periodo': dados_api.get('periodo', ''),  # currentPeriod formatado como "1º"
                     'eh_cotista': dados_api.get('eh_cotista', False),
-                    'email_pessoal': dados_api.get('email', ''),  # Email Pessoal (novo campo)
+                    'email_pessoal': dados_api.get('email', ''),  # Email Pessoal (campo email da API)
                     'email_institucional': '',  # Email Institucional (separado do email pessoal)
                     'nome_mae': dados_api.get('nome_mae', ''),
                     'nome_pai': dados_api.get('nome_pai', ''),
