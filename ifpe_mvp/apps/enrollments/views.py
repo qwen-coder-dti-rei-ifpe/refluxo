@@ -115,12 +115,26 @@ def student_data_form(request, pk):
             status='RASCUNHO'
         )
     
+    # Verifica se há dados na sessão para autopreenchimento (provenientes da API QAcadêmico)
+    initial_data = {}
+    if hasattr(request.session, 'get'):
+        estudante_dados = request.session.get('estudanteDados', {})
+        if estudante_dados:
+            initial_data = estudante_dados
+            # Mesclar dados da sessão com o objeto student
+            for key, value in estudante_dados.items():
+                if hasattr(student, key) and value:
+                    setattr(student, key, value)
+    
     if request.method == 'POST':
         # Salvar dados do estudante
         student = request.user.student
         student.nome_completo = request.POST.get('nome_completo', student.nome_completo)
         student.cpf = request.POST.get('cpf', student.cpf)
         student.save()
+        
+        # Limpar dados da sessão após salvar
+        request.session.pop('estudanteDados', None)
         
         messages.success(request, 'Dados do estudante salvos com sucesso!')
         return redirect('address_data_form', pk=pk)
