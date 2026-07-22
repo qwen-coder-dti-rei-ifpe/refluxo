@@ -133,6 +133,9 @@ def student_data_form(request, pk):
             student.sexo = estudante_dados.get('sexo')
         if estudante_dados.get('genero'):
             student.genero = estudante_dados.get('genero')
+        elif estudante_dados.get('sexo'):
+            # Se não tiver gênero, usa o sexo como fallback
+            student.genero = estudante_dados.get('sexo')
         if estudante_dados.get('periodo'):
             student.periodo = estudante_dados.get('periodo')
         if estudante_dados.get('campus'):
@@ -145,33 +148,17 @@ def student_data_form(request, pk):
             student.eh_cotista = estudante_dados.get('eh_cotista')
         
         # Email pessoal - campo separado, não usar como email institucional
-        if estudante_dados.get('email_pessoal'):
-            # Garantir que email_pessoal esteja disponível no objeto student
-            # Se o modelo Student não tiver email_pessoal, usamos uma variável temporária
-            pass
-        
-        # Forçar atualização dos valores no objeto student para o template
-        # Isso garante que os valores apareçam mesmo se o student já existir no banco
-        for key, value in estudante_dados.items():
-            if hasattr(student, key) and value:
-                setattr(student, key, value)
+        email_pessoal_value = estudante_dados.get('email_pessoal', '')
+        email_institucional_value = estudante_dados.get('email_institucional', '')
         
         # Adicionar atributos extras ao student para campos que podem não existir no modelo
         # Isso permite que o template acesse email_pessoal e genero mesmo se não existirem no modelo
-        if not hasattr(student, 'email_pessoal'):
-            student.email_pessoal = estudante_dados.get('email_pessoal', '')
-        elif not student.email_pessoal:
-            student.email_pessoal = estudante_dados.get('email_pessoal', '')
+        student.email_pessoal = email_pessoal_value
+        student.email_institucional = email_institucional_value
             
-        if not hasattr(student, 'genero'):
-            # Usar o gênero da sessão ou mapear sexo para gênero se necessário
+        # Garantir que genero esteja definido (fallback para sexo)
+        if not hasattr(student, 'genero') or not student.genero:
             student.genero = estudante_dados.get('genero', estudante_dados.get('sexo', ''))
-        elif not student.genero:
-            student.genero = estudante_dados.get('genero', estudante_dados.get('sexo', ''))
-        
-        # Garantir que email_institucional também esteja disponível
-        if not hasattr(student, 'email_institucional'):
-            student.email_institucional = estudante_dados.get('email_institucional', '')
     
     if request.method == 'POST':
         # Salvar dados do estudante
