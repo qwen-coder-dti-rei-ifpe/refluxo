@@ -1,36 +1,60 @@
-```
+```gitignore
 # Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.py~
+*.py.class
+*.py.backup
+*.swp
+*.swo
+
+# Virtual environments
+venv/
+.venv/
+env/
+.ENV/
+
+# Django/Python build artifacts
+*.class
+*.o
+*.so
+*.a
+*.obj
+*.out
 
 # Dependencies
-.venv/
-venv/
-env/
-requirements.txt.bak
+node_modules/
+.mypy_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+coverage/
 
 # Logs
 *.log
+*.tmp
 
 # Environment variables
 .env
 .env.local
 *.env.*
 
-# Coverage reports
-.coverage
-coverage/
-htmlcov/
-
-# IDE
+# Editors
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# OS
+# OS generated files
 .DS_Store
 Thumbs.db
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+.installed.cfg
+*.egg
 ```

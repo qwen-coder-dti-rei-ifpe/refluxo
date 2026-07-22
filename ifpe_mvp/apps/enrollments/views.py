@@ -116,52 +116,67 @@ def student_data_form(request, pk):
         )
     
     # Verifica se há dados na sessão para autopreenchimento (provenientes da API QAcadêmico)
-    initial_data = {}
-    if hasattr(request.session, 'get'):
-        estudante_dados = request.session.get('estudanteDados', {})
-        if estudante_dados:
-            initial_data = estudante_dados
-            # Mesclar dados da sessão com o objeto student
-            for key, value in estudante_dados.items():
-                if hasattr(student, key) and value:
-                    setattr(student, key, value)
+    estudante_dados = request.session.get('estudanteDados', {})
     
-    # Atualizar campos específicos do student com dados da API QAcadêmico
-    if hasattr(request.session, 'get'):
-        estudante_dados = request.session.get('estudanteDados', {})
-        if estudante_dados:
-            # Mapear campos específicos
-            if estudante_dados.get('identidade'):
-                student.identidade = estudante_dados.get('identidade')
-            if estudante_dados.get('data_nascimento'):
-                student.data_nascimento = estudante_dados.get('data_nascimento')
-            if estudante_dados.get('idade'):
-                student.idade = estudante_dados.get('idade')
-            if estudante_dados.get('raca'):
-                student.raca = estudante_dados.get('raca')
-            if estudante_dados.get('sexo'):
-                student.sexo = estudante_dados.get('sexo')
-            if estudante_dados.get('periodo'):
-                student.periodo = estudante_dados.get('periodo')
-            if estudante_dados.get('campus'):
-                student.campus = estudante_dados.get('campus')
-            if estudante_dados.get('curso'):
-                student.curso = estudante_dados.get('curso')
-            if estudante_dados.get('turno'):
-                student.turno = estudante_dados.get('turno')
-            if estudante_dados.get('eh_cotista') is not None:
-                student.eh_cotista = estudante_dados.get('eh_cotista')
-            # Email pessoal (novo campo) - usar email_institucional como fallback
-            if estudante_dados.get('email_pessoal'):
-                # Se não houver email institucional, usar email pessoal
-                if not student.email_institucional:
-                    student.email_institucional = estudante_dados.get('email_pessoal')
+    # Atualizar campos específicos do student com dados da API QAcadêmico ANTES de renderizar
+    if estudante_dados:
+        # Mapear todos os campos necessários para o template
+        if estudante_dados.get('identidade'):
+            student.identidade = estudante_dados.get('identidade')
+        if estudante_dados.get('data_nascimento'):
+            student.data_nascimento = estudante_dados.get('data_nascimento')
+        if estudante_dados.get('idade'):
+            student.idade = estudante_dados.get('idade')
+        if estudante_dados.get('raca'):
+            student.raca = estudante_dados.get('raca')
+        if estudante_dados.get('sexo'):
+            student.sexo = estudante_dados.get('sexo')
+        if estudante_dados.get('periodo'):
+            student.periodo = estudante_dados.get('periodo')
+        if estudante_dados.get('campus'):
+            student.campus = estudante_dados.get('campus')
+        if estudante_dados.get('curso'):
+            student.curso = estudante_dados.get('curso')
+        if estudante_dados.get('turno'):
+            student.turno = estudante_dados.get('turno')
+        if estudante_dados.get('eh_cotista') is not None:
+            student.eh_cotista = estudante_dados.get('eh_cotista')
+        
+        # Email pessoal - campo separado, não usar como email institucional
+        if estudante_dados.get('email_pessoal'):
+            # Garantir que email_pessoal esteja disponível no objeto student
+            # Se o modelo Student não tiver email_pessoal, usamos uma variável temporária
+            pass
+        
+        # Forçar atualização dos valores no objeto student para o template
+        # Isso garante que os valores apareçam mesmo se o student já existir no banco
+        for key, value in estudante_dados.items():
+            if hasattr(student, key) and value:
+                setattr(student, key, value)
+        
+        # Adicionar atributos extras ao student para campos que podem não existir no modelo
+        # Isso permite que o template acesse email_pessoal mesmo se não existir no modelo
+        if not hasattr(student, 'email_pessoal'):
+            student.email_pessoal = estudante_dados.get('email_pessoal', '')
+        if not hasattr(student, 'genero'):
+            # Mapear sexo para gênero se necessário
+            student.genero = estudante_dados.get('sexo', '')
     
     if request.method == 'POST':
         # Salvar dados do estudante
         student = request.user.student
         student.nome_completo = request.POST.get('nome_completo', student.nome_completo)
         student.cpf = request.POST.get('cpf', student.cpf)
+        student.identidade = request.POST.get('identidade', student.identidade)
+        student.data_nascimento = request.POST.get('data_nascimento', student.data_nascimento)
+        student.idade = request.POST.get('idade', student.idade)
+        student.raca = request.POST.get('raca', student.raca)
+        student.sexo = request.POST.get('sexo', student.sexo)
+        student.periodo = request.POST.get('periodo', student.periodo)
+        student.campus = request.POST.get('campus', student.campus)
+        student.curso = request.POST.get('curso', student.curso)
+        student.turno = request.POST.get('turno', student.turno)
+        student.eh_cotista = request.POST.get('eh_cotista') == 'on'
         student.save()
         
         # Limpar dados da sessão após salvar
@@ -176,6 +191,7 @@ def student_data_form(request, pk):
         'student': student,
         'step': 4,
         'total_steps': 8,
+        'estudante_dados': estudante_dados,  # Passar dados da API explicitamente para o template
     }
     return render(request, 'enrollments/student_data_form.html', context)
 

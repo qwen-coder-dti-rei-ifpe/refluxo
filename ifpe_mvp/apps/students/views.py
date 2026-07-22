@@ -74,6 +74,7 @@ def student_search(request):
                     'periodo': dados_api.get('currentPeriod', ''),  # currentPeriod
                     'eh_cotista': dados_api.get('eh_cotista', False),
                     'email_pessoal': dados_api.get('email', ''),  # Email Pessoal (novo campo)
+                    'email_institucional': '',  # Email Institucional (separado do email pessoal)
                     'nome_mae': dados_api.get('nome_mae', ''),
                     'nome_pai': dados_api.get('nome_pai', ''),
                     'estado_civil': dados_api.get('estado_civil', ''),
