@@ -15,6 +15,10 @@ from .serializers import EstudanteSerializer, EnderecoSerializer
 from .forms import LoginForm, JornadaForm
 
 
+# Importar serviço de integração com QAcadêmico
+from integrations.qacademico_service import buscar_estudante_qacademico
+
+
 class CustomLoginView(LoginView):
     """
     View personalizada para login com autopreenchimento de credenciais.
@@ -150,7 +154,33 @@ def student_dashboard_view(request):
                     edital_selecionado = None
             
             if matricula_search and edital_selecionado:
-                # Buscar estudante pelo CPF (que é o username) e matrícula
+                # Primeiro, tentar buscar na API do QAcadêmico (Mock Postman)
+                dados_qacademico, erro_api = buscar_estudante_qacademico(matricula_search)
+                
+                if dados_qacademico and not erro_api:
+                    # Dados encontrados na API QAcadêmico - usar para preencher formulário
+                    message = "Matrícula encontrada no QAcadêmico! Preencha os dados abaixo para enviar sua submissão."
+                    
+                    # Armazenar dados do estudante na sessão para autopreenchimento
+                    request.session['estudanteDados'] = {
+                        'nome_completo': dados_qacademico.get('nome_completo', ''),
+                        'cpf': dados_qacademico.get('cpf', ''),
+                        'idade': dados_qacademico.get('idade'),
+                        'raca': dados_qacademico.get('raca', ''),
+                        'sexo': dados_qacademico.get('sexo', ''),
+                        'matricula': dados_qacademico.get('matricula', ''),
+                        'campus': dados_qacademico.get('campus', ''),
+                        'curso': dados_qacademico.get('curso', ''),
+                        'turno': dados_qacademico.get('turno', ''),
+                        'periodo': dados_qacademico.get('periodo', ''),
+                        'eh_cotista': dados_qacademico.get('eh_cotista', False),
+                        'moradia_estudantil': False,
+                    }
+                    
+                    # Redireciona para Step 3 (cards)
+                    return redirect('step3_cards')
+                
+                # Se não encontrou na API, tenta buscar no banco local
                 try:
                     estudante = Estudante.objects.get(cpf=request.user.username, matricula=matricula_search)
                     
@@ -193,7 +223,11 @@ def student_dashboard_view(request):
                         return redirect('step3_cards')
                         
                 except Estudante.DoesNotExist:
-                    message = "Matrícula não encontrada para o seu CPF."
+                    # Não encontrou nem na API nem no banco local
+                    if erro_api:
+                        message = f"Erro ao buscar matrícula: {erro_api}"
+                    else:
+                        message = "Matrícula não encontrada para o seu CPF."
             elif not edital_selecionado:
                 message = "Por favor, selecione um edital ativo antes de buscar a matrícula."
     else:

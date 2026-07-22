@@ -218,7 +218,7 @@
                         <div class="form-group">
                             <label for="data_nascimento">Data de Nascimento</label>
                             <input type="date" class="form-control" id="data_nascimento" name="data_nascimento" 
-                                   value="{{ student.data_nascimento|date:'Y-m-d'|default:'' }}">
+                                   value="{{ estudante_dados.data_nascimento|default:student.data_nascimento|date:'Y-m-d'|default:'' }}">
                         </div>
                     </div>
                     
@@ -226,7 +226,7 @@
                         <div class="form-group">
                             <label for="idade">Idade</label>
                             <input type="number" class="form-control" id="idade" name="idade" 
-                                   value="{{ student.idade|default:'' }}">
+                                   value="{{ estudante_dados.idade|default:student.idade|default:'' }}">
                         </div>
                     </div>
                     
@@ -234,7 +234,7 @@
                         <div class="form-group">
                             <label for="identidade">Identidade (RG)</label>
                             <input type="text" class="form-control" id="identidade" name="identidade" 
-                                   value="{{ student.identidade|default:'' }}">
+                                   value="{{ estudante_dados.identidade|default:student.identidade|default:'' }}">
                         </div>
                     </div>
                     
@@ -243,11 +243,11 @@
                             <label for="raca">Raça *</label>
                             <select class="form-select" id="raca" name="raca">
                                 <option value="">Selecione...</option>
-                                <option value="BRANCA" {% if student.raca == 'BRANCA' %}selected{% endif %}>Branca</option>
-                                <option value="PRETA" {% if student.raca == 'PRETA' %}selected{% endif %}>Preta</option>
-                                <option value="PARDA" {% if student.raca == 'PARDA' %}selected{% endif %}>Parda</option>
-                                <option value="AMARELA" {% if student.raca == 'AMARELA' %}selected{% endif %}>Amarela</option>
-                                <option value="INDIGENA" {% if student.raca == 'INDIGENA' %}selected{% endif %}>Indígena</option>
+                                <option value="BRANCA" {% if estudante_dados.raca|default:student.raca == 'BRANCA' %}selected{% endif %}>Branca</option>
+                                <option value="PRETA" {% if estudante_dados.raca|default:student.raca == 'PRETA' %}selected{% endif %}>Preta</option>
+                                <option value="PARDA" {% if estudante_dados.raca|default:student.raca == 'PARDA' %}selected{% endif %}>Parda</option>
+                                <option value="AMARELA" {% if estudante_dados.raca|default:student.raca == 'AMARELA' %}selected{% endif %}>Amarela</option>
+                                <option value="INDIGENA" {% if estudante_dados.raca|default:student.raca == 'INDIGENA' %}selected{% endif %}>Indígena</option>
                             </select>
                         </div>
                     </div>
@@ -256,7 +256,7 @@
                         <div class="form-group">
                             <label for="cor">Cor</label>
                             <input type="text" class="form-control" id="cor" name="cor" 
-                                   value="{{ student.cor|default:'' }}">
+                                   value="{{ estudante_dados.cor|default:student.cor|default:'' }}">
                         </div>
                     </div>
                     
@@ -265,10 +265,10 @@
                             <label for="sexo">Sexo *</label>
                             <select class="form-select" id="sexo" name="sexo">
                                 <option value="">Selecione...</option>
-                                <option value="MASCULINO" {% if student.sexo == 'MASCULINO' %}selected{% endif %}>Masculino</option>
-                                <option value="FEMININO" {% if student.sexo == 'FEMININO' %}selected{% endif %}>Feminino</option>
-                                <option value="NAO_BINARIO" {% if student.sexo == 'NAO_BINARIO' %}selected{% endif %}>Não-binário</option>
-                                <option value="OUTRO" {% if student.sexo == 'OUTRO' %}selected{% endif %}>Outro</option>
+                                <option value="MASCULINO" {% if estudante_dados.sexo|default:student.sexo == 'MASCULINO' %}selected{% endif %}>Masculino</option>
+                                <option value="FEMININO" {% if estudante_dados.sexo|default:student.sexo == 'FEMININO' %}selected{% endif %}>Feminino</option>
+                                <option value="NAO_BINARIO" {% if estudante_dados.sexo|default:student.sexo == 'NAO_BINARIO' %}selected{% endif %}>Não-binário</option>
+                                <option value="OUTRO" {% if estudante_dados.sexo|default:student.sexo == 'OUTRO' %}selected{% endif %}>Outro</option>
                             </select>
                         </div>
                     </div>
@@ -292,7 +292,7 @@
                         <div class="form-group">
                             <label for="genero">Gênero</label>
                             <input type="text" class="form-control" id="genero" name="genero" 
-                                   value="{{ student.genero|default:'' }}">
+                                   value="{{ estudante_dados.genero|default:estudante_dados.sexo|default:student.genero|default:student.sexo|default:'' }}">
                         </div>
                     </div>
                 </div>
@@ -307,7 +307,7 @@
                         <div class="form-group">
                             <label for="matricula">Matrícula *</label>
                             <input type="text" class="form-control" id="matricula" name="matricula" 
-                                   value="{{ student.matricula|default:'' }}" required>
+                                   value="{{ estudante_dados.matricula|default:student.matricula|default:'' }}" required>
                         </div>
                     </div>
                     
@@ -315,7 +315,7 @@
                         <div class="form-group">
                             <label for="campus">Campus *</label>
                             <input type="text" class="form-control" id="campus" name="campus" 
-                                   value="{{ student.campus|default:'' }}" required>
+                                   value="{{ estudante_dados.campus|default:student.campus|default:'' }}" required>
                         </div>
                     </div>
                     
@@ -323,7 +323,7 @@
                         <div class="form-group">
                             <label for="curso">Curso *</label>
                             <input type="text" class="form-control" id="curso" name="curso" 
-                                   value="{{ student.curso|default:'' }}" required>
+                                   value="{{ estudante_dados.curso|default:student.curso|default:'' }}" required>
                         </div>
                     </div>
                     
@@ -332,10 +332,10 @@
                             <label for="turno">Turno *</label>
                             <select class="form-select" id="turno" name="turno">
                                 <option value="">Selecione...</option>
-                                <option value="MATUTINO" {% if student.turno == 'MATUTINO' %}selected{% endif %}>Matutino</option>
-                                <option value="VESPERTINO" {% if student.turno == 'VESPERTINO' %}selected{% endif %}>Vespertino</option>
-                                <option value="NOTURNO" {% if student.turno == 'NOTURNO' %}selected{% endif %}>Noturno</option>
-                                <option value="INTEGRAL" {% if student.turno == 'INTEGRAL' %}selected{% endif %}>Integral</option>
+                                <option value="MATUTINO" {% if estudante_dados.turno|default:student.turno == 'MATUTINO' %}selected{% endif %}>Matutino</option>
+                                <option value="VESPERTINO" {% if estudante_dados.turno|default:student.turno == 'VESPERTINO' %}selected{% endif %}>Vespertino</option>
+                                <option value="NOTURNO" {% if estudante_dados.turno|default:student.turno == 'NOTURNO' %}selected{% endif %}>Noturno</option>
+                                <option value="INTEGRAL" {% if estudante_dados.turno|default:student.turno == 'INTEGRAL' %}selected{% endif %}>Integral</option>
                             </select>
                         </div>
                     </div>
@@ -344,7 +344,7 @@
                         <div class="form-group">
                             <label for="periodo">Período</label>
                             <input type="number" class="form-control" id="periodo" name="periodo" 
-                                   value="{{ student.periodo|default:'' }}">
+                                   value="{{ estudante_dados.periodo|default:student.periodo|default:'' }}">
                         </div>
                     </div>
                     
@@ -391,7 +391,16 @@
                         <div class="form-group">
                             <label for="email_institucional">Email Institucional</label>
                             <input type="email" class="form-control" id="email_institucional" name="email_institucional" 
-                                   value="{{ student.email_institucional|default:'' }}">
+                                   value="{{ estudante_dados.email_institucional|default:student.email_institucional|default:'' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="email_pessoal">Email Pessoal</label>
+                            <input type="email" class="form-control" id="email_pessoal" name="email_pessoal" 
+                                   value="{{ estudante_dados.email_pessoal|default:student.email_pessoal|default:'' }}"
+                                   placeholder="Email pessoal do estudante">
                         </div>
                     </div>
                 </div>

@@ -115,12 +115,70 @@ def student_data_form(request, pk):
             status='RASCUNHO'
         )
     
+    # Verifica se há dados na sessão para autopreenchimento (provenientes da API QAcadêmico)
+    estudante_dados = request.session.get('estudanteDados', {})
+    
+    # Atualizar campos específicos do student com dados da API QAcadêmico ANTES de renderizar
+    if estudante_dados:
+        # Mapear todos os campos necessários para o template
+        if estudante_dados.get('identidade'):
+            student.identidade = estudante_dados.get('identidade')
+        if estudante_dados.get('data_nascimento'):
+            student.data_nascimento = estudante_dados.get('data_nascimento')
+        if estudante_dados.get('idade'):
+            student.idade = estudante_dados.get('idade')
+        if estudante_dados.get('raca'):
+            student.raca = estudante_dados.get('raca')
+        if estudante_dados.get('sexo'):
+            student.sexo = estudante_dados.get('sexo')
+        if estudante_dados.get('genero'):
+            student.genero = estudante_dados.get('genero')
+        elif estudante_dados.get('sexo'):
+            # Se não tiver gênero, usa o sexo como fallback
+            student.genero = estudante_dados.get('sexo')
+        if estudante_dados.get('periodo'):
+            student.periodo = estudante_dados.get('periodo')
+        if estudante_dados.get('campus'):
+            student.campus = estudante_dados.get('campus')
+        if estudante_dados.get('curso'):
+            student.curso = estudante_dados.get('curso')
+        if estudante_dados.get('turno'):
+            student.turno = estudante_dados.get('turno')
+        if estudante_dados.get('eh_cotista') is not None:
+            student.eh_cotista = estudante_dados.get('eh_cotista')
+        
+        # Email pessoal - campo separado, não usar como email institucional
+        email_pessoal_value = estudante_dados.get('email_pessoal', '')
+        email_institucional_value = estudante_dados.get('email_institucional', '')
+        
+        # Adicionar atributos extras ao student para campos que podem não existir no modelo
+        # Isso permite que o template acesse email_pessoal e genero mesmo se não existirem no modelo
+        student.email_pessoal = email_pessoal_value
+        student.email_institucional = email_institucional_value
+            
+        # Garantir que genero esteja definido (fallback para sexo)
+        if not hasattr(student, 'genero') or not student.genero:
+            student.genero = estudante_dados.get('genero', estudante_dados.get('sexo', ''))
+    
     if request.method == 'POST':
         # Salvar dados do estudante
         student = request.user.student
         student.nome_completo = request.POST.get('nome_completo', student.nome_completo)
         student.cpf = request.POST.get('cpf', student.cpf)
+        student.identidade = request.POST.get('identidade', student.identidade)
+        student.data_nascimento = request.POST.get('data_nascimento', student.data_nascimento)
+        student.idade = request.POST.get('idade', student.idade)
+        student.raca = request.POST.get('raca', student.raca)
+        student.sexo = request.POST.get('sexo', student.sexo)
+        student.periodo = request.POST.get('periodo', student.periodo)
+        student.campus = request.POST.get('campus', student.campus)
+        student.curso = request.POST.get('curso', student.curso)
+        student.turno = request.POST.get('turno', student.turno)
+        student.eh_cotista = request.POST.get('eh_cotista') == 'on'
         student.save()
+        
+        # Limpar dados da sessão após salvar
+        request.session.pop('estudanteDados', None)
         
         messages.success(request, 'Dados do estudante salvos com sucesso!')
         return redirect('address_data_form', pk=pk)
@@ -131,6 +189,7 @@ def student_data_form(request, pk):
         'student': student,
         'step': 4,
         'total_steps': 8,
+        'estudante_dados': estudante_dados,  # Passar dados da API explicitamente para o template
     }
     return render(request, 'enrollments/student_data_form.html', context)
 
