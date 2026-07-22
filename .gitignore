@@ -1,15 +1,15 @@
-```gitignore
-# Python cache files
+```
+# Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# Virtual environment
-venv/
-
 # Dependencies
-node_modules/
+.venv/
+venv/
+env/
+requirements.txt.bak
 
 # Logs
 *.log
@@ -19,55 +19,18 @@ node_modules/
 .env.local
 *.env.*
 
-# IDE files
+# Coverage reports
+.coverage
+coverage/
+htmlcov/
+
+# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# Build artifacts
-dist/
-build/
-target/
-
-# Coverage reports
-coverage/
-htmlcov/
-.coverage
-
-# Database
-*.sqlite3
-*.db
-
-# OS generated files
+# OS
 .DS_Store
 Thumbs.db
-
-# Temporary files
-*.tmp
-*.temp
-
-# Archives
-*.zip
-*.gz
-*.tar
-*.tgz
-*.bz2
-*.xz
-*.7z
-*.rar
-*.zst
-*.lz4
-*.lzh
-*.cab
-*.arj
-*.rpm
-*.deb
-*.Z
-*.lz
-*.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
 ```

@@ -126,6 +126,37 @@ def student_data_form(request, pk):
                 if hasattr(student, key) and value:
                     setattr(student, key, value)
     
+    # Atualizar campos específicos do student com dados da API QAcadêmico
+    if hasattr(request.session, 'get'):
+        estudante_dados = request.session.get('estudanteDados', {})
+        if estudante_dados:
+            # Mapear campos específicos
+            if estudante_dados.get('identidade'):
+                student.identidade = estudante_dados.get('identidade')
+            if estudante_dados.get('data_nascimento'):
+                student.data_nascimento = estudante_dados.get('data_nascimento')
+            if estudante_dados.get('idade'):
+                student.idade = estudante_dados.get('idade')
+            if estudante_dados.get('raca'):
+                student.raca = estudante_dados.get('raca')
+            if estudante_dados.get('sexo'):
+                student.sexo = estudante_dados.get('sexo')
+            if estudante_dados.get('periodo'):
+                student.periodo = estudante_dados.get('periodo')
+            if estudante_dados.get('campus'):
+                student.campus = estudante_dados.get('campus')
+            if estudante_dados.get('curso'):
+                student.curso = estudante_dados.get('curso')
+            if estudante_dados.get('turno'):
+                student.turno = estudante_dados.get('turno')
+            if estudante_dados.get('eh_cotista') is not None:
+                student.eh_cotista = estudante_dados.get('eh_cotista')
+            # Email pessoal (novo campo) - usar email_institucional como fallback
+            if estudante_dados.get('email_pessoal'):
+                # Se não houver email institucional, usar email pessoal
+                if not student.email_institucional:
+                    student.email_institucional = estudante_dados.get('email_pessoal')
+    
     if request.method == 'POST':
         # Salvar dados do estudante
         student = request.user.student

@@ -394,6 +394,15 @@
                                    value="{{ student.email_institucional|default:'' }}">
                         </div>
                     </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="email_pessoal">Email Pessoal</label>
+                            <input type="email" class="form-control" id="email_pessoal" name="email_pessoal" 
+                                   value="{{ student.email_institucional|default:student.email_pessoal|default:'' }}"
+                                   placeholder="Email pessoal do estudante">
+                        </div>
+                    </div>
                 </div>
             </div>
             

@@ -116,9 +116,9 @@ class QAcademicoAPIService:
         
         # Mapeamento de gênero/sexo
         sexo_map = {
-            'M': 'M',
-            'F': 'F',
-            'O': 'O',
+            'M': 'MASCULINO',
+            'F': 'FEMININO',
+            'O': 'OUTRO',
         }
         
         # Mapeamento de raça/cor
