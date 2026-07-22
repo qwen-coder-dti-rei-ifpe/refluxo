@@ -292,7 +292,7 @@
                         <div class="form-group">
                             <label for="genero">Gênero</label>
                             <input type="text" class="form-control" id="genero" name="genero" 
-                                   value="{{ estudante_dados.genero|default:student.genero|default:'' }}">
+                                   value="{{ estudante_dados.genero|default:student.genero|default:estudante_dados.sexo|default:student.sexo|default:'' }}">
                         </div>
                     </div>
                 </div>
@@ -399,7 +399,7 @@
                         <div class="form-group">
                             <label for="email_pessoal">Email Pessoal</label>
                             <input type="email" class="form-control" id="email_pessoal" name="email_pessoal" 
-                                   value="{{ estudante_dados.email_pessoal|default:student.email_pessoal|default:student.email_institucional|default:'' }}"
+                                   value="{{ estudante_dados.email_pessoal|default:student.email_pessoal|default:'' }}"
                                    placeholder="Email pessoal do estudante">
                         </div>
                     </div>

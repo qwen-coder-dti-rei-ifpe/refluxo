@@ -160,9 +160,18 @@ def student_data_form(request, pk):
         # Isso permite que o template acesse email_pessoal e genero mesmo se não existirem no modelo
         if not hasattr(student, 'email_pessoal'):
             student.email_pessoal = estudante_dados.get('email_pessoal', '')
+        elif not student.email_pessoal:
+            student.email_pessoal = estudante_dados.get('email_pessoal', '')
+            
         if not hasattr(student, 'genero'):
             # Usar o gênero da sessão ou mapear sexo para gênero se necessário
             student.genero = estudante_dados.get('genero', estudante_dados.get('sexo', ''))
+        elif not student.genero:
+            student.genero = estudante_dados.get('genero', estudante_dados.get('sexo', ''))
+        
+        # Garantir que email_institucional também esteja disponível
+        if not hasattr(student, 'email_institucional'):
+            student.email_institucional = estudante_dados.get('email_institucional', '')
     
     if request.method == 'POST':
         # Salvar dados do estudante
