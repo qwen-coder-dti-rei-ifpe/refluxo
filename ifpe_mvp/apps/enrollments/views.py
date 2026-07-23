@@ -68,6 +68,7 @@ def enrollment_dashboard(request, pk):
         'period': period,
         'enrollment': enrollment,
         'can_edit': period.esta_aberto(),
+        'student': student,
     }
     return render(request, 'enrollments/step3_cards.html', context)
 
@@ -291,6 +292,7 @@ def address_data_form(request, pk):
             enrollment_period=period,
             status='RASCUNHO'
         )
+        student = enrollment.student
     
     if request.method == 'POST':
         # Salvar dados de endereço
@@ -303,6 +305,7 @@ def address_data_form(request, pk):
         'address': enrollment.address if enrollment.address else None,
         'step': 5,
         'total_steps': 8,
+        'student': student,
     }
     return render(request, 'enrollments/address_data_form.html', context)
 
@@ -321,6 +324,7 @@ def family_members_form(request, pk):
             enrollment_period=period,
             status='RASCUNHO'
         )
+        student = enrollment.student
     
     if request.method == 'POST':
         # Salvar dados de membros familiares
@@ -337,6 +341,7 @@ def family_members_form(request, pk):
         'family_members': family_members,
         'step': 6,
         'total_steps': 8,
+        'student': student,
     }
     return render(request, 'enrollments/family_members_form.html', context)
 
@@ -355,6 +360,7 @@ def displacement_data_form(request, pk):
             enrollment_period=period,
             status='RASCUNHO'
         )
+        student = enrollment.student
     
     if request.method == 'POST':
         # Salvar dados de deslocamento
@@ -367,6 +373,7 @@ def displacement_data_form(request, pk):
         'displacement': enrollment.displacement if enrollment.displacement else None,
         'step': 7,
         'total_steps': 8,
+        'student': student,
     }
     return render(request, 'enrollments/displacement_data_form.html', context)
 
@@ -385,6 +392,7 @@ def enrollment_data_form(request, pk):
             enrollment_period=period,
             status='RASCUNHO'
         )
+        student = enrollment.student
     
     if request.method == 'POST':
         # Salvar dados de inscrição
@@ -396,6 +404,7 @@ def enrollment_data_form(request, pk):
         'enrollment': enrollment,
         'step': 8,
         'total_steps': 8,
+        'student': student,
     }
     return render(request, 'enrollments/enrollment_data_form.html', context)
 

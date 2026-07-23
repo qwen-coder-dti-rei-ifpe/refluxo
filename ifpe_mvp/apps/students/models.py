@@ -175,3 +175,11 @@ class Student(models.Model):
         if self.data_nascimento:
             return self.data_nascimento.strftime('%d/%m/%Y')
         return ''
+    
+    @property
+    def periodo_fmt(self):
+        """Retorna o período formatado com sufixo ordinal (1º, 2º, etc.)."""
+        if self.periodo:
+            suffix = 'º'
+            return f'{self.periodo}{suffix}'
+        return ''
