@@ -297,6 +297,25 @@
             <div class="form-section">
                 <h3 class="section-title"><i class="fas fa-graduation-cap"></i> Informações Acadêmicas</h3>
                 
+                <!-- Busca por Matrícula -->
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title"><i class="fas fa-search"></i> Buscar por Matrícula</h5>
+                                <p class="card-text text-muted">Digite sua matrícula para buscar dados no sistema ou na API do QAcadêmico.</p>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="matricula_search" placeholder="Digite o número da matrícula" value="{{ estudante_dados.matricula|default:student.matricula|default:'' }}">
+                                    <button class="btn btn-primary" type="button" id="btn_buscar_matricula">
+                                        <i class="fas fa-search"></i> Buscar
+                                    </button>
+                                </div>
+                                <div id="search_result" class="mt-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
@@ -512,4 +531,97 @@
         </form>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btnBuscar = document.getElementById('btn_buscar_matricula');
+    const matriculaSearch = document.getElementById('matricula_search');
+    const searchResult = document.getElementById('search_result');
+    
+    if (btnBuscar) {
+        btnBuscar.addEventListener('click', function() {
+            const matricula = matriculaSearch.value.trim();
+            
+            if (!matricula) {
+                searchResult.innerHTML = '<div class="alert alert-warning">Digite o número da matrícula para buscar.</div>';
+                return;
+            }
+            
+            // Mostrar loading
+            searchResult.innerHTML = '<div class="alert alert-info"><i class="fas fa-spinner fa-spin"></i> Buscando dados...</div>';
+            btnBuscar.disabled = true;
+            
+            // Primeiro tenta buscar na API QAcadêmico via endpoint interno
+            fetch(`/api/integrations/qacademico/student/${matricula}/`)
+                .then(response => response.json())
+                .then(data => {
+                    btnBuscar.disabled = false;
+                    
+                    if (data.success && data.dados) {
+                        // Dados encontrados na API QAcadêmico
+                        preencherFormulario(data.dados);
+                        searchResult.innerHTML = '<div class="alert alert-success"><i class="fas fa-check-circle"></i> Dados encontrados com sucesso! Preencha os campos abaixo.</div>';
+                    } else {
+                        // Não encontrado na API, tentar banco local ou mostrar erro
+                        searchResult.innerHTML = `<div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> ${data.error || 'Matrícula não encontrada.'}</div>`;
+                    }
+                })
+                .catch(error => {
+                    btnBuscar.disabled = false;
+                    searchResult.innerHTML = `<div class="alert alert-danger"><i class="fas fa-times-circle"></i> Erro ao buscar: ${error.message}</div>`;
+                    console.error('Erro na busca:', error);
+                });
+        });
+    }
+    
+    function preencherFormulario(dados) {
+        // Preencher campos do formulário com dados da API
+        if (dados.nome_completo) document.getElementById('nome_completo').value = dados.nome_completo;
+        if (dados.cpf) document.getElementById('cpf').value = dados.cpf;
+        if (dados.identidade) document.getElementById('identidade').value = dados.identidade;
+        
+        // Data de nascimento - formatar para DD/MM/AAAA
+        if (dados.data_nascimento_fmt) {
+            document.getElementById('data_nascimento').value = dados.data_nascimento_fmt;
+        } else if (dados.data_nascimento) {
+            // Tentar converter de YYYY-MM-DD para DD/MM/YYYY
+            try {
+                const dateObj = new Date(dados.data_nascimento + 'T00:00:00');
+                if (!isNaN(dateObj.getTime())) {
+                    const dia = String(dateObj.getDate()).padStart(2, '0');
+                    const mes = String(dateObj.getMonth() + 1).padStart(2, '0');
+                    const ano = dateObj.getFullYear();
+                    document.getElementById('data_nascimento').value = `${dia}/${mes}/${ano}`;
+                }
+            } catch (e) {
+                console.error('Erro ao formatar data:', e);
+            }
+        }
+        
+        if (dados.idade) document.getElementById('idade').value = dados.idade;
+        if (dados.raca) document.getElementById('raca').value = dados.raca;
+        if (dados.sexo) document.getElementById('sexo').value = dados.sexo;
+        if (dados.genero) document.getElementById('genero').value = dados.genero;
+        if (dados.matricula) {
+            document.getElementById('matricula').value = dados.matricula;
+            document.getElementById('matricula_search').value = dados.matricula;
+        }
+        if (dados.campus) document.getElementById('campus').value = dados.campus;
+        if (dados.curso) document.getElementById('curso').value = dados.curso;
+        if (dados.turno) document.getElementById('turno').value = dados.turno;
+        if (dados.periodo) document.getElementById('periodo').value = dados.periodo;
+        if (dados.email_pessoal) document.getElementById('email_pessoal').value = dados.email_pessoal;
+        
+        // Marcar checkbox de cotista se verdadeiro
+        if (dados.eh_cotista) {
+            document.getElementById('eh_cotista').checked = true;
+        }
+        
+        // Rolar a página para o início do formulário
+        window.scrollTo({ top: 200, behavior: 'smooth' });
+    }
+});
+</script>
 {% endblock %}

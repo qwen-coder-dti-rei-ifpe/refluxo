@@ -118,14 +118,17 @@ def student_data_form(request, pk):
             status='RASCUNHO'
         )
     
-    # Obter dados da sessão (provenientes da API QAcadêmico)
+    # Obter dados da sessão (provenientes da busca por matrícula via API QAcadêmico)
     estudante_dados = request.session.get('estudanteDados', {})
     
     # Flag para controlar se já carregou dados do banco na sessão
     already_loaded_from_db = request.session.get('student_data_loaded', False)
     
-    # Se for a primeira vez acessando o formulário e já existem dados no banco,
-    # carregar dados do banco para a sessão para preencher o formulário
+    # Lógica de preenchimento do formulário:
+    # 1. Primeiro verifica se há dados da API QAcadêmico na sessão (busca recente por matrícula)
+    # 2. Se não houver dados da API, carrega dados do banco local
+    # 3. Dados da API têm prioridade sobre dados do banco
+    
     if not already_loaded_from_db and student.id:
         # Carregar dados do banco para a sessão apenas uma vez
         db_data = {
