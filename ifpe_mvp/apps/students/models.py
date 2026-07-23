@@ -168,3 +168,10 @@ class Student(models.Model):
                 (hoje.month, hoje.day) < (self.data_nascimento.month, self.data_nascimento.day)
             )
             self.save(update_fields=['idade'])
+    
+    @property
+    def data_nascimento_fmt(self):
+        """Retorna a data de nascimento formatada como DD/MM/YYYY."""
+        if self.data_nascimento:
+            return self.data_nascimento.strftime('%d/%m/%Y')
+        return ''

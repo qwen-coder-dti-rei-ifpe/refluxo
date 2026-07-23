@@ -21,6 +21,8 @@ urlpatterns = [
     path('family/', include('apps.family.urls')),
     path('enrollments/', include('apps.enrollments.urls')),
     path('api/v1/', include('apps.api.urls')),
+    # Integrações com APIs externas (QAcadêmico, ConectaGov)
+    path('api/', include('integrations.urls')),
 ]
 
 # Servir arquivos de mídia em desenvolvimento

@@ -10,8 +10,6 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.conf import settings
-from .models import QAcademicoMock, ConectaGovMock
-from .serializers import QAcademicoMockSerializer, ConectaGovMockSerializer
 
 
 class QAcademicoViewSet(viewsets.ViewSet):
@@ -21,6 +19,73 @@ class QAcademicoViewSet(viewsets.ViewSet):
     Fornece endpoints para consultar dados acadêmicos do estudante
     usando matrícula como identificador.
     """
+    
+    @action(detail=False, methods=['get'], url_path='student/(?P<matricula>[^/.]+)')
+    def student(self, request, matricula=None):
+        """Consulta dados completos do estudante pela matrícula na API Mock do QAcadêmico."""
+        if not matricula:
+            return Response(
+                {'success': False, 'error': 'Matrícula é obrigatória'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Importar serviço de integração com QAcadêmico
+        try:
+            from integrations.qacademico_service import buscar_estudante_qacademico
+            
+            dados_api, erro = buscar_estudante_qacademico(matricula)
+            
+            if dados_api:
+                # Formatar data de nascimento para DD/MM/YYYY
+                data_nascimento_fmt = ''
+                if dados_api.get('data_nascimento'):
+                    try:
+                        from datetime import datetime
+                        date_obj = datetime.strptime(dados_api.get('data_nascimento'), '%Y-%m-%d')
+                        data_nascimento_fmt = date_obj.strftime('%d/%m/%Y')
+                    except (ValueError, TypeError):
+                        data_nascimento_fmt = dados_api.get('data_nascimento', '')
+                
+                # Mapear dados para formato esperado pelo frontend
+                dados_formatados = {
+                    'nome_completo': dados_api.get('nome_completo', ''),
+                    'cpf': dados_api.get('cpf', ''),
+                    'identidade': dados_api.get('identidade', ''),
+                    'data_nascimento': dados_api.get('data_nascimento', ''),
+                    'data_nascimento_fmt': data_nascimento_fmt,
+                    'idade': dados_api.get('idade', 0),
+                    'raca': dados_api.get('raca', ''),
+                    'sexo': dados_api.get('sexo', ''),
+                    'genero': dados_api.get('genero', dados_api.get('sexo', '')),
+                    'matricula': dados_api.get('matricula', ''),
+                    'campus': dados_api.get('campus', ''),
+                    'curso': dados_api.get('curso', ''),
+                    'turno': dados_api.get('turno', ''),
+                    'periodo': dados_api.get('periodo', ''),
+                    'eh_cotista': dados_api.get('eh_cotista', False),
+                    'email': dados_api.get('email', ''),
+                    'email_institucional': dados_api.get('email_institucional', dados_api.get('email', '')),
+                    'email_pessoal': dados_api.get('email_pessoal', dados_api.get('email', '')),
+                    'nome_mae': dados_api.get('nome_mae', ''),
+                    'nome_pai': dados_api.get('nome_pai', ''),
+                }
+                
+                return Response({
+                    'success': True,
+                    'dados': dados_formatados,
+                    'mensagem': 'Dados encontrados com sucesso'
+                })
+            else:
+                return Response({
+                    'success': False,
+                    'error': erro or 'Estudante não encontrado'
+                }, status=status.HTTP_404_NOT_FOUND)
+                
+        except Exception as e:
+            return Response({
+                'success': False,
+                'error': f'Erro ao consultar API QAcadêmico: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     @action(detail=False, methods=['get'])
     def consultar(self, request):

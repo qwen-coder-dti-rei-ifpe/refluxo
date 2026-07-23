@@ -1,6 +1,7 @@
 """
 Views do aplicativo Enrollments - Gestão de inscrições e editais
 """
+from datetime import datetime
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -121,10 +122,22 @@ def student_data_form(request, pk):
     # Atualizar campos específicos do student com dados da API QAcadêmico ANTES de renderizar
     if estudante_dados:
         # Mapear todos os campos necessários para o template
+        if estudante_dados.get('nome_completo'):
+            student.nome_completo = estudante_dados.get('nome_completo')
+        if estudante_dados.get('cpf'):
+            student.cpf = estudante_dados.get('cpf')
         if estudante_dados.get('identidade'):
             student.identidade = estudante_dados.get('identidade')
         if estudante_dados.get('data_nascimento'):
             student.data_nascimento = estudante_dados.get('data_nascimento')
+            # Adiciona a versão formatada para exibição no template (DD/MM/YYYY)
+            try:
+                # Tenta parsear a data no formato YYYY-MM-DD
+                date_obj = datetime.strptime(estudante_dados.get('data_nascimento'), '%Y-%m-%d')
+                estudante_dados['data_nascimento_fmt'] = date_obj.strftime('%d/%m/%Y')
+            except (ValueError, TypeError):
+                # Se falhar, usa o valor original ou tenta outro formato
+                estudante_dados['data_nascimento_fmt'] = estudante_dados.get('data_nascimento')
         if estudante_dados.get('idade'):
             student.idade = estudante_dados.get('idade')
         if estudante_dados.get('raca'):
@@ -146,15 +159,16 @@ def student_data_form(request, pk):
             student.turno = estudante_dados.get('turno')
         if estudante_dados.get('eh_cotista') is not None:
             student.eh_cotista = estudante_dados.get('eh_cotista')
+        if estudante_dados.get('matricula'):
+            student.matricula = estudante_dados.get('matricula')
         
-        # Email pessoal - campo separado, não usar como email institucional
-        email_pessoal_value = estudante_dados.get('email_pessoal', '')
-        email_institucional_value = estudante_dados.get('email_institucional', '')
+        # Email pessoal e institucional - ambos usam o mesmo valor da API
+        email_value = estudante_dados.get('email_institucional', estudante_dados.get('email_pessoal', ''))
         
         # Adicionar atributos extras ao student para campos que podem não existir no modelo
         # Isso permite que o template acesse email_pessoal e genero mesmo se não existirem no modelo
-        student.email_pessoal = email_pessoal_value
-        student.email_institucional = email_institucional_value
+        student.email_pessoal = email_value
+        student.email_institucional = email_value
             
         # Garantir que genero esteja definido (fallback para sexo)
         if not hasattr(student, 'genero') or not student.genero:

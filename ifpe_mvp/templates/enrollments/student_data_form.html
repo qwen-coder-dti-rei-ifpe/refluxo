@@ -162,6 +162,67 @@
         background: #27ae60;
         color: white;
     }
+    
+    /* Loading spinner styles */
+    .loading-spinner {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9999;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        text-align: center;
+    }
+    
+    .loading-spinner.show {
+        display: block;
+    }
+    
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #e2e8f0;
+        border-top: 5px solid #27ae60;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .loading-text {
+        color: #27ae60;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    
+    /* Search button loading state */
+    .btn-search.loading {
+        pointer-events: none;
+        opacity: 0.7;
+    }
+    
+    .btn-search.loading .spinner-sm {
+        display: inline-block;
+    }
+    
+    .spinner-sm {
+        display: none;
+        width: 16px;
+        height: 16px;
+        border: 2px solid #ffffff;
+        border-top: 2px solid transparent;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        margin-right: 8px;
+    }
 </style>
 {% endblock %}
 
@@ -202,7 +263,7 @@
                         <div class="form-group">
                             <label for="nome_completo">Nome completo *</label>
                             <input type="text" class="form-control" id="nome_completo" name="nome_completo" 
-                                   value="{{ student.nome_completo|default:'' }}" required>
+                                   value="{{ estudante_dados.nome_completo|default:student.nome_completo|default:'' }}" required>
                         </div>
                     </div>
                     
@@ -216,9 +277,9 @@
                     
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="data_nascimento">Data de Nascimento</label>
+                            <label for="data_nascimento">Data de Nascimento *</label>
                             <input type="date" class="form-control" id="data_nascimento" name="data_nascimento" 
-                                   value="{{ estudante_dados.data_nascimento|default:student.data_nascimento|date:'Y-m-d'|default:'' }}">
+                                   value="{{ estudante_dados.data_nascimento|default:'' }}{% if not estudante_dados.data_nascimento and student.data_nascimento %}{{ student.data_nascimento|date:'Y-m-d' }}{% endif %}" required>
                         </div>
                     </div>
                     
@@ -226,15 +287,15 @@
                         <div class="form-group">
                             <label for="idade">Idade</label>
                             <input type="number" class="form-control" id="idade" name="idade" 
-                                   value="{{ estudante_dados.idade|default:student.idade|default:'' }}">
+                                   value="{{ estudante_dados.idade|default:student.idade|default:'' }}" readonly>
                         </div>
                     </div>
                     
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="identidade">Identidade (RG)</label>
+                            <label for="identidade">Identidade (RG) *</label>
                             <input type="text" class="form-control" id="identidade" name="identidade" 
-                                   value="{{ estudante_dados.identidade|default:student.identidade|default:'' }}">
+                                   value="{{ estudante_dados.identidade|default:student.identidade|default:'' }}" required>
                         </div>
                     </div>
                     
@@ -263,7 +324,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="sexo">Sexo *</label>
-                            <select class="form-select" id="sexo" name="sexo">
+                            <select class="form-select" id="sexo" name="sexo" required>
                                 <option value="">Selecione...</option>
                                 <option value="MASCULINO" {% if estudante_dados.sexo|default:student.sexo == 'MASCULINO' %}selected{% endif %}>Masculino</option>
                                 <option value="FEMININO" {% if estudante_dados.sexo|default:student.sexo == 'FEMININO' %}selected{% endif %}>Feminino</option>
@@ -290,9 +351,14 @@
                     
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="genero">Gênero</label>
-                            <input type="text" class="form-control" id="genero" name="genero" 
-                                   value="{{ estudante_dados.genero|default:estudante_dados.sexo|default:student.genero|default:student.sexo|default:'' }}">
+                            <label for="genero">Gênero *</label>
+                            <select class="form-select" id="genero" name="genero" required>
+                                <option value="">Selecione...</option>
+                                <option value="MASCULINO" {% if estudante_dados.genero|default:estudante_dados.sexo|default:student.genero|default:student.sexo == 'MASCULINO' %}selected{% endif %}>Masculino</option>
+                                <option value="FEMININO" {% if estudante_dados.genero|default:estudante_dados.sexo|default:student.genero|default:student.sexo == 'FEMININO' %}selected{% endif %}>Feminino</option>
+                                <option value="NAO_BINARIO" {% if estudante_dados.genero|default:estudante_dados.sexo|default:student.genero|default:student.sexo == 'NAO_BINARIO' %}selected{% endif %}>Não-binário</option>
+                                <option value="OUTRO" {% if estudante_dados.genero|default:estudante_dados.sexo|default:student.genero|default:student.sexo == 'OUTRO' %}selected{% endif %}>Outro</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -389,9 +455,9 @@
                     
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="email_institucional">Email Institucional</label>
+                            <label for="email_institucional">Email Institucional *</label>
                             <input type="email" class="form-control" id="email_institucional" name="email_institucional" 
-                                   value="{{ estudante_dados.email_institucional|default:student.email_institucional|default:'' }}">
+                                   value="{{ estudante_dados.email_institucional|default:estudante_dados.email_pessoal|default:student.email_institucional|default:'' }}" required>
                         </div>
                     </div>
                     
@@ -399,7 +465,7 @@
                         <div class="form-group">
                             <label for="email_pessoal">Email Pessoal</label>
                             <input type="email" class="form-control" id="email_pessoal" name="email_pessoal" 
-                                   value="{{ estudante_dados.email_pessoal|default:student.email_pessoal|default:'' }}"
+                                   value="{{ estudante_dados.email_pessoal|default:estudante_dados.email_institucional|default:student.email_pessoal|default:'' }}"
                                    placeholder="Email pessoal do estudante">
                         </div>
                     </div>
@@ -495,7 +561,7 @@
             
             <!-- Botões de ação -->
             <div class="text-center mt-4">
-                <a href="{% url 'step3_cards' %}" class="btn btn-secondary me-3">
+                <a href="{% url 'step3_cards' enrollment.pk %}" class="btn btn-secondary me-3">
                     <i class="fas fa-arrow-left"></i> Anterior: Início
                 </a>
                 <button type="submit" class="btn btn-save btn-lg">
@@ -507,5 +573,186 @@
             </div>
         </form>
     </div>
+    
+    <!-- Loading spinner overlay -->
+    <div id="loading-spinner" class="loading-spinner">
+        <div class="spinner"></div>
+        <p class="loading-text">Buscando dados do estudante...</p>
+    </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Busca automática por matrícula ao carregar a página se houver matrícula no campo
+    const matriculaField = document.getElementById('matricula');
+    const loadingSpinner = document.getElementById('loading-spinner');
+    
+    if (matriculaField && matriculaField.value && matriculaField.value.trim() !== '') {
+        // Pequeno delay para garantir que a página carregou completamente
+        setTimeout(function() {
+            buscarDadosMatricula(matriculaField.value);
+        }, 500);
+    }
+    
+    // Adicionar evento de busca quando o campo de matrícula perder o foco
+    if (matriculaField) {
+        matriculaField.addEventListener('blur', function() {
+            const matricula = this.value.trim();
+            if (matricula && matricula.length >= 5) {
+                buscarDadosMatricula(matricula);
+            }
+        });
+        
+        // Também permitir busca ao pressionar Enter no campo de matrícula
+        matriculaField.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const matricula = this.value.trim();
+                if (matricula && matricula.length >= 5) {
+                    buscarDadosMatricula(matricula);
+                }
+            }
+        });
+    }
+    
+    /**
+     * Função para buscar dados do estudante pela matrícula usando requisição assíncrona
+     */
+    async function buscarDadosMatricula(matricula) {
+        if (!matricula || matricula.length < 5) return;
+        
+        try {
+            // Mostrar loading spinner
+            loadingSpinner.classList.add('show');
+            
+            // Fazer requisição assíncrona para a API
+            const response = await fetch(`/api/qacademico/student/${matricula}/`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                
+                if (data && data.success) {
+                    preencherCamposComDados(data.dados);
+                    
+                    // Mostrar mensagem de sucesso
+                    showMessage('success', 'Dados encontrados e preenchidos automaticamente!');
+                } else {
+                    showMessage('warning', 'Matrícula não encontrada na base do QAcadêmico.');
+                }
+            } else {
+                showMessage('warning', 'Não foi possível buscar os dados da matrícula.');
+            }
+        } catch (error) {
+            console.error('Erro ao buscar dados:', error);
+            showMessage('danger', 'Erro ao conectar com o servidor. Tente novamente.');
+        } finally {
+            // Esconder loading spinner
+            loadingSpinner.classList.remove('show');
+        }
+    }
+    
+    /**
+     * Preenche os campos do formulário com os dados recebidos da API
+     */
+    function preencherCamposComDados(dados) {
+        // Mapeamento de campos da API para o formulário
+        const mapeamentoCampos = {
+            'nome_completo': dados.nome_completo || '',
+            'cpf': formatarCPF(dados.cpf || ''),
+            'identidade': dados.identidade || '',
+            'data_nascimento': dados.data_nascimento || '',
+            'idade': dados.idade || '',
+            'raca': dados.raca || '',
+            'sexo': dados.sexo || '',
+            'genero': dados.genero || dados.sexo || '',
+            'matricula': dados.matricula || '',
+            'campus': dados.campus || '',
+            'curso': dados.curso || '',
+            'turno': dados.turno || '',
+            'periodo': extrairNumeroPeriodo(dados.periodo || ''),
+            'email_institucional': dados.email_institucional || dados.email || '',
+            'email_pessoal': dados.email_pessoal || dados.email || '',
+        };
+        
+        // Preencher cada campo
+        for (const [campo, valor] of Object.entries(mapeamentoCampos)) {
+            const elemento = document.getElementById(campo);
+            if (elemento) {
+                if (elemento.tagName === 'SELECT') {
+                    elemento.value = valor;
+                } else {
+                    elemento.value = valor;
+                }
+            }
+        }
+        
+        // Atualizar checkbox de cotista se necessário
+        if (dados.eh_cotista !== undefined) {
+            const checkboxCotista = document.getElementById('eh_cotista');
+            if (checkboxCotista) {
+                checkboxCotista.checked = dados.eh_cotista;
+            }
+        }
+    }
+    
+    /**
+     * Formata CPF no formato XXX.XXX.XXX-XX
+     */
+    function formatarCPF(cpf) {
+        // Remove caracteres não numéricos
+        cpf = cpf.replace(/\D/g, '');
+        
+        // Aplica a formatação
+        if (cpf.length === 11) {
+            return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+        }
+        return cpf;
+    }
+    
+    /**
+     * Extrai apenas o número do período (ex: "1º" -> "1")
+     */
+    function extrairNumeroPeriodo(periodo) {
+        if (!periodo) return '';
+        return periodo.replace(/[^\d]/g, '');
+    }
+    
+    /**
+     * Mostra mensagem de feedback para o usuário
+     */
+    function showMessage(type, message) {
+        // Verifica se já existe uma área de mensagens
+        let messagesContainer = document.querySelector('.messages-container');
+        
+        if (!messagesContainer) {
+            messagesContainer = document.createElement('div');
+            messagesContainer.className = 'messages-container';
+            messagesContainer.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 10000;';
+            document.body.appendChild(messagesContainer);
+        }
+        
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+        alertDiv.role = 'alert';
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        alertDiv.style.cssText = 'min-width: 300px; margin-bottom: 10px;';
+        
+        messagesContainer.appendChild(alertDiv);
+        
+        // Auto-dismiss após 5 segundos
+        setTimeout(() => {
+            alertDiv.classList.remove('show');
+            setTimeout(() => alertDiv.remove(), 150);
+        }, 5000);
+    }
+});
+</script>
 {% endblock %}

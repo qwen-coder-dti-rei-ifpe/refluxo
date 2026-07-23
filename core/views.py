@@ -165,15 +165,20 @@ def student_dashboard_view(request):
                     request.session['estudanteDados'] = {
                         'nome_completo': dados_qacademico.get('nome_completo', ''),
                         'cpf': dados_qacademico.get('cpf', ''),
+                        'identidade': dados_qacademico.get('identidade', ''),
+                        'data_nascimento': dados_qacademico.get('data_nascimento', ''),
                         'idade': dados_qacademico.get('idade'),
                         'raca': dados_qacademico.get('raca', ''),
                         'sexo': dados_qacademico.get('sexo', ''),
+                        'genero': dados_qacademico.get('sexo', ''),  # Gênero igual ao sexo por padrão
                         'matricula': dados_qacademico.get('matricula', ''),
                         'campus': dados_qacademico.get('campus', ''),
                         'curso': dados_qacademico.get('curso', ''),
                         'turno': dados_qacademico.get('turno', ''),
                         'periodo': dados_qacademico.get('periodo', ''),
                         'eh_cotista': dados_qacademico.get('eh_cotista', False),
+                        'email_institucional': dados_qacademico.get('email_institucional', dados_qacademico.get('email', '')),
+                        'email_pessoal': dados_qacademico.get('email_pessoal', dados_qacademico.get('email', '')),
                         'moradia_estudantil': False,
                     }
                     
@@ -200,15 +205,20 @@ def student_dashboard_view(request):
                         request.session['estudanteDados'] = {
                             'nome_completo': estudante.nome_completo,
                             'cpf': estudante.cpf,
+                            'identidade': estudante.identidade if hasattr(estudante, 'identidade') else '',
+                            'data_nascimento': str(estudante.data_nascimento) if hasattr(estudante, 'data_nascimento') and estudante.data_nascimento else '',
                             'idade': estudante.idade,
                             'raca': estudante.raca,
                             'sexo': estudante.sexo,
+                            'genero': estudante.genero if hasattr(estudante, 'genero') else estudante.sexo,
                             'matricula': estudante.matricula,
                             'campus': estudante.campus,
                             'curso': estudante.curso,
                             'turno': estudante.turno,
                             'periodo': estudante.periodo,
                             'eh_cotista': estudante.eh_cotista,
+                            'email_institucional': estudante.email_institucional if hasattr(estudante, 'email_institucional') else '',
+                            'email_pessoal': estudante.email_pessoal if hasattr(estudante, 'email_pessoal') else '',
                             'moradia_estudantil': estudante.moradia_estudantil,
                         }
                         # Se tiver endereço, armazena também
