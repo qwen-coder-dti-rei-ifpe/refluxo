@@ -53,7 +53,8 @@ def student_search(request):
                         turno=dados_api.get('turno', ''),
                         periodo=dados_api.get('periodo', ''),
                         eh_cotista=dados_api.get('eh_cotista', False),
-                        email_institucional=dados_api.get('email', ''),
+                        email_institucional=dados_api.get('email_institucional', dados_api.get('email', '')),
+                        email_pessoal=dados_api.get('email_pessoal', dados_api.get('email', '')),
                     )
                     # Não salva ainda, apenas prepara para exibição
                 

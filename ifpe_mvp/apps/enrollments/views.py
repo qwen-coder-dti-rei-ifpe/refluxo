@@ -178,13 +178,11 @@ def student_data_form(request, pk):
         if estudante_dados.get('matricula'):
             student.matricula = estudante_dados.get('matricula')
         
-        # Email pessoal e institucional - ambos usam o mesmo valor da API
-        email_value = estudante_dados.get('email_institucional', estudante_dados.get('email_pessoal', ''))
-        
-        # Adicionar atributos extras ao student para campos que podem não existir no modelo
-        # Isso permite que o template acesse email_pessoal e genero mesmo se não existirem no modelo
-        student.email_pessoal = email_value
-        student.email_institucional = email_value
+        # Email pessoal e institucional - mapear separadamente da API QAcademico
+        if estudante_dados.get('email_pessoal'):
+            student.email_pessoal = estudante_dados.get('email_pessoal')
+        if estudante_dados.get('email_institucional'):
+            student.email_institucional = estudante_dados.get('email_institucional')
             
         # Garantir que genero esteja definido (fallback para sexo)
         if not hasattr(student, 'genero') or not student.genero:
@@ -253,6 +251,11 @@ def student_data_form(request, pk):
             student.quantidade_disciplinas = 0
         
         student.eh_cotista = request.POST.get('eh_cotista') == 'on'
+        
+        # Salvar emails
+        student.email_institucional = request.POST.get('email_institucional', student.email_institucional)
+        student.email_pessoal = request.POST.get('email_pessoal', student.email_pessoal)
+        
         student.save()
         
         # Limpar dados da sessão após salvar

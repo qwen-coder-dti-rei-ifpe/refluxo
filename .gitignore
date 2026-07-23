@@ -1,74 +1,71 @@
-```
-# Python
+```gitignore
+# Python compiled files
+*.pyc
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
 
-# Virtual Environment
+# Virtual environment
 venv/
-ENV/
-env/
-.venv/
-.env/
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*.tmp
+# Dependencies in virtual environment
+venv/lib/python*/site-packages/__pycache__/
 
 # Logs
 *.log
 
-# Coverage
-.coverage
-coverage/
-htmlcov/
+# Temporary files
+*.tmp
+*.swp
 
-# Environment variables
+# Environment files
 .env
 .env.local
 *.env.*
 
-# Django specific
-*.pyc
-__pycache__/
-*.pyo
-*.pyd
-.Python
-env/
-venv/
-ENV/
-.venv/
-.dbshell_history
-*.pot
-*.po
-MANIFEST
-.settings/
-logs/
-media/
-staticfiles/
-*.sqlite3
-*.sqlite3-journal
-local_settings.py
-db.sqlite3
-celerybeat-schedule
+# IDE and editor files
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
+
+# Build artifacts
+dist/
+build/
+target/
+
+# MyPy cache
+.mypy_cache/
+
+# PyTest cache
+.pytest_cache/
+
+# Compressed files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
 ```

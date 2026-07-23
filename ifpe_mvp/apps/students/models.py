@@ -112,6 +112,7 @@ class Student(models.Model):
     
     # Contato
     email_institucional = models.EmailField(_('Email institucional'), null=True, blank=True)
+    email_pessoal = models.EmailField(_('Email pessoal'), null=True, blank=True)
     telefone_celular = models.CharField(_('Telefone celular'), max_length=20, null=True, blank=True)
     
     # Informações Bancárias

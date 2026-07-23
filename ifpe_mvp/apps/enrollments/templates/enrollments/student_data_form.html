@@ -386,6 +386,14 @@
                     
                     <div class="col-md-6">
                         <div class="form-group">
+                            <label for="email_pessoal">Email Pessoal *</label>
+                            <input type="email" class="form-control" id="email_pessoal" name="email_pessoal" 
+                                   value="{{ estudante_dados.email_pessoal|default:student.email_pessoal|default:'' }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
                             <label for="email_institucional">Email Institucional</label>
                             <input type="email" class="form-control" id="email_institucional" name="email_institucional" 
                                    value="{{ estudante_dados.email_institucional|default:student.email_institucional|default:'' }}">
