@@ -132,7 +132,7 @@ def student_data_form(request, pk):
             'nome_completo': student.nome_completo or '',
             'cpf': student.cpf or '',
             'identidade': student.identidade or '',
-            'data_nascimento': student.data_nascimento.strftime('%m-%d-%Y') if student.data_nascimento else '',
+            'data_nascimento': student.data_nascimento.strftime('%Y-%m-%d') if student.data_nascimento else '',
             'idade': student.idade or '',
             'raca': student.raca or '',
             'sexo': student.sexo or '',
