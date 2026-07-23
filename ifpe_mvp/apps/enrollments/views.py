@@ -178,11 +178,10 @@ def student_data_form(request, pk):
         if estudante_dados.get('matricula'):
             student.matricula = estudante_dados.get('matricula')
         
-        # Email pessoal e institucional - mapear separadamente da API QAcademico
+        # Email pessoal - mapear da API QAcademico
         if estudante_dados.get('email_pessoal'):
             student.email_pessoal = estudante_dados.get('email_pessoal')
-        if estudante_dados.get('email_institucional'):
-            student.email_institucional = estudante_dados.get('email_institucional')
+        # Email institucional NÃO é preenchido pela API, manter do banco de dados
             
         # Garantir que genero esteja definido (fallback para sexo)
         if not hasattr(student, 'genero') or not student.genero:
