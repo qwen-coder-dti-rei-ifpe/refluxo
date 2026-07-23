@@ -195,8 +195,8 @@ class QAcademicoAPIService:
             'eh_cotista': eh_cotista,
             'quota_info': quota,
             'email': dados_api.get('email', ''),
-            'email_institucional': dados_api.get('email', ''),
-            'email_pessoal': dados_api.get('email', ''),
+            'email_pessoal': dados_api.get('email', ''),  # Email Pessoal vem da API
+            # email_institucional NÃO é preenchido pela API QAcademico
             'nome_mae': dados_api.get('motherName', ''),
             'nome_pai': dados_api.get('fatherName', ''),
             'estado_civil': dados_api.get('maritalStatus', ''),

@@ -1,1 +1,1 @@
-Nothing needs to be added to .gitignore since the only change is a modification to a template file (.html) which is source code and should not be ignored.
+Nothing should be ignored based on the provided file changes, as they only include source code files (.py) without any build artifacts, dependencies, or temporary files.

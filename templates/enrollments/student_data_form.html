@@ -252,14 +252,6 @@
                     
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="cor">Cor</label>
-                            <input type="text" class="form-control" id="cor" name="cor" 
-                                   value="{{ student.cor|default:'' }}">
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-6">
-                        <div class="form-group">
                             <label for="sexo">Sexo *</label>
                             <select class="form-select" id="sexo" name="sexo">
                                 <option value="">Selecione...</option>
@@ -341,8 +333,8 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="periodo">Período</label>
-                            <input type="number" class="form-control" id="periodo" name="periodo" 
-                                   value="{{ estudante_dados.periodo|default:student.periodo|default:'' }}">
+                            <input type="text" class="form-control" id="periodo" name="periodo" 
+                                   value="{{ estudante_dados.periodo|default:student.periodo_fmt|default:'' }}">
                         </div>
                     </div>
                     
@@ -382,6 +374,14 @@
                                        {% if student.moradia_estudantil %}checked{% endif %}>
                                 <label class="form-check-label" for="moradia_estudantil">Usa moradia estudantil?</label>
                             </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="email_pessoal">Email Pessoal *</label>
+                            <input type="email" class="form-control" id="email_pessoal" name="email_pessoal" 
+                                   value="{{ student.email_pessoal|default:'' }}" required>
                         </div>
                     </div>
                     

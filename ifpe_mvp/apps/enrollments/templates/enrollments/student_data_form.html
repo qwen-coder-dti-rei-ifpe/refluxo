@@ -339,7 +339,7 @@
                         <div class="form-group">
                             <label for="periodo">Período</label>
                             <input type="text" class="form-control" id="periodo" name="periodo" 
-                                   value="{{ estudante_dados.periodo|default:student.periodo|default:'' }}"
+                                   value="{{ estudante_dados.periodo|default:student.periodo_fmt|default:'' }}"
                                    pattern="\d+[ºª]?" title="Digite apenas números">
                         </div>
                     </div>
@@ -381,6 +381,14 @@
                                        {% if estudante_dados.moradia_estudantil|default:student.moradia_estudantil %}checked{% endif %}>
                                 <label class="form-check-label" for="moradia_estudantil">Usa moradia estudantil?</label>
                             </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="email_pessoal">Email Pessoal *</label>
+                            <input type="email" class="form-control" id="email_pessoal" name="email_pessoal" 
+                                   value="{{ estudante_dados.email_pessoal|default:student.email_pessoal|default:'' }}" required>
                         </div>
                     </div>
                     

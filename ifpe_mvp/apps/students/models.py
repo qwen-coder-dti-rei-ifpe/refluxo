@@ -112,6 +112,7 @@ class Student(models.Model):
     
     # Contato
     email_institucional = models.EmailField(_('Email institucional'), null=True, blank=True)
+    email_pessoal = models.EmailField(_('Email pessoal'), null=True, blank=True)
     telefone_celular = models.CharField(_('Telefone celular'), max_length=20, null=True, blank=True)
     
     # Informações Bancárias
@@ -174,4 +175,12 @@ class Student(models.Model):
         """Retorna a data de nascimento formatada como DD/MM/YYYY."""
         if self.data_nascimento:
             return self.data_nascimento.strftime('%d/%m/%Y')
+        return ''
+    
+    @property
+    def periodo_fmt(self):
+        """Retorna o período formatado com sufixo ordinal (1º, 2º, etc.)."""
+        if self.periodo:
+            suffix = 'º'
+            return f'{self.periodo}{suffix}'
         return ''

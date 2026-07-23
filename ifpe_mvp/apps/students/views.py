@@ -53,7 +53,8 @@ def student_search(request):
                         turno=dados_api.get('turno', ''),
                         periodo=dados_api.get('periodo', ''),
                         eh_cotista=dados_api.get('eh_cotista', False),
-                        email_institucional=dados_api.get('email', ''),
+                        email_pessoal=dados_api.get('email_pessoal', dados_api.get('email', '')),
+                        # email_institucional NÃO é preenchido pela API, será mantido vazio ou do banco
                     )
                     # Não salva ainda, apenas prepara para exibição
                 
@@ -88,7 +89,7 @@ def student_search(request):
                     'periodo': dados_api.get('periodo', ''),  # currentPeriod formatado como "1º"
                     'eh_cotista': dados_api.get('eh_cotista', False),
                     'email_pessoal': email_value,  # Email Pessoal (campo email da API)
-                    'email_institucional': email_value,  # Email Institucional (usar email da API)
+                    # Email Institucional NÃO é preenchido pela API, será mantido do banco de dados
                     'nome_mae': dados_api.get('nome_mae', ''),
                     'nome_pai': dados_api.get('nome_pai', ''),
                     'estado_civil': dados_api.get('estado_civil', ''),

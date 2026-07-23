@@ -68,6 +68,7 @@ def enrollment_dashboard(request, pk):
         'period': period,
         'enrollment': enrollment,
         'can_edit': period.esta_aberto(),
+        'student': student,
     }
     return render(request, 'enrollments/step3_cards.html', context)
 
@@ -161,6 +162,11 @@ def student_data_form(request, pk):
                     student.periodo = periodo_value
             else:
                 student.periodo = periodo_value
+        
+        # Adicionar versão formatada do período para exibição no template
+        if estudante_dados.get('periodo'):
+            estudante_dados['periodo_fmt'] = estudante_dados.get('periodo')
+        
         if estudante_dados.get('campus'):
             student.campus = estudante_dados.get('campus')
         if estudante_dados.get('curso'):
@@ -172,13 +178,10 @@ def student_data_form(request, pk):
         if estudante_dados.get('matricula'):
             student.matricula = estudante_dados.get('matricula')
         
-        # Email pessoal e institucional - ambos usam o mesmo valor da API
-        email_value = estudante_dados.get('email_institucional', estudante_dados.get('email_pessoal', ''))
-        
-        # Adicionar atributos extras ao student para campos que podem não existir no modelo
-        # Isso permite que o template acesse email_pessoal e genero mesmo se não existirem no modelo
-        student.email_pessoal = email_value
-        student.email_institucional = email_value
+        # Email pessoal - mapear da API QAcademico
+        if estudante_dados.get('email_pessoal'):
+            student.email_pessoal = estudante_dados.get('email_pessoal')
+        # Email institucional NÃO é preenchido pela API, manter do banco de dados
             
         # Garantir que genero esteja definido (fallback para sexo)
         if not hasattr(student, 'genero') or not student.genero:
@@ -247,6 +250,11 @@ def student_data_form(request, pk):
             student.quantidade_disciplinas = 0
         
         student.eh_cotista = request.POST.get('eh_cotista') == 'on'
+        
+        # Salvar emails
+        student.email_institucional = request.POST.get('email_institucional', student.email_institucional)
+        student.email_pessoal = request.POST.get('email_pessoal', student.email_pessoal)
+        
         student.save()
         
         # Limpar dados da sessão após salvar
@@ -255,10 +263,13 @@ def student_data_form(request, pk):
         messages.success(request, 'Dados do estudante salvos com sucesso!')
         return redirect('address_data_form', pk=pk)
     
-    # Garantir que student.data_nascimento_fmt esteja disponível no template
-    # O template usa student.data_nascimento_fmt como fallback
+    # Garantir que student.data_nascimento_fmt e student.periodo_fmt estejam disponíveis no template
     if not estudante_dados.get('data_nascimento_fmt') and student.data_nascimento:
         estudante_dados['data_nascimento_fmt'] = student.data_nascimento.strftime('%d/%m/%Y')
+    
+    # Adicionar periodo_fmt se não existir na sessão mas o student tiver período
+    if not estudante_dados.get('periodo_fmt') and student.periodo:
+        estudante_dados['periodo_fmt'] = student.periodo_fmt
     
     context = {
         'period': period,
@@ -285,6 +296,7 @@ def address_data_form(request, pk):
             enrollment_period=period,
             status='RASCUNHO'
         )
+        student = enrollment.student
     
     if request.method == 'POST':
         # Salvar dados de endereço
@@ -297,6 +309,7 @@ def address_data_form(request, pk):
         'address': enrollment.address if enrollment.address else None,
         'step': 5,
         'total_steps': 8,
+        'student': student,
     }
     return render(request, 'enrollments/address_data_form.html', context)
 
@@ -315,6 +328,7 @@ def family_members_form(request, pk):
             enrollment_period=period,
             status='RASCUNHO'
         )
+        student = enrollment.student
     
     if request.method == 'POST':
         # Salvar dados de membros familiares
@@ -331,6 +345,7 @@ def family_members_form(request, pk):
         'family_members': family_members,
         'step': 6,
         'total_steps': 8,
+        'student': student,
     }
     return render(request, 'enrollments/family_members_form.html', context)
 
@@ -349,6 +364,7 @@ def displacement_data_form(request, pk):
             enrollment_period=period,
             status='RASCUNHO'
         )
+        student = enrollment.student
     
     if request.method == 'POST':
         # Salvar dados de deslocamento
@@ -361,6 +377,7 @@ def displacement_data_form(request, pk):
         'displacement': enrollment.displacement if enrollment.displacement else None,
         'step': 7,
         'total_steps': 8,
+        'student': student,
     }
     return render(request, 'enrollments/displacement_data_form.html', context)
 
@@ -379,6 +396,7 @@ def enrollment_data_form(request, pk):
             enrollment_period=period,
             status='RASCUNHO'
         )
+        student = enrollment.student
     
     if request.method == 'POST':
         # Salvar dados de inscrição
@@ -390,6 +408,7 @@ def enrollment_data_form(request, pk):
         'enrollment': enrollment,
         'step': 8,
         'total_steps': 8,
+        'student': student,
     }
     return render(request, 'enrollments/enrollment_data_form.html', context)
 
