@@ -257,14 +257,6 @@
                     
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="cor">Cor</label>
-                            <input type="text" class="form-control" id="cor" name="cor" 
-                                   value="{{ estudante_dados.cor|default:student.cor|default:'' }}">
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-6">
-                        <div class="form-group">
                             <label for="sexo">Sexo *</label>
                             <select class="form-select" id="sexo" name="sexo">
                                 <option value="">Selecione...</option>
@@ -346,8 +338,9 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="periodo">Período</label>
-                            <input type="number" class="form-control" id="periodo" name="periodo" 
-                                   value="{{ estudante_dados.periodo|default:student.periodo|default:'' }}">
+                            <input type="text" class="form-control" id="periodo" name="periodo" 
+                                   value="{{ estudante_dados.periodo|default:student.periodo|default:'' }}"
+                                   pattern="\d+[ºª]?" title="Digite apenas números">
                         </div>
                     </div>
                     
@@ -355,7 +348,8 @@
                         <div class="form-group">
                             <label for="quantidade_disciplinas">Quantidade de Disciplinas</label>
                             <input type="number" class="form-control" id="quantidade_disciplinas" name="quantidade_disciplinas" 
-                                   value="{{ estudante_dados.quantidade_disciplinas|default:student.quantidade_disciplinas|default:0 }}">
+                                   value="{{ estudante_dados.quantidade_disciplinas|default:student.quantidade_disciplinas|default:0 }}"
+                                   min="0" step="1">
                         </div>
                     </div>
                     

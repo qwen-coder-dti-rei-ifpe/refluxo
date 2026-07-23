@@ -1,6 +1,7 @@
 """
 Views do aplicativo Enrollments - Gestão de inscrições e editais
 """
+import re
 from datetime import datetime
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
@@ -150,7 +151,16 @@ def student_data_form(request, pk):
             # Se não tiver gênero, usa o sexo como fallback
             student.genero = estudante_dados.get('sexo')
         if estudante_dados.get('periodo'):
-            student.periodo = estudante_dados.get('periodo')
+            # Extrair apenas o número do período (ex: "1º" -> 1)
+            periodo_value = estudante_dados.get('periodo')
+            if isinstance(periodo_value, str):
+                match = re.match(r'(\d+)', periodo_value)
+                if match:
+                    student.periodo = int(match.group(1))
+                else:
+                    student.periodo = periodo_value
+            else:
+                student.periodo = periodo_value
         if estudante_dados.get('campus'):
             student.campus = estudante_dados.get('campus')
         if estudante_dados.get('curso'):
@@ -180,14 +190,62 @@ def student_data_form(request, pk):
         student.nome_completo = request.POST.get('nome_completo', student.nome_completo)
         student.cpf = request.POST.get('cpf', student.cpf)
         student.identidade = request.POST.get('identidade', student.identidade)
-        student.data_nascimento = request.POST.get('data_nascimento', student.data_nascimento)
+        
+        # Processar data de nascimento - converter de DD/MM/YYYY para YYYY-MM-DD
+        data_nascimento_post = request.POST.get('data_nascimento', '')
+        if data_nascimento_post:
+            try:
+                # Tentar parsear no formato DD/MM/YYYY
+                date_obj = datetime.strptime(data_nascimento_post, '%d/%m/%Y')
+                student.data_nascimento = date_obj.date()
+            except ValueError:
+                try:
+                    # Tentar formato YYYY-MM-DD como fallback
+                    date_obj = datetime.strptime(data_nascimento_post, '%Y-%m-%d')
+                    student.data_nascimento = date_obj.date()
+                except ValueError:
+                    # Se falhar ambos, manter o valor atual ou limpar se vazio
+                    if data_nascimento_post.strip():
+                        messages.error(request, f'Formato de data inválido: {data_nascimento_post}. Use DD/MM/AAAA.')
+                        context = {
+                            'period': period,
+                            'enrollment': enrollment,
+                            'student': student,
+                            'step': 4,
+                            'total_steps': 8,
+                            'estudante_dados': estudante_dados,
+                        }
+                        return render(request, 'enrollments/student_data_form.html', context)
+                    else:
+                        student.data_nascimento = None
+        else:
+            student.data_nascimento = None
+        
         student.idade = request.POST.get('idade', student.idade)
         student.raca = request.POST.get('raca', student.raca)
         student.sexo = request.POST.get('sexo', student.sexo)
-        student.periodo = request.POST.get('periodo', student.periodo)
+        
+        # Processar período - extrair apenas o número se tiver sufixo ordinal
+        periodo_post = request.POST.get('periodo', '')
+        if periodo_post:
+            match = re.match(r'(\d+)', periodo_post)
+            if match:
+                student.periodo = int(match.group(1))
+            else:
+                student.periodo = periodo_post
+        
         student.campus = request.POST.get('campus', student.campus)
         student.curso = request.POST.get('curso', student.curso)
         student.turno = request.POST.get('turno', student.turno)
+        
+        # Processar quantidade de disciplinas - garantir que não seja negativo
+        qtd_disciplinas = request.POST.get('quantidade_disciplinas', '0')
+        try:
+            qtd_value = int(qtd_disciplinas)
+            student.quantidade_disciplinas = max(0, qtd_value)  # Garante valor não negativo
+        except (ValueError, TypeError):
+            student.quantidade_disciplinas = 0
+        
         student.eh_cotista = request.POST.get('eh_cotista') == 'on'
         student.save()
         
@@ -196,6 +254,11 @@ def student_data_form(request, pk):
         
         messages.success(request, 'Dados do estudante salvos com sucesso!')
         return redirect('address_data_form', pk=pk)
+    
+    # Garantir que student.data_nascimento_fmt esteja disponível no template
+    # O template usa student.data_nascimento_fmt como fallback
+    if not estudante_dados.get('data_nascimento_fmt') and student.data_nascimento:
+        estudante_dados['data_nascimento_fmt'] = student.data_nascimento.strftime('%d/%m/%Y')
     
     context = {
         'period': period,
