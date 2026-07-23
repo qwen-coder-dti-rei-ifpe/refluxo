@@ -150,6 +150,8 @@ def student_data_form(request, pk):
             student.turno = estudante_dados.get('turno')
         if estudante_dados.get('eh_cotista') is not None:
             student.eh_cotista = estudante_dados.get('eh_cotista')
+        if estudante_dados.get('matricula'):
+            student.matricula = estudante_dados.get('matricula')
         
         # Email pessoal e institucional - ambos usam o mesmo valor da API
         email_value = estudante_dados.get('email_institucional', estudante_dados.get('email_pessoal', ''))
