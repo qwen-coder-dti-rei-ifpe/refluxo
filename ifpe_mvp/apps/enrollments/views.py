@@ -1,6 +1,7 @@
 """
 Views do aplicativo Enrollments - Gestão de inscrições e editais
 """
+from datetime import datetime
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -129,6 +130,14 @@ def student_data_form(request, pk):
             student.identidade = estudante_dados.get('identidade')
         if estudante_dados.get('data_nascimento'):
             student.data_nascimento = estudante_dados.get('data_nascimento')
+            # Adiciona a versão formatada para exibição no template (DD/MM/YYYY)
+            try:
+                # Tenta parsear a data no formato YYYY-MM-DD
+                date_obj = datetime.strptime(estudante_dados.get('data_nascimento'), '%Y-%m-%d')
+                estudante_dados['data_nascimento_fmt'] = date_obj.strftime('%d/%m/%Y')
+            except (ValueError, TypeError):
+                # Se falhar, usa o valor original ou tenta outro formato
+                estudante_dados['data_nascimento_fmt'] = estudante_dados.get('data_nascimento')
         if estudante_dados.get('idade'):
             student.idade = estudante_dados.get('idade')
         if estudante_dados.get('raca'):

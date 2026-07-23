@@ -36,12 +36,23 @@ class QAcademicoViewSet(viewsets.ViewSet):
             dados_api, erro = buscar_estudante_qacademico(matricula)
             
             if dados_api:
+                # Formatar data de nascimento para DD/MM/YYYY
+                data_nascimento_fmt = ''
+                if dados_api.get('data_nascimento'):
+                    try:
+                        from datetime import datetime
+                        date_obj = datetime.strptime(dados_api.get('data_nascimento'), '%Y-%m-%d')
+                        data_nascimento_fmt = date_obj.strftime('%d/%m/%Y')
+                    except (ValueError, TypeError):
+                        data_nascimento_fmt = dados_api.get('data_nascimento', '')
+                
                 # Mapear dados para formato esperado pelo frontend
                 dados_formatados = {
                     'nome_completo': dados_api.get('nome_completo', ''),
                     'cpf': dados_api.get('cpf', ''),
                     'identidade': dados_api.get('identidade', ''),
                     'data_nascimento': dados_api.get('data_nascimento', ''),
+                    'data_nascimento_fmt': data_nascimento_fmt,
                     'idade': dados_api.get('idade', 0),
                     'raca': dados_api.get('raca', ''),
                     'sexo': dados_api.get('sexo', ''),
