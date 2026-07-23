@@ -342,7 +342,7 @@
                         <div class="form-group">
                             <label for="periodo">Período</label>
                             <input type="number" class="form-control" id="periodo" name="periodo" 
-                                   value="{{ student.periodo|default:'' }}">
+                                   value="{{ estudante_dados.periodo|default:student.periodo|default:'' }}">
                         </div>
                     </div>
                     
