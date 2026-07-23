@@ -181,6 +181,13 @@ def student_data_form(request, pk):
         # Email pessoal - mapear da API QAcademico
         if estudante_dados.get('email_pessoal'):
             student.email_pessoal = estudante_dados.get('email_pessoal')
+
+        # Salvar informações bancárias
+        student.tipo_conta = request.POST.get('tipo_conta', student.tipo_conta)
+        student.numero_agencia = request.POST.get('numero_agencia', student.numero_agencia)
+        student.numero_conta = request.POST.get('numero_conta', student.numero_conta)
+        student.banco = request.POST.get('banco', student.banco)
+        student.banco_outro = request.POST.get('banco_outro', student.banco_outro)
         # Email institucional NÃO é preenchido pela API, manter do banco de dados
             
         # Garantir que genero esteja definido (fallback para sexo)
@@ -254,6 +261,13 @@ def student_data_form(request, pk):
         # Salvar emails
         student.email_institucional = request.POST.get('email_institucional', student.email_institucional)
         student.email_pessoal = request.POST.get('email_pessoal', student.email_pessoal)
+        
+        # Salvar informações bancárias
+        student.tipo_conta = request.POST.get('tipo_conta', student.tipo_conta)
+        student.numero_agencia = request.POST.get('numero_agencia', student.numero_agencia)
+        student.numero_conta = request.POST.get('numero_conta', student.numero_conta)
+        student.banco = request.POST.get('banco', student.banco)
+        student.banco_outro = request.POST.get('banco_outro', student.banco_outro)
         
         student.save()
         
