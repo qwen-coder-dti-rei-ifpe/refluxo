@@ -256,6 +256,12 @@ def student_data_form(request, pk):
         except (ValueError, TypeError):
             student.quantidade_disciplinas = 0
         
+        # Salvar origem escolar
+        student.origem_escolar = request.POST.get('origem_escolar', student.origem_escolar)
+        
+        # Salvar moradia estudantil
+        student.moradia_estudantil = request.POST.get('moradia_estudantil') == 'on'
+        
         student.eh_cotista = request.POST.get('eh_cotista') == 'on'
         
         # Salvar emails
