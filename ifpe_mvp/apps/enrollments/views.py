@@ -162,6 +162,11 @@ def student_data_form(request, pk):
                     student.periodo = periodo_value
             else:
                 student.periodo = periodo_value
+        
+        # Adicionar versão formatada do período para exibição no template
+        if estudante_dados.get('periodo'):
+            estudante_dados['periodo_fmt'] = estudante_dados.get('periodo')
+        
         if estudante_dados.get('campus'):
             student.campus = estudante_dados.get('campus')
         if estudante_dados.get('curso'):
@@ -256,10 +261,13 @@ def student_data_form(request, pk):
         messages.success(request, 'Dados do estudante salvos com sucesso!')
         return redirect('address_data_form', pk=pk)
     
-    # Garantir que student.data_nascimento_fmt esteja disponível no template
-    # O template usa student.data_nascimento_fmt como fallback
+    # Garantir que student.data_nascimento_fmt e student.periodo_fmt estejam disponíveis no template
     if not estudante_dados.get('data_nascimento_fmt') and student.data_nascimento:
         estudante_dados['data_nascimento_fmt'] = student.data_nascimento.strftime('%d/%m/%Y')
+    
+    # Adicionar periodo_fmt se não existir na sessão mas o student tiver período
+    if not estudante_dados.get('periodo_fmt') and student.periodo:
+        estudante_dados['periodo_fmt'] = student.periodo_fmt
     
     context = {
         'period': period,
