@@ -59,6 +59,7 @@ def student_search(request):
                 
                 # Armazena dados na sessão para pré-preenchimento do formulário
                 # Mapeamento completo dos campos da API para o formulário
+                email_value = dados_api.get('email', '')
                 dados_sessao = {
                     'nome_completo': dados_api.get('nome_completo', ''),
                     'cpf': dados_api.get('cpf', ''),
@@ -74,8 +75,8 @@ def student_search(request):
                     'turno': dados_api.get('turno', ''),
                     'periodo': dados_api.get('periodo', ''),  # currentPeriod formatado como "1º"
                     'eh_cotista': dados_api.get('eh_cotista', False),
-                    'email_pessoal': dados_api.get('email', ''),  # Email Pessoal (campo email da API)
-                    'email_institucional': '',  # Email Institucional (separado do email pessoal)
+                    'email_pessoal': email_value,  # Email Pessoal (campo email da API)
+                    'email_institucional': email_value,  # Email Institucional (usar email da API)
                     'nome_mae': dados_api.get('nome_mae', ''),
                     'nome_pai': dados_api.get('nome_pai', ''),
                     'estado_civil': dados_api.get('estado_civil', ''),

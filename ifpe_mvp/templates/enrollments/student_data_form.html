@@ -216,9 +216,9 @@
                     
                     <div class="col-md-4">
                         <div class="form-group">
-                            <label for="data_nascimento">Data de Nascimento</label>
+                            <label for="data_nascimento">Data de Nascimento *</label>
                             <input type="date" class="form-control" id="data_nascimento" name="data_nascimento" 
-                                   value="{{ estudante_dados.data_nascimento|default:student.data_nascimento|date:'Y-m-d'|default:'' }}">
+                                   value="{{ estudante_dados.data_nascimento|default:student.data_nascimento|date:'Y-m-d'|default:'' }}" required>
                         </div>
                     </div>
                     
@@ -226,15 +226,15 @@
                         <div class="form-group">
                             <label for="idade">Idade</label>
                             <input type="number" class="form-control" id="idade" name="idade" 
-                                   value="{{ estudante_dados.idade|default:student.idade|default:'' }}">
+                                   value="{{ estudante_dados.idade|default:student.idade|default:'' }}" readonly>
                         </div>
                     </div>
                     
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="identidade">Identidade (RG)</label>
+                            <label for="identidade">Identidade (RG) *</label>
                             <input type="text" class="form-control" id="identidade" name="identidade" 
-                                   value="{{ estudante_dados.identidade|default:student.identidade|default:'' }}">
+                                   value="{{ estudante_dados.identidade|default:student.identidade|default:'' }}" required>
                         </div>
                     </div>
                     
@@ -263,7 +263,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="sexo">Sexo *</label>
-                            <select class="form-select" id="sexo" name="sexo">
+                            <select class="form-select" id="sexo" name="sexo" required>
                                 <option value="">Selecione...</option>
                                 <option value="MASCULINO" {% if estudante_dados.sexo|default:student.sexo == 'MASCULINO' %}selected{% endif %}>Masculino</option>
                                 <option value="FEMININO" {% if estudante_dados.sexo|default:student.sexo == 'FEMININO' %}selected{% endif %}>Feminino</option>
@@ -290,9 +290,9 @@
                     
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="genero">Gênero</label>
+                            <label for="genero">Gênero *</label>
                             <input type="text" class="form-control" id="genero" name="genero" 
-                                   value="{{ estudante_dados.genero|default:estudante_dados.sexo|default:student.genero|default:student.sexo|default:'' }}">
+                                   value="{{ estudante_dados.genero|default:estudante_dados.sexo|default:student.genero|default:student.sexo|default:'' }}" required>
                         </div>
                     </div>
                 </div>
@@ -389,9 +389,9 @@
                     
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="email_institucional">Email Institucional</label>
+                            <label for="email_institucional">Email Institucional *</label>
                             <input type="email" class="form-control" id="email_institucional" name="email_institucional" 
-                                   value="{{ estudante_dados.email_institucional|default:student.email_institucional|default:'' }}">
+                                   value="{{ estudante_dados.email_institucional|default:student.email_institucional|default:'' }}" required>
                         </div>
                     </div>
                     

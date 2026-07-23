@@ -147,14 +147,13 @@ def student_data_form(request, pk):
         if estudante_dados.get('eh_cotista') is not None:
             student.eh_cotista = estudante_dados.get('eh_cotista')
         
-        # Email pessoal - campo separado, não usar como email institucional
-        email_pessoal_value = estudante_dados.get('email_pessoal', '')
-        email_institucional_value = estudante_dados.get('email_institucional', '')
+        # Email pessoal e institucional - ambos usam o mesmo valor da API
+        email_value = estudante_dados.get('email_institucional', estudante_dados.get('email_pessoal', ''))
         
         # Adicionar atributos extras ao student para campos que podem não existir no modelo
         # Isso permite que o template acesse email_pessoal e genero mesmo se não existirem no modelo
-        student.email_pessoal = email_pessoal_value
-        student.email_institucional = email_institucional_value
+        student.email_pessoal = email_value
+        student.email_institucional = email_value
             
         # Garantir que genero esteja definido (fallback para sexo)
         if not hasattr(student, 'genero') or not student.genero:
