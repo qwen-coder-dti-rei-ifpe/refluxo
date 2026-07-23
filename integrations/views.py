@@ -45,7 +45,7 @@ class QAcademicoViewSet(viewsets.ViewSet):
                     'idade': dados_api.get('idade', 0),
                     'raca': dados_api.get('raca', ''),
                     'sexo': dados_api.get('sexo', ''),
-                    'genero': dados_api.get('sexo', ''),  # Gênero igual ao sexo por padrão
+                    'genero': dados_api.get('genero', dados_api.get('sexo', '')),
                     'matricula': dados_api.get('matricula', ''),
                     'campus': dados_api.get('campus', ''),
                     'curso': dados_api.get('curso', ''),
@@ -53,8 +53,8 @@ class QAcademicoViewSet(viewsets.ViewSet):
                     'periodo': dados_api.get('periodo', ''),
                     'eh_cotista': dados_api.get('eh_cotista', False),
                     'email': dados_api.get('email', ''),
-                    'email_institucional': dados_api.get('email', ''),
-                    'email_pessoal': dados_api.get('email', ''),
+                    'email_institucional': dados_api.get('email_institucional', dados_api.get('email', '')),
+                    'email_pessoal': dados_api.get('email_pessoal', dados_api.get('email', '')),
                     'nome_mae': dados_api.get('nome_mae', ''),
                     'nome_pai': dados_api.get('nome_pai', ''),
                 }

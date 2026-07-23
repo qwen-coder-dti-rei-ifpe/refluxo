@@ -121,6 +121,10 @@ def student_data_form(request, pk):
     # Atualizar campos específicos do student com dados da API QAcadêmico ANTES de renderizar
     if estudante_dados:
         # Mapear todos os campos necessários para o template
+        if estudante_dados.get('nome_completo'):
+            student.nome_completo = estudante_dados.get('nome_completo')
+        if estudante_dados.get('cpf'):
+            student.cpf = estudante_dados.get('cpf')
         if estudante_dados.get('identidade'):
             student.identidade = estudante_dados.get('identidade')
         if estudante_dados.get('data_nascimento'):

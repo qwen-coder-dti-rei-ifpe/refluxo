@@ -263,7 +263,7 @@
                         <div class="form-group">
                             <label for="nome_completo">Nome completo *</label>
                             <input type="text" class="form-control" id="nome_completo" name="nome_completo" 
-                                   value="{{ student.nome_completo|default:'' }}" required>
+                                   value="{{ estudante_dados.nome_completo|default:student.nome_completo|default:'' }}" required>
                         </div>
                     </div>
                     
