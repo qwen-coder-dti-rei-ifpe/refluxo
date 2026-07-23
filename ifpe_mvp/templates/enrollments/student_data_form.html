@@ -401,8 +401,8 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="periodo">Período</label>
-                            <input type="number" class="form-control" id="periodo" name="periodo" 
-                                   value="{{ estudante_dados.periodo|default:student.periodo|default:'' }}">
+                            <input type="text" class="form-control" id="periodo" name="periodo" 
+                                   value="{{ estudante_dados.periodo|default:student.periodo_fmt|default:student.periodo|default:'' }}">
                         </div>
                     </div>
                     
