@@ -190,7 +190,37 @@ def student_data_form(request, pk):
         student.nome_completo = request.POST.get('nome_completo', student.nome_completo)
         student.cpf = request.POST.get('cpf', student.cpf)
         student.identidade = request.POST.get('identidade', student.identidade)
-        student.data_nascimento = request.POST.get('data_nascimento', student.data_nascimento)
+        
+        # Processar data de nascimento - converter de DD/MM/YYYY para YYYY-MM-DD
+        data_nascimento_post = request.POST.get('data_nascimento', '')
+        if data_nascimento_post:
+            try:
+                # Tentar parsear no formato DD/MM/YYYY
+                date_obj = datetime.strptime(data_nascimento_post, '%d/%m/%Y')
+                student.data_nascimento = date_obj.date()
+            except ValueError:
+                try:
+                    # Tentar formato YYYY-MM-DD como fallback
+                    date_obj = datetime.strptime(data_nascimento_post, '%Y-%m-%d')
+                    student.data_nascimento = date_obj.date()
+                except ValueError:
+                    # Se falhar ambos, manter o valor atual ou limpar se vazio
+                    if data_nascimento_post.strip():
+                        messages.error(request, f'Formato de data inválido: {data_nascimento_post}. Use DD/MM/AAAA.')
+                        context = {
+                            'period': period,
+                            'enrollment': enrollment,
+                            'student': student,
+                            'step': 4,
+                            'total_steps': 8,
+                            'estudante_dados': estudante_dados,
+                        }
+                        return render(request, 'enrollments/student_data_form.html', context)
+                    else:
+                        student.data_nascimento = None
+        else:
+            student.data_nascimento = None
+        
         student.idade = request.POST.get('idade', student.idade)
         student.raca = request.POST.get('raca', student.raca)
         student.sexo = request.POST.get('sexo', student.sexo)
