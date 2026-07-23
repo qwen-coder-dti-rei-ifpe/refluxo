@@ -118,8 +118,49 @@ def student_data_form(request, pk):
             status='RASCUNHO'
         )
     
-    # Verifica se há dados na sessão para autopreenchimento (provenientes da API QAcadêmico)
+    # Obter dados da sessão (provenientes da API QAcadêmico)
     estudante_dados = request.session.get('estudanteDados', {})
+    
+    # Flag para controlar se já carregou dados do banco na sessão
+    already_loaded_from_db = request.session.get('student_data_loaded', False)
+    
+    # Se for a primeira vez acessando o formulário e já existem dados no banco,
+    # carregar dados do banco para a sessão para preencher o formulário
+    if not already_loaded_from_db and student.id:
+        # Carregar dados do banco para a sessão apenas uma vez
+        db_data = {
+            'nome_completo': student.nome_completo or '',
+            'cpf': student.cpf or '',
+            'identidade': student.identidade or '',
+            'data_nascimento': student.data_nascimento.strftime('%Y-%m-%d') if student.data_nascimento else '',
+            'idade': student.idade or '',
+            'raca': student.raca or '',
+            'sexo': student.sexo or '',
+            'genero': student.genero or student.sexo or '',
+            'matricula': student.matricula or '',
+            'campus': student.campus or '',
+            'curso': student.curso or '',
+            'turno': student.turno or '',
+            'periodo': str(student.periodo) if student.periodo else '',
+            'eh_cotista': student.eh_cotista,
+            'email_pessoal': student.email_pessoal or '',
+            'origem_escolar': student.origem_escolar or '',
+            'moradia_estudantil': student.moradia_estudantil,
+            'tipo_conta': student.tipo_conta or '',
+            'numero_agencia': student.numero_agencia or '',
+            'numero_conta': student.numero_conta or '',
+            'banco': student.banco or '',
+            'banco_outro': student.banco_outro or '',
+        }
+        
+        # Mesclar dados do banco com dados da API (API tem prioridade se existir)
+        for key, value in db_data.items():
+            if key not in estudante_dados or not estudante_dados[key]:
+                estudante_dados[key] = value
+        
+        # Marcar que já carregou dados do banco
+        request.session['student_data_loaded'] = True
+        request.session['estudanteDados'] = estudante_dados
     
     # Atualizar campos específicos do student com dados da API QAcadêmico ANTES de renderizar
     if estudante_dados:
@@ -181,14 +222,12 @@ def student_data_form(request, pk):
         # Email pessoal - mapear da API QAcademico
         if estudante_dados.get('email_pessoal'):
             student.email_pessoal = estudante_dados.get('email_pessoal')
-
-        # Salvar informações bancárias
-        student.tipo_conta = request.POST.get('tipo_conta', student.tipo_conta)
-        student.numero_agencia = request.POST.get('numero_agencia', student.numero_agencia)
-        student.numero_conta = request.POST.get('numero_conta', student.numero_conta)
-        student.banco = request.POST.get('banco', student.banco)
-        student.banco_outro = request.POST.get('banco_outro', student.banco_outro)
-        # Email institucional NÃO é preenchido pela API, manter do banco de dados
+        
+        # Informações acadêmicas adicionais
+        if estudante_dados.get('origem_escolar'):
+            student.origem_escolar = estudante_dados.get('origem_escolar')
+        if estudante_dados.get('moradia_estudantil') is not None:
+            student.moradia_estudantil = estudante_dados.get('moradia_estudantil')
             
         # Garantir que genero esteja definido (fallback para sexo)
         if not hasattr(student, 'genero') or not student.genero:
@@ -277,8 +316,9 @@ def student_data_form(request, pk):
         
         student.save()
         
-        # Limpar dados da sessão após salvar
+        # Limpar flags da sessão após salvar para permitir recarregamento na próxima visita
         request.session.pop('estudanteDados', None)
+        request.session.pop('student_data_loaded', None)
         
         messages.success(request, 'Dados do estudante salvos com sucesso!')
         return redirect('address_data_form', pk=pk)
