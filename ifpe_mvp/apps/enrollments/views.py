@@ -162,12 +162,6 @@ def student_data_form(request, pk):
                     student.periodo = periodo_value
             else:
                 student.periodo = periodo_value
-        
-        # Adicionar atributo periodo_fmt ao student para exibição com sufixo ordinal
-        if hasattr(student, 'periodo') and student.periodo:
-            student.periodo_fmt = f"{student.periodo}º"
-        else:
-            student.periodo_fmt = estudante_dados.get('periodo', '')
         if estudante_dados.get('campus'):
             student.campus = estudante_dados.get('campus')
         if estudante_dados.get('curso'):
