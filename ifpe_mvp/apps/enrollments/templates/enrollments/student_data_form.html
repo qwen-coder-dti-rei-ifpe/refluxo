@@ -346,8 +346,9 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="periodo">Período</label>
-                            <input type="number" class="form-control" id="periodo" name="periodo" 
-                                   value="{{ estudante_dados.periodo|default:student.periodo|default:'' }}">
+                            <input type="text" class="form-control" id="periodo" name="periodo" 
+                                   value="{{ estudante_dados.periodo|default:student.periodo|default:'' }}"
+                                   pattern="\d+[ºª]?" title="Digite apenas números">
                         </div>
                     </div>
                     
@@ -355,7 +356,8 @@
                         <div class="form-group">
                             <label for="quantidade_disciplinas">Quantidade de Disciplinas</label>
                             <input type="number" class="form-control" id="quantidade_disciplinas" name="quantidade_disciplinas" 
-                                   value="{{ estudante_dados.quantidade_disciplinas|default:student.quantidade_disciplinas|default:0 }}">
+                                   value="{{ estudante_dados.quantidade_disciplinas|default:student.quantidade_disciplinas|default:0 }}"
+                                   min="0" step="1">
                         </div>
                     </div>
                     
