@@ -551,7 +551,7 @@ document.addEventListener('DOMContentLoaded', function() {
             searchResult.innerHTML = '<div class="alert alert-info"><i class="fas fa-spinner fa-spin"></i> Buscando dados...</div>';
             btnBuscar.disabled = true;
             
-            // Enviar matrícula para a sessão e recarregar a página para processamento no backend
+            // Enviar matrícula para a sessão e processar resposta
             fetch('/enrollments/store-matricula-search/', {
                 method: 'POST',
                 headers: {
@@ -562,12 +562,19 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => response.json())
             .then(data => {
+                btnBuscar.disabled = false;
+                
                 if (data.success) {
-                    // Recarregar a página para que o backend processe a busca
-                    window.location.reload();
+                    // Preencher formulário com dados retornados
+                    if (data.data) {
+                        preencherFormulario(data.data);
+                        
+                        // Mostrar mensagem de sucesso com origem dos dados
+                        let fonteDados = data.source === 'database' ? 'banco de dados local' : 'API QAcadêmico';
+                        searchResult.innerHTML = `<div class="alert alert-success"><i class="fas fa-check-circle"></i> Dados encontrados com sucesso na ${fonteDados}!</div>`;
+                    }
                 } else {
-                    btnBuscar.disabled = false;
-                    searchResult.innerHTML = `<div class="alert alert-danger"><i class="fas fa-times-circle"></i> Erro ao salvar matrícula: ${data.error}</div>`;
+                    searchResult.innerHTML = `<div class="alert alert-danger"><i class="fas fa-times-circle"></i> Erro ao buscar: ${data.error}</div>`;
                 }
             })
             .catch(error => {

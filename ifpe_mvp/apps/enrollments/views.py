@@ -80,6 +80,96 @@ def step3_cards(request, pk):
 
 
 @login_required
+def store_matricula_search(request):
+    """
+    Endpoint AJAX para armazenar matrícula da busca na sessão e buscar dados do estudante.
+    
+    Fluxo:
+    1. Recebe matrícula via POST
+    2. Busca no banco de dados local
+    3. Se não encontrar no banco, busca na API QAcadêmico
+    4. Armazena dados na sessão
+    5. Retorna JSON com sucesso ou erro
+    """
+    import json
+    from django.http import JsonResponse
+    from django.views.decorators.http import require_http_methods
+    from integrations.qacademico_service import buscar_estudante_qacademico
+    
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Método não permitido'}, status=405)
+    
+    try:
+        data = json.loads(request.body)
+        matricula = data.get('matricula', '').strip()
+        
+        if not matricula:
+            return JsonResponse({'success': False, 'error': 'Matrícula é obrigatória'})
+        
+        # Passo 1: Tentar buscar no banco de dados local
+        try:
+            student = Student.objects.get(matricula=matricula)
+            
+            # Dados encontrados no banco local
+            dados_sessao = {
+                'nome_completo': student.nome_completo or '',
+                'cpf': student.cpf or '',
+                'identidade': student.identidade or '',
+                'data_nascimento': student.data_nascimento.strftime('%Y-%m-%d') if student.data_nascimento else '',
+                'idade': student.idade or '',
+                'raca': student.raca or '',
+                'sexo': student.sexo or '',
+                'genero': student.genero or student.sexo or '',
+                'matricula': student.matricula or '',
+                'campus': student.campus or '',
+                'curso': student.curso or '',
+                'turno': student.turno or '',
+                'periodo': str(student.periodo) if student.periodo else '',
+                'eh_cotista': student.eh_cotista,
+                'email_pessoal': student.email_pessoal or '',
+                'origem_escolar': student.origem_escolar or '',
+                'moradia_estudantil': student.moradia_estudantil,
+            }
+            
+            request.session['estudanteDados'] = dados_sessao
+            request.session['student_data_loaded'] = False  # Resetar flag para recarregar do banco
+            
+            return JsonResponse({
+                'success': True,
+                'source': 'database',
+                'message': 'Dados encontrados no banco de dados local',
+                'data': dados_sessao
+            })
+            
+        except Student.DoesNotExist:
+            # Passo 2: Não encontrado no banco, buscar na API QAcadêmico
+            dados_api, erro = buscar_estudante_qacademico(matricula)
+            
+            if dados_api:
+                # Dados encontrados na API QAcadêmico
+                request.session['estudanteDados'] = dados_api
+                request.session['student_data_loaded'] = False  # Resetar flag para permitir carregamento
+                
+                return JsonResponse({
+                    'success': True,
+                    'source': 'qacademico_api',
+                    'message': 'Dados encontrados na API QAcadêmico',
+                    'data': dados_api
+                })
+            else:
+                # Não encontrado nem no banco nem na API
+                return JsonResponse({
+                    'success': False,
+                    'error': erro or 'Matrícula não encontrada no banco de dados ou na API QAcadêmico'
+                })
+    
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'error': 'Dados inválidos'}, status=400)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': f'Erro interno: {str(e)}'}, status=500)
+
+
+@login_required
 def student_data_form(request, pk):
     """Step 4: Formulário de Dados do Estudante."""
     from inscricoes.models import Edital
@@ -332,7 +422,7 @@ def student_data_form(request, pk):
     
     # Adicionar periodo_fmt se não existir na sessão mas o student tiver período
     if not estudante_dados.get('periodo_fmt') and student.periodo:
-        estudante_dados['periodo_fmt'] = student.periodo_fmt
+        estudante_dados['periodo_fmt'] = str(student.periodo) + 'º' if isinstance(student.periodo, int) else student.periodo
     
     context = {
         'period': period,
@@ -341,6 +431,7 @@ def student_data_form(request, pk):
         'step': 4,
         'total_steps': 8,
         'estudante_dados': estudante_dados,  # Passar dados da API explicitamente para o template
+        'form_data': estudante_dados,  # Alias para compatibilidade com o template
     }
     return render(request, 'enrollments/student_data_form.html', context)
 
