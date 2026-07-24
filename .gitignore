@@ -1,14 +1,1 @@
-```
-# Python cache
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Virtual environment
-venv/
-
-# Dependencies in virtual environment
-venv/lib/python*/site-packages/
-
-```
+Nothing should be ignored since the changes only include HTML template files which are source code/config files.

@@ -217,11 +217,9 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label for="data_nascimento">Data de Nascimento *</label>
-                            <input type="text" class="form-control" id="data_nascimento" name="data_nascimento" 
-                                   placeholder="DD/MM/AAAA" maxlength="10"
-                                   value="{{ estudante_dados.data_nascimento_fmt|default:student.data_nascimento_fmt|default:'' }}"
+                            <input type="date" class="form-control" id="data_nascimento" name="data_nascimento" 
+                                   value="{{ estudante_dados.data_nascimento|date:'Y-m-d'|default:student.data_nascimento|date:'Y-m-d'|default:'' }}"
                                    required>
-                            <small class="form-text text-muted">Formato: DD/MM/AAAA</small>
                         </div>
                     </div>
                     
@@ -582,18 +580,19 @@ document.addEventListener('DOMContentLoaded', function() {
         if (dados.cpf) document.getElementById('cpf').value = dados.cpf;
         if (dados.identidade) document.getElementById('identidade').value = dados.identidade;
         
-        // Data de nascimento - formatar para DD/MM/AAAA
-        if (dados.data_nascimento_fmt) {
-            document.getElementById('data_nascimento').value = dados.data_nascimento_fmt;
-        } else if (dados.data_nascimento) {
-            // Tentar converter de YYYY-MM-DD para DD/MM/YYYY
+        // Data de nascimento - formato YYYY-MM-DD para input type="date"
+        if (dados.data_nascimento) {
+            // Se já estiver no formato YYYY-MM-DD, usar diretamente
+            document.getElementById('data_nascimento').value = dados.data_nascimento;
+        } else if (dados.data_nascimento_fmt) {
+            // Converter de DD/MM/YYYY para YYYY-MM-DD
             try {
-                const dateObj = new Date(dados.data_nascimento + 'T00:00:00');
-                if (!isNaN(dateObj.getTime())) {
-                    const dia = String(dateObj.getDate()).padStart(2, '0');
-                    const mes = String(dateObj.getMonth() + 1).padStart(2, '0');
-                    const ano = dateObj.getFullYear();
-                    document.getElementById('data_nascimento').value = `${dia}/${mes}/${ano}`;
+                const parts = dados.data_nascimento_fmt.split('/');
+                if (parts.length === 3) {
+                    const dia = parts[0];
+                    const mes = parts[1];
+                    const ano = parts[2];
+                    document.getElementById('data_nascimento').value = `${ano}-${mes}-${dia}`;
                 }
             } catch (e) {
                 console.error('Erro ao formatar data:', e);
