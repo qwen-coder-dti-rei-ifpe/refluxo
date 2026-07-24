@@ -14,6 +14,9 @@ urlpatterns = [
     # URL alternativa para step3_cards (compatibilidade)
     path('<int:pk>/cards/', views.step3_cards, name='step3_cards'),
     
+    # Endpoint para armazenar matrícula da busca na sessão
+    path('store-matricula-search/', views.store_matricula_search, name='store_matricula_search'),
+    
     # Step 4: Dados do Estudante
     path('<int:pk>/student-data/', views.student_data_form, name='student_data_form'),
     

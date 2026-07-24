@@ -202,7 +202,7 @@
                         <div class="form-group">
                             <label for="nome_completo">Nome completo *</label>
                             <input type="text" class="form-control" id="nome_completo" name="nome_completo" 
-                                   value="{{ estudante_dados.nome_completo|default:student.nome_completo|default:'' }}" required>
+                                   value="{{ form_data.nome_completo|default:student.nome_completo|default:'' }}" required>
                         </div>
                     </div>
                     
@@ -210,7 +210,7 @@
                         <div class="form-group">
                             <label for="cpf">CPF *</label>
                             <input type="text" class="form-control" id="cpf" name="cpf" 
-                                   value="{{ estudante_dados.cpf|default:student.cpf|default:'' }}" required placeholder="000.000.000-00">
+                                   value="{{ form_data.cpf|default:student.cpf|default:'' }}" required placeholder="000.000.000-00">
                         </div>
                     </div>
                     
@@ -218,7 +218,7 @@
                         <div class="form-group">
                             <label for="data_nascimento">Data de Nascimento *</label>
                             <input type="date" class="form-control" id="data_nascimento" name="data_nascimento" 
-                                   value="{{ estudante_dados.data_nascimento|date:'Y-m-d'|default:student.data_nascimento|date:'Y-m-d'|default:'' }}"
+                                   value="{{ form_data.data_nascimento|date:'Y-m-d'|default:student.data_nascimento|date:'Y-m-d'|default:'' }}"
                                    required>
                         </div>
                     </div>
@@ -227,7 +227,7 @@
                         <div class="form-group">
                             <label for="idade">Idade</label>
                             <input type="number" class="form-control" id="idade" name="idade" 
-                                   value="{{ estudante_dados.idade|default:student.idade|default:'' }}">
+                                   value="{{ form_data.idade|default:student.idade|default:'' }}">
                         </div>
                     </div>
                     
@@ -235,7 +235,7 @@
                         <div class="form-group">
                             <label for="identidade">Identidade (RG)</label>
                             <input type="text" class="form-control" id="identidade" name="identidade" 
-                                   value="{{ estudante_dados.identidade|default:student.identidade|default:'' }}">
+                                   value="{{ form_data.identidade|default:student.identidade|default:'' }}">
                         </div>
                     </div>
                     
@@ -244,11 +244,11 @@
                             <label for="raca">Raça *</label>
                             <select class="form-select" id="raca" name="raca">
                                 <option value="">Selecione...</option>
-                                <option value="BRANCA" {% if estudante_dados.raca|default:student.raca == 'BRANCA' %}selected{% endif %}>Branca</option>
-                                <option value="PRETA" {% if estudante_dados.raca|default:student.raca == 'PRETA' %}selected{% endif %}>Preta</option>
-                                <option value="PARDA" {% if estudante_dados.raca|default:student.raca == 'PARDA' %}selected{% endif %}>Parda</option>
-                                <option value="AMARELA" {% if estudante_dados.raca|default:student.raca == 'AMARELA' %}selected{% endif %}>Amarela</option>
-                                <option value="INDIGENA" {% if estudante_dados.raca|default:student.raca == 'INDIGENA' %}selected{% endif %}>Indígena</option>
+                                <option value="BRANCA" {% if form_data.raca|default:student.raca == 'BRANCA' %}selected{% endif %}>Branca</option>
+                                <option value="PRETA" {% if form_data.raca|default:student.raca == 'PRETA' %}selected{% endif %}>Preta</option>
+                                <option value="PARDA" {% if form_data.raca|default:student.raca == 'PARDA' %}selected{% endif %}>Parda</option>
+                                <option value="AMARELA" {% if form_data.raca|default:student.raca == 'AMARELA' %}selected{% endif %}>Amarela</option>
+                                <option value="INDIGENA" {% if form_data.raca|default:student.raca == 'INDIGENA' %}selected{% endif %}>Indígena</option>
                             </select>
                         </div>
                     </div>
@@ -258,10 +258,10 @@
                             <label for="sexo">Sexo *</label>
                             <select class="form-select" id="sexo" name="sexo">
                                 <option value="">Selecione...</option>
-                                <option value="MASCULINO" {% if estudante_dados.sexo|default:student.sexo == 'MASCULINO' %}selected{% endif %}>Masculino</option>
-                                <option value="FEMININO" {% if estudante_dados.sexo|default:student.sexo == 'FEMININO' %}selected{% endif %}>Feminino</option>
-                                <option value="NAO_BINARIO" {% if estudante_dados.sexo|default:student.sexo == 'NAO_BINARIO' %}selected{% endif %}>Não-binário</option>
-                                <option value="OUTRO" {% if estudante_dados.sexo|default:student.sexo == 'OUTRO' %}selected{% endif %}>Outro</option>
+                                <option value="MASCULINO" {% if form_data.sexo|default:student.sexo == 'MASCULINO' %}selected{% endif %}>Masculino</option>
+                                <option value="FEMININO" {% if form_data.sexo|default:student.sexo == 'FEMININO' %}selected{% endif %}>Feminino</option>
+                                <option value="NAO_BINARIO" {% if form_data.sexo|default:student.sexo == 'NAO_BINARIO' %}selected{% endif %}>Não-binário</option>
+                                <option value="OUTRO" {% if form_data.sexo|default:student.sexo == 'OUTRO' %}selected{% endif %}>Outro</option>
                             </select>
                         </div>
                     </div>
@@ -271,12 +271,12 @@
                             <label for="orientacao_sexual">Orientação Sexual</label>
                             <select class="form-select" id="orientacao_sexual" name="orientacao_sexual">
                                 <option value="">Selecione...</option>
-                                <option value="HETEROSSEXUAL" {% if estudante_dados.orientacao_sexual|default:student.orientacao_sexual == 'HETEROSSEXUAL' %}selected{% endif %}>Heterossexual</option>
-                                <option value="HOMOSSEXUAL" {% if estudante_dados.orientacao_sexual|default:student.orientacao_sexual == 'HOMOSSEXUAL' %}selected{% endif %}>Homossexual</option>
-                                <option value="BISSEXUAL" {% if estudante_dados.orientacao_sexual|default:student.orientacao_sexual == 'BISSEXUAL' %}selected{% endif %}>Bissexual</option>
-                                <option value="ASSEXUAL" {% if estudante_dados.orientacao_sexual|default:student.orientacao_sexual == 'ASSEXUAL' %}selected{% endif %}>Assexual</option>
-                                <option value="OUTRO" {% if estudante_dados.orientacao_sexual|default:student.orientacao_sexual == 'OUTRO' %}selected{% endif %}>Outro</option>
-                                <option value="NAO_DECLARADA" {% if estudante_dados.orientacao_sexual|default:student.orientacao_sexual == 'NAO_DECLARADA' %}selected{% endif %}>Prefiro não declarar</option>
+                                <option value="HETEROSSEXUAL" {% if form_data.orientacao_sexual|default:student.orientacao_sexual == 'HETEROSSEXUAL' %}selected{% endif %}>Heterossexual</option>
+                                <option value="HOMOSSEXUAL" {% if form_data.orientacao_sexual|default:student.orientacao_sexual == 'HOMOSSEXUAL' %}selected{% endif %}>Homossexual</option>
+                                <option value="BISSEXUAL" {% if form_data.orientacao_sexual|default:student.orientacao_sexual == 'BISSEXUAL' %}selected{% endif %}>Bissexual</option>
+                                <option value="ASSEXUAL" {% if form_data.orientacao_sexual|default:student.orientacao_sexual == 'ASSEXUAL' %}selected{% endif %}>Assexual</option>
+                                <option value="OUTRO" {% if form_data.orientacao_sexual|default:student.orientacao_sexual == 'OUTRO' %}selected{% endif %}>Outro</option>
+                                <option value="NAO_DECLARADA" {% if form_data.orientacao_sexual|default:student.orientacao_sexual == 'NAO_DECLARADA' %}selected{% endif %}>Prefiro não declarar</option>
                             </select>
                         </div>
                     </div>
@@ -285,7 +285,7 @@
                         <div class="form-group">
                             <label for="genero">Gênero</label>
                             <input type="text" class="form-control" id="genero" name="genero" 
-                                   value="{{ estudante_dados.genero|default:student.genero|default:'' }}">
+                                   value="{{ form_data.genero|default:student.genero|default:'' }}">
                         </div>
                     </div>
                 </div>
@@ -303,7 +303,7 @@
                                 <h5 class="card-title"><i class="fas fa-search"></i> Buscar por Matrícula</h5>
                                 <p class="card-text text-muted">Digite sua matrícula para buscar dados no sistema ou na API do QAcadêmico.</p>
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="matricula_search" placeholder="Digite o número da matrícula" value="{{ estudante_dados.matricula|default:student.matricula|default:'' }}">
+                                    <input type="text" class="form-control" id="matricula_search" placeholder="Digite o número da matrícula" value="{{ form_data.matricula|default:student.matricula|default:'' }}">
                                     <button class="btn btn-primary" type="button" id="btn_buscar_matricula">
                                         <i class="fas fa-search"></i> Buscar
                                     </button>
@@ -319,7 +319,7 @@
                         <div class="form-group">
                             <label for="matricula">Matrícula *</label>
                             <input type="text" class="form-control" id="matricula" name="matricula" 
-                                   value="{{ estudante_dados.matricula|default:student.matricula|default:'' }}" required>
+                                   value="{{ form_data.matricula|default:student.matricula|default:'' }}" required>
                         </div>
                     </div>
                     
@@ -327,7 +327,7 @@
                         <div class="form-group">
                             <label for="campus">Campus *</label>
                             <input type="text" class="form-control" id="campus" name="campus" 
-                                   value="{{ estudante_dados.campus|default:student.campus|default:'' }}" required>
+                                   value="{{ form_data.campus|default:student.campus|default:'' }}" required>
                         </div>
                     </div>
                     
@@ -335,7 +335,7 @@
                         <div class="form-group">
                             <label for="curso">Curso *</label>
                             <input type="text" class="form-control" id="curso" name="curso" 
-                                   value="{{ estudante_dados.curso|default:student.curso|default:'' }}" required>
+                                   value="{{ form_data.curso|default:student.curso|default:'' }}" required>
                         </div>
                     </div>
                     
@@ -344,10 +344,10 @@
                             <label for="turno">Turno *</label>
                             <select class="form-select" id="turno" name="turno">
                                 <option value="">Selecione...</option>
-                                <option value="MATUTINO" {% if estudante_dados.turno|default:student.turno == 'MATUTINO' %}selected{% endif %}>Matutino</option>
-                                <option value="VESPERTINO" {% if estudante_dados.turno|default:student.turno == 'VESPERTINO' %}selected{% endif %}>Vespertino</option>
-                                <option value="NOTURNO" {% if estudante_dados.turno|default:student.turno == 'NOTURNO' %}selected{% endif %}>Noturno</option>
-                                <option value="INTEGRAL" {% if estudante_dados.turno|default:student.turno == 'INTEGRAL' %}selected{% endif %}>Integral</option>
+                                <option value="MATUTINO" {% if form_data.turno|default:student.turno == 'MATUTINO' %}selected{% endif %}>Matutino</option>
+                                <option value="VESPERTINO" {% if form_data.turno|default:student.turno == 'VESPERTINO' %}selected{% endif %}>Vespertino</option>
+                                <option value="NOTURNO" {% if form_data.turno|default:student.turno == 'NOTURNO' %}selected{% endif %}>Noturno</option>
+                                <option value="INTEGRAL" {% if form_data.turno|default:student.turno == 'INTEGRAL' %}selected{% endif %}>Integral</option>
                             </select>
                         </div>
                     </div>
@@ -356,7 +356,7 @@
                         <div class="form-group">
                             <label for="periodo">Período</label>
                             <input type="text" class="form-control" id="periodo" name="periodo" 
-                                   value="{{ estudante_dados.periodo|default:student.periodo_fmt|default:'' }}"
+                                   value="{{ form_data.periodo|default:student.periodo_fmt|default:'' }}"
                                    pattern="\d+[ºª]?" title="Digite apenas números">
                         </div>
                     </div>
@@ -365,7 +365,7 @@
                         <div class="form-group">
                             <label for="quantidade_disciplinas">Quantidade de Disciplinas</label>
                             <input type="number" class="form-control" id="quantidade_disciplinas" name="quantidade_disciplinas" 
-                                   value="{{ estudante_dados.quantidade_disciplinas|default:student.quantidade_disciplinas|default:0 }}"
+                                   value="{{ form_data.quantidade_disciplinas|default:student.quantidade_disciplinas|default:0 }}"
                                    min="0" step="1">
                         </div>
                     </div>
@@ -375,8 +375,8 @@
                             <label for="origem_escolar">Origem Escolar</label>
                             <select class="form-select" id="origem_escolar" name="origem_escolar">
                                 <option value="">Selecione...</option>
-                                <option value="PUBLICA" {% if estudante_dados.origem_escolar|default:student.origem_escolar == 'PUBLICA' %}selected{% endif %}>Escola Pública</option>
-                                <option value="PRIVADA" {% if estudante_dados.origem_escolar|default:student.origem_escolar == 'PRIVADA' %}selected{% endif %}>Escola Privada</option>
+                                <option value="PUBLICA" {% if form_data.origem_escolar|default:student.origem_escolar == 'PUBLICA' %}selected{% endif %}>Escola Pública</option>
+                                <option value="PRIVADA" {% if form_data.origem_escolar|default:student.origem_escolar == 'PRIVADA' %}selected{% endif %}>Escola Privada</option>
                             </select>
                         </div>
                     </div>
@@ -385,7 +385,7 @@
                         <div class="form-group">
                             <div class="form-check mt-4">
                                 <input class="form-check-input" type="checkbox" id="eh_cotista" name="eh_cotista" 
-                                       {% if estudante_dados.eh_cotista|default:student.eh_cotista %}checked{% endif %}>
+                                       {% if form_data.eh_cotista|default:student.eh_cotista %}checked{% endif %}>
                                 <label class="form-check-label" for="eh_cotista">É cotista?</label>
                             </div>
                         </div>
@@ -395,7 +395,7 @@
                         <div class="form-group">
                             <div class="form-check mt-4">
                                 <input class="form-check-input" type="checkbox" id="moradia_estudantil" name="moradia_estudantil" 
-                                       {% if estudante_dados.moradia_estudantil|default:student.moradia_estudantil %}checked{% endif %}>
+                                       {% if form_data.moradia_estudantil|default:student.moradia_estudantil %}checked{% endif %}>
                                 <label class="form-check-label" for="moradia_estudantil">Usa moradia estudantil?</label>
                             </div>
                         </div>
@@ -405,7 +405,7 @@
                         <div class="form-group">
                             <label for="email_pessoal">Email Pessoal *</label>
                             <input type="email" class="form-control" id="email_pessoal" name="email_pessoal" 
-                                   value="{{ estudante_dados.email_pessoal|default:student.email_pessoal|default:'' }}" required>
+                                   value="{{ form_data.email_pessoal|default:student.email_pessoal|default:'' }}" required>
                         </div>
                     </div>
                     
@@ -413,7 +413,7 @@
                         <div class="form-group">
                             <label for="email_institucional">Email Institucional</label>
                             <input type="email" class="form-control" id="email_institucional" name="email_institucional" 
-                                   value="{{ estudante_dados.email_institucional|default:student.email_institucional|default:'' }}">
+                                   value="{{ form_data.email_institucional|default:student.email_institucional|default:'' }}">
                         </div>
                     </div>
                 </div>
@@ -551,27 +551,53 @@ document.addEventListener('DOMContentLoaded', function() {
             searchResult.innerHTML = '<div class="alert alert-info"><i class="fas fa-spinner fa-spin"></i> Buscando dados...</div>';
             btnBuscar.disabled = true;
             
-            // Primeiro tenta buscar na API QAcadêmico via endpoint interno
-            fetch(`/api/integrations/qacademico/student/${matricula}/`)
-                .then(response => response.json())
-                .then(data => {
-                    btnBuscar.disabled = false;
-                    
-                    if (data.success && data.dados) {
-                        // Dados encontrados na API QAcadêmico
-                        preencherFormulario(data.dados);
-                        searchResult.innerHTML = '<div class="alert alert-success"><i class="fas fa-check-circle"></i> Dados encontrados com sucesso! Preencha os campos abaixo.</div>';
-                    } else {
-                        // Não encontrado na API, tentar banco local ou mostrar erro
-                        searchResult.innerHTML = `<div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> ${data.error || 'Matrícula não encontrada.'}</div>`;
+            // Enviar matrícula para a sessão e processar resposta
+            fetch('/enrollments/store-matricula-search/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ matricula: matricula })
+            })
+            .then(response => response.json())
+            .then(data => {
+                btnBuscar.disabled = false;
+                
+                if (data.success) {
+                    // Preencher formulário com dados retornados
+                    if (data.data) {
+                        preencherFormulario(data.data);
+                        
+                        // Mostrar mensagem de sucesso com origem dos dados
+                        let fonteDados = data.source === 'database' ? 'banco de dados local' : 'API QAcadêmico';
+                        searchResult.innerHTML = `<div class="alert alert-success"><i class="fas fa-check-circle"></i> Dados encontrados com sucesso na ${fonteDados}!</div>`;
                     }
-                })
-                .catch(error => {
-                    btnBuscar.disabled = false;
-                    searchResult.innerHTML = `<div class="alert alert-danger"><i class="fas fa-times-circle"></i> Erro ao buscar: ${error.message}</div>`;
-                    console.error('Erro na busca:', error);
-                });
+                } else {
+                    searchResult.innerHTML = `<div class="alert alert-danger"><i class="fas fa-times-circle"></i> Erro ao buscar: ${data.error}</div>`;
+                }
+            })
+            .catch(error => {
+                btnBuscar.disabled = false;
+                searchResult.innerHTML = `<div class="alert alert-danger"><i class="fas fa-times-circle"></i> Erro ao buscar: ${error.message}</div>`;
+                console.error('Erro na busca:', error);
+            });
         });
+    }
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
     }
     
     function preencherFormulario(dados) {
@@ -603,6 +629,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (dados.raca) document.getElementById('raca').value = dados.raca;
         if (dados.sexo) document.getElementById('sexo').value = dados.sexo;
         if (dados.genero) document.getElementById('genero').value = dados.genero;
+        if (dados.orientacao_sexual) document.getElementById('orientacao_sexual').value = dados.orientacao_sexual;
         if (dados.matricula) {
             document.getElementById('matricula').value = dados.matricula;
             document.getElementById('matricula_search').value = dados.matricula;
@@ -612,10 +639,16 @@ document.addEventListener('DOMContentLoaded', function() {
         if (dados.turno) document.getElementById('turno').value = dados.turno;
         if (dados.periodo) document.getElementById('periodo').value = dados.periodo;
         if (dados.email_pessoal) document.getElementById('email_pessoal').value = dados.email_pessoal;
+        if (dados.quantidade_disciplinas !== undefined) document.getElementById('quantidade_disciplinas').value = dados.quantidade_disciplinas;
         
         // Marcar checkbox de cotista se verdadeiro
         if (dados.eh_cotista) {
             document.getElementById('eh_cotista').checked = true;
+        }
+        
+        // Marcar checkbox de moradia estudantil se verdadeiro
+        if (dados.moradia_estudantil) {
+            document.getElementById('moradia_estudantil').checked = true;
         }
         
         // Rolar a página para o início do formulário
