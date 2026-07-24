@@ -366,6 +366,8 @@ def student_data_form(request, pk):
         student.idade = request.POST.get('idade', student.idade)
         student.raca = request.POST.get('raca', student.raca)
         student.sexo = request.POST.get('sexo', student.sexo)
+        student.genero = request.POST.get('genero', student.genero)
+        student.orientacao_sexual = request.POST.get('orientacao_sexual', student.orientacao_sexual)
         
         # Processar período - extrair apenas o número se tiver sufixo ordinal
         periodo_post = request.POST.get('periodo', '')

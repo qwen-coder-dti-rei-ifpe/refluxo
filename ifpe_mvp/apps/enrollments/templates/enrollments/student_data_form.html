@@ -629,6 +629,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (dados.raca) document.getElementById('raca').value = dados.raca;
         if (dados.sexo) document.getElementById('sexo').value = dados.sexo;
         if (dados.genero) document.getElementById('genero').value = dados.genero;
+        if (dados.orientacao_sexual) document.getElementById('orientacao_sexual').value = dados.orientacao_sexual;
         if (dados.matricula) {
             document.getElementById('matricula').value = dados.matricula;
             document.getElementById('matricula_search').value = dados.matricula;
@@ -638,10 +639,16 @@ document.addEventListener('DOMContentLoaded', function() {
         if (dados.turno) document.getElementById('turno').value = dados.turno;
         if (dados.periodo) document.getElementById('periodo').value = dados.periodo;
         if (dados.email_pessoal) document.getElementById('email_pessoal').value = dados.email_pessoal;
+        if (dados.quantidade_disciplinas !== undefined) document.getElementById('quantidade_disciplinas').value = dados.quantidade_disciplinas;
         
         // Marcar checkbox de cotista se verdadeiro
         if (dados.eh_cotista) {
             document.getElementById('eh_cotista').checked = true;
+        }
+        
+        // Marcar checkbox de moradia estudantil se verdadeiro
+        if (dados.moradia_estudantil) {
+            document.getElementById('moradia_estudantil').checked = true;
         }
         
         // Rolar a página para o início do formulário
