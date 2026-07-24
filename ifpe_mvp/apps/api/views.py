@@ -151,3 +151,79 @@ class QAcademicoMockView(APIView):
         }
         
         return Response(mock_data)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def search_student_by_matricula(request):
+    """
+    Busca dados do estudante por matrícula.
+    Primeiro verifica no banco de dados local, depois na API QAcadêmico.
+    """
+    from students.models import Student
+    
+    matricula = request.query_params.get('matricula', None)
+    
+    if not matricula:
+        return Response({'error': 'Matrícula não fornecida'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Primeiro, busca no banco de dados local
+    try:
+        student = Student.objects.get(matricula=matricula)
+        data = {
+            'fonte': 'banco_dados',
+            'matricula': student.matricula or '',
+            'nome_completo': student.nome_completo or '',
+            'cpf': student.cpf or '',
+            'identidade': student.identidade or '',
+            'data_nascimento': student.data_nascimento.strftime('%Y-%m-%d') if student.data_nascimento else '',
+            'idade': student.idade or '',
+            'raca': student.raca or '',
+            'sexo': student.sexo or '',
+            'genero': student.genero or student.sexo or '',
+            'campus': student.campus or '',
+            'curso': student.curso or '',
+            'turno': student.turno or '',
+            'periodo': str(student.periodo) if student.periodo else '',
+            'eh_cotista': student.eh_cotista,
+            'email_pessoal': student.email_pessoal or '',
+            'origem_escolar': student.origem_escolar or '',
+            'moradia_estudantil': student.moradia_estudantil,
+            'tipo_conta': student.tipo_conta or '',
+            'numero_agencia': student.numero_agencia or '',
+            'numero_conta': student.numero_conta or '',
+            'banco': student.banco or '',
+            'banco_outro': student.banco_outro or '',
+        }
+        return Response(data)
+    except Student.DoesNotExist:
+        pass
+    
+    # Se não encontrou no banco, busca na API QAcadêmico (mock)
+    mock_data = {
+        'fonte': 'qacademico',
+        'matricula': matricula,
+        'nome_completo': 'João da Silva',
+        'cpf': '',
+        'identidade': '',
+        'data_nascimento': '',
+        'idade': '',
+        'raca': '',
+        'sexo': '',
+        'genero': '',
+        'campus': 'Recife',
+        'curso': 'Técnico em Informática',
+        'turno': 'MATUTINO',
+        'periodo': '3',
+        'eh_cotista': False,
+        'email_pessoal': '',
+        'origem_escolar': '',
+        'moradia_estudantil': False,
+        'tipo_conta': '',
+        'numero_agencia': '',
+        'numero_conta': '',
+        'banco': '',
+        'banco_outro': '',
+    }
+    
+    return Response(mock_data)

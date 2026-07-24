@@ -1,42 +1,4 @@
 ```
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
-env/
-venv/
-.venv/
-.ENV
-.ENV.*
-.venv.bak/
-env.bak/
-
-# Django/Python web framework
-*.log
-*.pot
-*.pyc
-__pycache__/
-*.mo
-.sass-cache/
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+# Environment variables
+.env
 ```

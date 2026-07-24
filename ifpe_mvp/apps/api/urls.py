@@ -9,6 +9,7 @@ from .views import (
     EnrollmentViewSet,
     ConnectaGovMockView,
     QAcademicoMockView,
+    search_student_by_matricula,
 )
 
 router = DefaultRouter()
@@ -23,4 +24,7 @@ urlpatterns = [
     # Mocks de integração
     path('connecta-gov/', ConnectaGovMockView.as_view(), name='connecta-gov-mock'),
     path('qacademico/', QAcademicoMockView.as_view(), name='qacademico-mock'),
+    
+    # Busca de estudante por matrícula
+    path('search-student/', search_student_by_matricula, name='search-student-by-matricula'),
 ]
