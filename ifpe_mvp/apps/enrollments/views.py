@@ -88,7 +88,7 @@ def store_matricula_search(request):
     1. Recebe matrícula via POST
     2. Busca no banco de dados local
     3. Se não encontrar no banco, busca na API QAcadêmico
-    4. Armazena dados na sessão
+    4. Armazena dados na sessão com indicador de origem
     5. Retorna JSON com sucesso ou erro
     """
     import json
@@ -129,10 +129,12 @@ def store_matricula_search(request):
                 'email_pessoal': student.email_pessoal or '',
                 'origem_escolar': student.origem_escolar or '',
                 'moradia_estudantil': student.moradia_estudantil,
+                'source': 'database',  # Indicador de origem
+                'student_id': student.id,  # ID do estudante encontrado
             }
             
             request.session['estudanteDados'] = dados_sessao
-            request.session['student_data_loaded'] = False  # Resetar flag para recarregar do banco
+            request.session['student_data_source'] = 'database'  # Indicar origem dos dados
             
             return JsonResponse({
                 'success': True,
@@ -147,8 +149,11 @@ def store_matricula_search(request):
             
             if dados_api:
                 # Dados encontrados na API QAcadêmico
+                dados_api['source'] = 'qacademico_api'  # Indicador de origem
+                dados_api['student_id'] = None  # Nenhum estudante existente ainda
+                
                 request.session['estudanteDados'] = dados_api
-                request.session['student_data_loaded'] = False  # Resetar flag para permitir carregamento
+                request.session['student_data_source'] = 'qacademico_api'  # Indicar origem dos dados
                 
                 return JsonResponse({
                     'success': True,
@@ -208,20 +213,19 @@ def student_data_form(request, pk):
             status='RASCUNHO'
         )
     
-    # Obter dados da sessão (provenientes da busca por matrícula via API QAcadêmico)
+    # Obter dados da sessão (provenientes da busca por matrícula)
     estudante_dados = request.session.get('estudanteDados', {})
     
-    # Flag para controlar se já carregou dados do banco na sessão
-    already_loaded_from_db = request.session.get('student_data_loaded', False)
+    # Obter origem dos dados (database ou qacademico_api)
+    data_source = request.session.get('student_data_source', None)
     
     # Lógica de preenchimento do formulário:
-    # 1. Primeiro verifica se há dados da API QAcadêmico na sessão (busca recente por matrícula)
-    # 2. Se não houver dados da API, carrega dados do banco local
-    # 3. Dados da API têm prioridade sobre dados do banco
+    # 1. Se houve busca por matrícula, usa os dados da sessão (seja do banco ou API)
+    # 2. Se não houve busca, carrega dados do banco local do estudante logado
     
-    if not already_loaded_from_db and student.id:
-        # Carregar dados do banco para a sessão apenas uma vez
-        db_data = {
+    if not estudante_dados and student.id:
+        # Não há dados de busca na sessão, carregar dados do banco do estudante logado
+        estudante_dados = {
             'nome_completo': student.nome_completo or '',
             'cpf': student.cpf or '',
             'identidade': student.identidade or '',
@@ -244,18 +248,13 @@ def student_data_form(request, pk):
             'numero_conta': student.numero_conta or '',
             'banco': student.banco or '',
             'banco_outro': student.banco_outro or '',
+            'source': 'database',
+            'student_id': student.id,
         }
-        
-        # Mesclar dados do banco com dados da API (API tem prioridade se existir)
-        for key, value in db_data.items():
-            if key not in estudante_dados or not estudante_dados[key]:
-                estudante_dados[key] = value
-        
-        # Marcar que já carregou dados do banco
-        request.session['student_data_loaded'] = True
         request.session['estudanteDados'] = estudante_dados
+        request.session['student_data_source'] = 'database'
     
-    # Atualizar campos específicos do student com dados da API QAcadêmico ANTES de renderizar
+    # Atualizar campos específicos do student com dados da sessão (API ou database) ANTES de renderizar
     if estudante_dados:
         # Mapear todos os campos necessários para o template
         if estudante_dados.get('nome_completo'):
@@ -329,6 +328,21 @@ def student_data_form(request, pk):
     if request.method == 'POST':
         # Salvar dados do estudante
         student = request.user.student
+        
+        # Obter matrícula do POST para verificar se precisa buscar o estudante correto
+        matricula_post = request.POST.get('matricula', '').strip()
+        
+        # Se a matrícula foi alterada, tentar buscar o estudante correspondente
+        if matricula_post and matricula_post != student.matricula:
+            try:
+                # Tentar encontrar estudante com esta matrícula
+                student_existing = Student.objects.get(matricula=matricula_post)
+                # Usar este estudante se encontrado
+                student = student_existing
+            except Student.DoesNotExist:
+                # Continuar com o estudante atual se não encontrar
+                pass
+        
         student.nome_completo = request.POST.get('nome_completo', student.nome_completo)
         student.cpf = request.POST.get('cpf', student.cpf)
         student.identidade = request.POST.get('identidade', student.identidade)
@@ -411,9 +425,9 @@ def student_data_form(request, pk):
         
         student.save()
         
-        # Limpar flags da sessão após salvar para permitir recarregamento na próxima visita
+        # Limpar dados da sessão após salvar para permitir recarregamento na próxima visita
         request.session.pop('estudanteDados', None)
-        request.session.pop('student_data_loaded', None)
+        request.session.pop('student_data_source', None)
         
         messages.success(request, 'Dados do estudante salvos com sucesso!')
         return redirect('address_data_form', pk=pk)
