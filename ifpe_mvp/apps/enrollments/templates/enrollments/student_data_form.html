@@ -302,7 +302,8 @@
                         <div class="form-group">
                             <label for="matricula">Matrícula *</label>
                             <input type="text" class="form-control" id="matricula" name="matricula" 
-                                   value="{{ estudante_dados.matricula|default:student.matricula|default:'' }}" required>
+                                   value="{{ estudante_dados.matricula|default:student.matricula|default:'' }}" required
+                                   onchange="searchStudentByMatricula()" onblur="searchStudentByMatricula()">
                         </div>
                     </div>
                     
@@ -433,6 +434,14 @@
                             </select>
                         </div>
                     </div>
+
+                    <div class="col-md-6" id="banco_outro_container" style="display: none;">
+                        <div class="form-group">
+                            <label for="banco_outro">Especificar Banco</label>
+                            <input type="text" class="form-control" id="banco_outro" name="banco_outro"
+                                   value="{{ student.banco_outro|default:'' }}" placeholder="Nome do banco">
+                        </div>
+                    </div>
                     
                     <div class="col-md-6">
                         <div class="form-group">
@@ -504,4 +513,76 @@
         </form>
     </div>
 </div>
+
+<script>
+function searchStudentByMatricula() {
+    const matricula = document.getElementById('matricula').value.trim();
+    if (!matricula) return;
+    
+    fetch(`/api/search-student/?matricula=${encodeURIComponent(matricula)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.fonte === 'banco_dados' || data.fonte === 'qacademico') {
+                // Preencher campos com dados retornados
+                if (data.nome_completo) document.getElementById('nome_completo').value = data.nome_completo;
+                if (data.cpf) document.getElementById('cpf').value = data.cpf;
+                if (data.identidade) document.getElementById('identidade').value = data.identidade;
+                if (data.data_nascimento) {
+                    // Converter data de YYYY-MM-DD para DD/MM/YYYY se necessário
+                    const dateInput = document.getElementById('data_nascimento');
+                    if (data.data_nascimento.includes('-')) {
+                        // Formato YYYY-MM-DD, converter para YYYY-MM-DD para input type=date
+                        dateInput.value = data.data_nascimento;
+                    } else {
+                        dateInput.value = data.data_nascimento;
+                    }
+                }
+                if (data.idade) document.getElementById('idade').value = data.idade;
+                if (data.raca) document.getElementById('raca').value = data.raca;
+                if (data.sexo) document.getElementById('sexo').value = data.sexo;
+                if (data.genero) document.getElementById('genero').value = data.genero;
+                if (data.campus) document.getElementById('campus').value = data.campus;
+                if (data.curso) document.getElementById('curso').value = data.curso;
+                if (data.turno) document.getElementById('turno').value = data.turno;
+                if (data.periodo) document.getElementById('periodo').value = data.periodo;
+                if (data.email_pessoal) document.getElementById('email_pessoal').value = data.email_pessoal;
+                if (data.origem_escolar) document.getElementById('origem_escolar').value = data.origem_escolar;
+                
+                // Checkbox fields
+                if (data.eh_cotista !== undefined) {
+                    document.getElementById('eh_cotista').checked = data.eh_cotista === true || data.eh_cotista === 'on';
+                }
+                if (data.moradia_estudantil !== undefined) {
+                    document.getElementById('moradia_estudantil').checked = data.moradia_estudantil === true || data.moradia_estudantil === 'on';
+                }
+                
+                // Bank info
+                if (data.tipo_conta) document.getElementById('tipo_conta').value = data.tipo_conta;
+                if (data.numero_agencia) document.getElementById('numero_agencia').value = data.numero_agencia;
+                if (data.numero_conta) document.getElementById('numero_conta').value = data.numero_conta;
+                if (data.banco) {
+                    const bancoSelect = document.getElementById('banco');
+                    bancoSelect.value = data.banco;
+                    // Show "outro" field if needed
+                    if (data.banco === 'OUTRO' && data.banco_outro) {
+                        document.getElementById('banco_outro_container').style.display = 'block';
+                        document.getElementById('banco_outro').value = data.banco_outro;
+                    }
+                }
+                if (data.banco_outro) {
+                    document.getElementById('banco_outro_container').style.display = 'block';
+                    document.getElementById('banco_outro').value = data.banco_outro;
+                }
+                
+                // Show success message
+                const fonteTexto = data.fonte === 'banco_dados' ? 'banco de dados' : 'API QAcadêmico';
+                alert(`Dados carregados com sucesso do ${fonteTexto}!`);
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao buscar dados do estudante:', error);
+            alert('Erro ao buscar dados do estudante. Verifique a matrícula e tente novamente.');
+        });
+}
+</script>
 {% endblock %}
