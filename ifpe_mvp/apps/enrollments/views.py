@@ -126,7 +126,7 @@ def enrollment_dashboard(request, pk):
     
     # Verificar completion dos cards
     enrollment_complete = (
-        enrollment.student and
+        student and
         enrollment.address and
         enrollment_has_family and
         enrollment.displacement and

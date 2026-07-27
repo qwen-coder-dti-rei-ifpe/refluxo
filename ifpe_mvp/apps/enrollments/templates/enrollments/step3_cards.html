@@ -207,8 +207,8 @@
                     Informações pessoais, acadêmicas e bancárias do estudante
                 </p>
             </div>
-            <span class="card-status {% if enrollment.student %}status-preenchido{% else %}status-pendente{% endif %}">
-                {% if enrollment.student %}
+            <span class="card-status {% if student %}status-preenchido{% else %}status-pendente{% endif %}">
+                {% if student %}
                     <i class="fas fa-check"></i> Preenchido
                 {% else %}
                     <i class="fas fa-clock"></i> Pendente
