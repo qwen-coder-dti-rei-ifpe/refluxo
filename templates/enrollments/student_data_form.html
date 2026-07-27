@@ -208,7 +208,7 @@
                         <div class="form-group">
                             <label for="cpf">CPF *</label>
                             <input type="text" class="form-control" id="cpf" name="cpf" 
-                                   value="{{ student.cpf|default:'' }}" required placeholder="000.000.000-00">
+                                   value="{{ student.cpf|default:'' }}" required placeholder="000.000.000-00" readonly>
                         </div>
                     </div>
                     
@@ -224,7 +224,7 @@
                         <div class="form-group">
                             <label for="idade">Idade</label>
                             <input type="number" class="form-control" id="idade" name="idade" 
-                                   value="{{ student.idade|default:'' }}">
+                                   value="{{ student.idade|default:'' }}" min="1">
                         </div>
                     </div>
                     
@@ -297,7 +297,7 @@
                         <div class="form-group">
                             <label for="matricula">Matrícula *</label>
                             <input type="text" class="form-control" id="matricula" name="matricula" 
-                                   value="{{ student.matricula|default:'' }}" required>
+                                   value="{{ student.matricula|default:'' }}" required readonly>
                         </div>
                     </div>
                     
@@ -342,7 +342,7 @@
                         <div class="form-group">
                             <label for="quantidade_disciplinas">Quantidade de Disciplinas</label>
                             <input type="number" class="form-control" id="quantidade_disciplinas" name="quantidade_disciplinas" 
-                                   value="{{ student.quantidade_disciplinas|default:0 }}">
+                                   value="{{ student.quantidade_disciplinas|default:0 }}" min="0">
                         </div>
                     </div>
                     
