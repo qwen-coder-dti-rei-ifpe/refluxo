@@ -11,6 +11,7 @@ from .views import (
     ConectaGovViewSet, 
     ConsultaElegibilidadeView,
     OAuth2TokenView,
+    DadosFamiliarView,
 )
 
 # Router para gerar URLs automaticamente para ViewSets
@@ -25,4 +26,6 @@ urlpatterns = [
     path('consulta-elegibilidade/', ConsultaElegibilidadeView.as_view(), name='consulta-elegibilidade'),
     # Endpoint OAuth2 para geração de token JWT
     path('api-cpf-light/v2/oauth2/token', OAuth2TokenView.as_view(), name='oauth2-token'),
+    # Endpoint para consulta de dados familiares do CadÚnico
+    path('api-cadunico-servicos-dados/v1/dp/dadosFamiliar/<str:cpf>', DadosFamiliarView.as_view(), name='dados-familiar'),
 ]

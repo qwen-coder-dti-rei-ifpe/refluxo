@@ -26,6 +26,9 @@ def enrollment_period_list(request):
 def enrollment_dashboard(request, pk):
     """Dashboard com blocos dos eixos para atualização da inscrição (Step 3 - Cards)."""
     from inscricoes.models import Edital
+    from ifpe_mvp.apps.family.models import FamilyMember
+    import requests
+    from django.conf import settings
     
     # Tenta obter como EnrollmentPeriod primeiro, senão tenta como Edital
     try:
@@ -64,11 +67,87 @@ def enrollment_dashboard(request, pk):
         defaults={'status': 'RASCUNHO'}
     )
     
+    # Verificar se possui membros familiares cadastrados
+    enrollment_has_family = FamilyMember.objects.filter(student=student).exists()
+    
+    # Tentar obter dados da API CadÚnico se tiver CPF do estudante
+    faixa_renda_familiar_per_capita = None
+    dados_cadunico_obtidos = False
+    
+    if student.cpf:
+        try:
+            # Primeiro, obter token OAuth2
+            oauth_url = getattr(settings, 'CPF_LIGHT_API_BASE_URL', 'https://ee18227e-74c8-4cf4-97c0-daa3f5908982.mock.pstmn.io')
+            token_response = requests.post(
+                f"{oauth_url}/api-cpf-light/v2/oauth2/token",
+                headers={
+                    'x-cpf-usuario': student.cpf,
+                },
+                timeout=10
+            )
+            
+            if token_response.status_code == 200:
+                token_data = token_response.json()
+                access_token = token_data.get('access_token')
+                
+                if access_token:
+                    # Agora consultar dados familiares na API CadÚnico
+                    cadunico_url = getattr(settings, 'CADUNICO_API_BASE_URL', 'https://ee18227e-74c8-4cf4-97c0-daa3f5908982.mock.pstmn.io')
+                    
+                    # Obter headers das configurações do Django
+                    x_consumer_id = getattr(settings, 'X_CONSUMER_ID', 'IFPE')
+                    x_consumer_id_type = getattr(settings, 'X_CONSUMER_ID_TYPE', 'CPF')
+                    x_authorization_id = getattr(settings, 'X_AUTHORIZATION_ID', '0002452-51.2016.2.00.0001')
+                    x_authorization_id_type = getattr(settings, 'X_AUTHORIZATION_ID_TYPE', 'Processo')
+                    
+                    familiar_response = requests.get(
+                        f"{cadunico_url}/api-cadunico-servicos-dados/v1/dp/dadosFamiliar/{student.cpf}",
+                        headers={
+                            'Accept-Language': 'application/json',
+                            'Content-Type': 'application/json',
+                            'cpf': student.cpf,
+                            'X-Consumer-Id': x_consumer_id,
+                            'X-Consumer-Id-Type': x_consumer_id_type,
+                            'X-Authorization-Id': x_authorization_id,
+                            'X-Authorization-Id-Type': x_authorization_id_type,
+                            'Authorization': f'Bearer {access_token}',
+                        },
+                        timeout=30
+                    )
+                    
+                    if familiar_response.status_code == 200:
+                        dados_familiares = familiar_response.json()
+                        # Extrair faixa de renda familiar per capita
+                        faixa_renda_familiar_per_capita = dados_familiares.get('faixaRendaFamiliarPerCapita')
+                        dados_cadunico_obtidos = True
+        except Exception as e:
+            # Em caso de erro, continuar sem os dados da API
+            pass
+    
+    # Verificar completion dos cards
+    enrollment_complete = (
+        enrollment.student and
+        enrollment.address and
+        enrollment_has_family and
+        enrollment.displacement and
+        enrollment.declaracao_veracidade
+    )
+    
+    enrollment_incomplete = not enrollment_complete
+    
+    all_completed = enrollment_complete
+    
     context = {
         'period': period,
         'enrollment': enrollment,
         'can_edit': period.esta_aberto(),
         'student': student,
+        'enrollment_has_family': enrollment_has_family,
+        'enrollment_complete': enrollment_complete,
+        'enrollment_incomplete': enrollment_incomplete,
+        'all_completed': all_completed,
+        'faixa_renda_familiar_per_capita': faixa_renda_familiar_per_capita,
+        'dados_cadunico_obtidos': dados_cadunico_obtidos,
     }
     return render(request, 'enrollments/step3_cards.html', context)
 
