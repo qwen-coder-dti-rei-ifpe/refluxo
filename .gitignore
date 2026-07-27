@@ -1,51 +1,42 @@
-# Compiled and build artifacts
-*.pyc
+```
+# Python compiled files
 __pycache__/
+*.py[cod]
+*$py.class
 
-# Dependencies
-.venv/
+# Virtual Environment
 venv/
-node_modules/
 
-# Logs and temp files
+# Django specific
 *.log
-*.tmp
-*.swp
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
 
-# Environment
-.env
-.env.local
-.env.*
-
-# Editors
+# IDE specific
 .vscode/
 .idea/
 
-# OS specific
+# OS generated files
 .DS_Store
 Thumbs.db
 
-# Coverage reports
-coverage/
-htmlcov/
-.coverage
+# Environment variables
+.env
+.env.local
 
-# Build outputs
+# Coverage reports
+.coverage
+htmlcov/
+
+# Pytest cache
+.pytest_cache/
+
+# Mypy cache
+.mypy_cache/
+
+# Distribution / packaging
 dist/
 build/
-target/
-*.out
-*.exe
-*.dll
-*.so
-*.a
-
-# Python specific
-*.pyo
-*.pyd
-.Python
 *.egg-info/
-
-# MyPy cache
-.mypy_cache/
-.pytest_cache/
+```

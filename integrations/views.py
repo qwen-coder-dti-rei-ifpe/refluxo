@@ -2,14 +2,16 @@
 Views do app integrations - Views para integrações com APIs externas.
 
 Este módulo contém as views da API REST para integração com
-QAcadêmico e ConectaGov, incluindo consulta de elegibilidade.
+QAcadêmico, ConectaGov, incluindo consulta de elegibilidade e OAuth2.
 """
 import requests
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny
 from django.conf import settings
+from datetime import timedelta
 
 
 class QAcademicoViewSet(viewsets.ViewSet):
@@ -268,3 +270,78 @@ class ConsultaElegibilidadeView(APIView):
                 motivos.append('Renda per capita acima do limite permitido')
         
         return motivos
+
+
+class OAuth2TokenView(APIView):
+    """
+    View para geração de token OAuth2 (JWT) para integração com API CPF Light.
+    
+    Endpoint: POST /api-cpf-light/v2/oauth2/token
+    Header necessário: x-cpf-usuario (CPF do usuário)
+    
+    Retorna um JWT token de acesso para autenticação nas requisições subsequentes.
+    """
+    permission_classes = [AllowAny]
+    
+    def post(self, request, format=None):
+        """Gera token JWT de acesso baseado no CPF do usuário."""
+        # Obter CPF do header
+        cpf_usuario = request.headers.get('x-cpf-usuario')
+        
+        if not cpf_usuario:
+            return Response(
+                {'error': 'Header x-cpf-usuario é obrigatório'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validar formato do CPF (apenas números, 11 dígitos)
+        cpf_limpo = ''.join(filter(str.isdigit, cpf_usuario))
+        
+        if len(cpf_limpo) != 11:
+            return Response(
+                {'error': 'CPF deve conter 11 dígitos'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Importar SimpleJWT para gerar token
+        try:
+            from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+            
+            # Criar dados fictícios do usuário para gerar o token
+            # Em produção, validaria o CPF em uma base real
+            user_data = {
+                'username': cpf_limpo,
+                'cpf': cpf_limpo,
+            }
+            
+            # Gerar token usando SimpleJWT
+            serializer = TokenObtainPairSerializer()
+            
+            # Usar a lógica interna do SimpleJWT para criar tokens
+            from rest_framework_simplejwt.tokens import RefreshToken
+            from django.contrib.auth import get_user_model
+            
+            User = get_user_model()
+            
+            # Tentar obter ou criar usuário temporário para o CPF
+            user, created = User.objects.get_or_create(
+                username=cpf_limpo,
+                defaults={
+                    'cpf': cpf_limpo,
+                    'email': f'{cpf_limpo}@cpf-light.local',
+                }
+            )
+            
+            # Gerar tokens para o usuário
+            refresh = RefreshToken.for_user(user)
+            
+            return Response({
+                'access_token': str(refresh.access_token),
+                'token_type': 'Bearer',
+                'expires_in': 3600,  # 1 hora em segundos
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({
+                'error': f'Erro ao gerar token: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
