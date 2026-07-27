@@ -227,7 +227,7 @@
                         <div class="form-group">
                             <label for="idade">Idade</label>
                             <input type="number" class="form-control" id="idade" name="idade" 
-                                   value="{{ form_data.idade|default:student.idade|default:'' }}">
+                                   value="{{ form_data.idade|default:student.idade|default:'' }}" min="1">
                         </div>
                     </div>
                     

@@ -287,7 +287,7 @@
                         <div class="form-group">
                             <label for="idade">Idade</label>
                             <input type="number" class="form-control" id="idade" name="idade" 
-                                   value="{{ estudante_dados.idade|default:student.idade|default:'' }}" readonly>
+                                   value="{{ estudante_dados.idade|default:student.idade|default:'' }}" readonly min="1">
                         </div>
                     </div>
                     
@@ -410,7 +410,7 @@
                         <div class="form-group">
                             <label for="quantidade_disciplinas">Quantidade de Disciplinas</label>
                             <input type="number" class="form-control" id="quantidade_disciplinas" name="quantidade_disciplinas" 
-                                   value="{{ student.quantidade_disciplinas|default:0 }}">
+                                   value="{{ student.quantidade_disciplinas|default:0 }}" min="0">
                         </div>
                     </div>
                     
