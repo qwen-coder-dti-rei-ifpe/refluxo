@@ -210,7 +210,7 @@
                         <div class="form-group">
                             <label for="cpf">CPF *</label>
                             <input type="text" class="form-control" id="cpf" name="cpf" 
-                                   value="{{ form_data.cpf|default:student.cpf|default:'' }}" required placeholder="000.000.000-00">
+                                   value="{{ form_data.cpf|default:student.cpf|default:'' }}" required placeholder="000.000.000-00" readonly>
                         </div>
                     </div>
                     
@@ -319,7 +319,7 @@
                         <div class="form-group">
                             <label for="matricula">Matrícula *</label>
                             <input type="text" class="form-control" id="matricula" name="matricula" 
-                                   value="{{ form_data.matricula|default:student.matricula|default:'' }}" required>
+                                   value="{{ form_data.matricula|default:student.matricula|default:'' }}" required readonly>
                         </div>
                     </div>
                     
