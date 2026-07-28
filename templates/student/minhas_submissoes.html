@@ -1,0 +1,206 @@
+{% extends 'student_base.html' %}
+
+{% block title %}Minhas Submissões - PAMA{% endblock %}
+
+{% block extra_css %}
+<style>
+    .submissions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .submission-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+        padding: 1.5rem;
+        transition: transform 0.3s, box-shadow 0.3s;
+        border-left: 4px solid #e9ecef;
+    }
+    
+    .submission-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    }
+    
+    .submission-card.status-submetida {
+        border-left-color: #27ae60;
+    }
+    
+    .submission-card.status-em-analise {
+        border-left-color: #f39c12;
+    }
+    
+    .submission-card.status-deferida {
+        border-left-color: #27ae60;
+    }
+    
+    .submission-card.status-indeferida {
+        border-left-color: #e74c3c;
+    }
+    
+    .submission-card.status-rascunho {
+        border-left-color: #95a5a6;
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .status-submetida .status-badge {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .status-em-analise .status-badge {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-deferida .status-badge {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .status-indeferida .status-badge {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .status-rascunho .status-badge {
+        background-color: #e9ecef;
+        color: #495057;
+    }
+    
+    .card-header-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+    
+    .edital-number {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-bottom: 0.25rem;
+    }
+    
+    .edital-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.5rem;
+    }
+    
+    .submission-date {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: #e9ecef;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state h4 {
+        color: #4a5568;
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-state p {
+        color: #718096;
+        margin-bottom: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-2"><i class="fas fa-file-alt"></i> Minhas Submissões</h2>
+            <p class="text-muted">Visualize todas as suas inscrições submetidas aos editais do PAMA</p>
+        </div>
+    </div>
+    
+    {% if inscricoes %}
+    <div class="submissions-grid">
+        {% for inscricao in inscricoes %}
+        <div class="submission-card status-{{ inscricao.status|lower|slugify }}">
+            <div class="card-header-info">
+                <div>
+                    <div class="edital-number">{{ inscricao.edital.numero }}</div>
+                    <div class="edital-title">{{ inscricao.edital.titulo }}</div>
+                </div>
+                <span class="status-badge">{{ inscricao.get_status_display }}</span>
+            </div>
+            
+            <div class="mb-3">
+                <small class="text-muted">
+                    <i class="fas fa-calendar"></i> 
+                    Submetido em: {{ inscricao.submetida_em|date:"d/m/Y H:i"|default:"Não submetido" }}
+                </small>
+            </div>
+            
+            <div class="mb-3">
+                <small class="text-muted d-block">
+                    <i class="fas fa-tag"></i> 
+                    Classificação: {{ inscricao.get_classificacao_display|default:"Em análise" }}
+                </small>
+            </div>
+            
+            {% if inscricao.status == 'RASCUNHO' %}
+            <div class="mt-3">
+                <a href="{% url 'step3_cards' %}" class="btn btn-sm btn-outline-primary w-100">
+                    <i class="fas fa-edit"></i> Continuar Edição
+                </a>
+            </div>
+            {% elif inscricao.status == 'SUBMETIDA' or inscricao.status == 'EM_ANALISE' %}
+            <div class="mt-3">
+                <button class="btn btn-sm btn-outline-secondary w-100" disabled>
+                    <i class="fas fa-clock"></i> Em Análise
+                </button>
+            </div>
+            {% elif inscricao.status == 'DEFERIDA' %}
+            <div class="mt-3">
+                <button class="btn btn-sm btn-success w-100" disabled>
+                    <i class="fas fa-check"></i> Deferida
+                </button>
+            </div>
+            {% elif inscricao.status == 'INDEFERIDA' %}
+            <div class="mt-3">
+                <a href="#" class="btn btn-sm btn-outline-danger w-100">
+                    <i class="fas fa-exclamation-circle"></i> Ver Motivos
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-folder-open"></i>
+        <h4>Nenhuma submissão encontrada</h4>
+        <p>Você ainda não possui inscrições submetidas aos editais do PAMA.</p>
+        <a href="{% url 'student_dashboard' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Criar Nova Inscrição
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
