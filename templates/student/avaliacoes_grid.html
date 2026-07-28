@@ -1,0 +1,225 @@
+{% extends 'student_base.html' %}
+
+{% block title %}Avaliações - PAMA{% endblock %}
+
+{% block extra_css %}
+<style>
+    .avaliacoes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .avaliacao-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+        padding: 1.5rem;
+        text-align: center;
+        transition: transform 0.3s, box-shadow 0.3s;
+        border: 2px solid transparent;
+        cursor: pointer;
+    }
+    
+    .avaliacao-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(39, 174, 96, 0.2);
+        border-color: #27ae60;
+    }
+    
+    .card-icon {
+        font-size: 3.5rem;
+        margin-bottom: 1rem;
+        color: #27ae60;
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.75rem;
+    }
+    
+    .card-description {
+        color: #718096;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 1.5rem;
+    }
+    
+    .card-result {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .result-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .result-value {
+        font-size: 0.95rem;
+        color: #2d3748;
+        font-weight: 500;
+    }
+    
+    .status-indicator {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .status-disponivel {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .status-em-analise {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-concluido {
+        background-color: #bee3f8;
+        color: #2b6cb0;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: #e9ecef;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-2"><i class="fas fa-clipboard-check"></i> Avaliações</h2>
+            <p class="text-muted">Acompanhe as avaliações dos seus dados e informações cadastrais</p>
+        </div>
+    </div>
+    
+    <div class="avaliacoes-grid">
+        <!-- Card: Avaliação da Renda Familiar -->
+        <div class="avaliacao-card" onclick="window.location.href='{% url 'resultado_avaliacao_renda' %}'" style="cursor: pointer;">
+            <div class="card-icon">
+                <i class="fas fa-hand-holding-usd"></i>
+            </div>
+            <h3 class="card-title">Avaliação da Renda Familiar</h3>
+            <p class="card-description">
+                Faixa de renda familiar per capita baseada nos dados do CadÚnico
+            </p>
+            
+            {% if faixa_renda_descricao %}
+            <div class="card-result">
+                <div class="result-label">Resultado:</div>
+                <div class="result-value text-success">
+                    <i class="fas fa-check-circle"></i> {{ faixa_renda_descricao }}
+                </div>
+            </div>
+            {% elif erro_familiar %}
+            <div class="card-result">
+                <div class="result-label">Status:</div>
+                <div class="result-value text-warning">
+                    <i class="fas fa-exclamation-triangle"></i> {{ erro_familiar }}
+                </div>
+            </div>
+            {% else %}
+            <div class="card-result">
+                <div class="result-label">Status:</div>
+                <div class="result-value text-info">
+                    <i class="fas fa-spinner fa-spin"></i> Consultando...
+                </div>
+            </div>
+            {% endif %}
+            
+            <span class="status-indicator status-disponivel mt-3">
+                <i class="fas fa-database"></i> CadÚnico
+            </span>
+        </div>
+        
+        <!-- Card: Dados Cadastrais (placeholder para futuras avaliações) -->
+        <div class="avaliacao-card">
+            <div class="card-icon">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <h3 class="card-title">Dados Cadastrais</h3>
+            <p class="card-description">
+                Validação das informações pessoais e acadêmicas
+            </p>
+            
+            <div class="card-result">
+                <div class="result-label">Status:</div>
+                <div class="result-value text-secondary">
+                    <i class="fas fa-clock"></i> Em breve
+                </div>
+            </div>
+            
+            <span class="status-indicator status-em-analise mt-3">
+                <i class="fas fa-hourglass-half"></i> Pendente
+            </span>
+        </div>
+        
+        <!-- Card: Composição Familiar (placeholder para futuras avaliações) -->
+        <div class="avaliacao-card">
+            <div class="card-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <h3 class="card-title">Composição Familiar</h3>
+            <p class="card-description">
+                Análise do grupo familiar e dependentes
+            </p>
+            
+            <div class="card-result">
+                <div class="result-label">Status:</div>
+                <div class="result-value text-secondary">
+                    <i class="fas fa-clock"></i> Em breve
+                </div>
+            </div>
+            
+            <span class="status-indicator status-em-analise mt-3">
+                <i class="fas fa-hourglass-half"></i> Pendente
+            </span>
+        </div>
+        
+        <!-- Card: Vulnerabilidade Social (placeholder para futuras avaliações) -->
+        <div class="avaliacao-card">
+            <div class="card-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <h3 class="card-title">Índice de Vulnerabilidade</h3>
+            <p class="card-description">
+                Cálculo do índice baseado em critérios socioeconômicos
+            </p>
+            
+            <div class="card-result">
+                <div class="result-label">Status:</div>
+                <div class="result-value text-secondary">
+                    <i class="fas fa-clock"></i> Em breve
+                </div>
+            </div>
+            
+            <span class="status-indicator status-em-analise mt-3">
+                <i class="fas fa-hourglass-half"></i> Pendente
+            </span>
+        </div>
+    </div>
+</div>
+{% endblock %}

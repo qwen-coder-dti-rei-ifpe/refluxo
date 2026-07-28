@@ -20,7 +20,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-from core.views import home_view, buscar_cpf_view, CustomLoginView, assistente_dashboard_view, assistente_edital_detalhes_view, jornada_estudante_view, student_dashboard_view, step3_cards_view
+from core.views import home_view, buscar_cpf_view, CustomLoginView, assistente_dashboard_view, assistente_edital_detalhes_view, jornada_estudante_view, student_dashboard_view, step3_cards_view, avaliacoes_grid_view, resultado_avaliacao_renda_view, minhas_submissoes_view
 
 urlpatterns = [
     # Página inicial do programa
@@ -43,6 +43,15 @@ urlpatterns = [
     
     # Step 3 - Cards de navegação da jornada
     path('step3-cards/', step3_cards_view, name='step3_cards'),
+    
+    # Avaliações Grid - Página de cards de avaliações
+    path('avaliacoes/', avaliacoes_grid_view, name='avaliacoes_grid'),
+    
+    # Resultado Avaliação da Renda Familiar - Página de detalhes da renda familiar
+    path('avaliacoes/renda-familiar/', resultado_avaliacao_renda_view, name='resultado_avaliacao_renda'),
+    
+    # Minhas Submissões - Lista de todas as submissões do estudante
+    path('minhas-submissoes/', minhas_submissoes_view, name='minhas_submissoes'),
     
     # Enrollment app URLs (fluxo de inscrição completo)
     path('enrollments/', include('ifpe_mvp.apps.enrollments.urls')),

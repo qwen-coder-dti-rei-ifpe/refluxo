@@ -295,6 +295,37 @@
                 {% endif %}
             </span>
         </a>
+        
+        <!-- Card 6: Avaliação da Renda Familiar -->
+        <div class="info-card" style="cursor: default;">
+            <div>
+                <div class="card-icon">
+                    <i class="fas fa-hand-holding-usd"></i>
+                </div>
+                <h3 class="card-title">Avaliação da Renda Familiar</h3>
+                <p class="card-description">
+                    Faixa de renda familiar per capita baseada nos dados do CadÚnico
+                </p>
+                {% if faixa_renda_descricao %}
+                <div class="alert alert-success mt-3 mb-2" style="font-size: 0.85rem; padding: 0.5rem;">
+                    <strong><i class="fas fa-check-circle"></i> Resultado:</strong><br>
+                    {{ faixa_renda_descricao }}
+                </div>
+                {% elif erro_familiar %}
+                <div class="alert alert-warning mt-3 mb-2" style="font-size: 0.85rem; padding: 0.5rem;">
+                    <strong><i class="fas fa-exclamation-triangle"></i> Atenção:</strong><br>
+                    {{ erro_familiar }}
+                </div>
+                {% else %}
+                <div class="alert alert-info mt-3 mb-2" style="font-size: 0.85rem; padding: 0.5rem;">
+                    <i class="fas fa-spinner fa-spin"></i> Consultando...
+                </div>
+                {% endif %}
+            </div>
+            <span class="card-status status-completo">
+                <i class="fas fa-database"></i> CadÚnico
+            </span>
+        </div>
     </div>
     
     <!-- Botões de ação -->

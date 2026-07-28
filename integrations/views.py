@@ -12,6 +12,52 @@ from rest_framework.decorators import action
 from django.conf import settings
 
 
+class OAuthTokenView(APIView):
+    """
+    View para obtenção de token OAuth para API CPF Light.
+    
+    Endpoint: POST /api-cpf-light/v2/oauth2/token
+    
+    Requer header x-cpf-usuario com o CPF do usuário.
+    Retorna um token JWT de acesso.
+    """
+    
+    def post(self, request):
+        """Gera e retorna um token de acesso OAuth."""
+        # Obter CPF do header
+        cpf = request.headers.get('x-cpf-usuario')
+        
+        if not cpf:
+            return Response(
+                {'error': 'Header x-cpf-usuario é obrigatório'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validar formato do CPF (opcional - pode ser removido se não necessário)
+        cpf_limpo = ''.join(filter(str.isdigit, cpf))
+        if len(cpf_limpo) != 11:
+            return Response(
+                {'error': 'CPF inválido. Deve conter 11 dígitos.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            # Importar serviço OAuth
+            from integrations.oauth_service import gerar_token_acesso
+            
+            # Gerar token de acesso
+            access_token = gerar_token_acesso(cpf_limpo)
+            
+            return Response({
+                'access_token': access_token
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response({
+                'error': f'Erro ao gerar token: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 class QAcademicoViewSet(viewsets.ViewSet):
     """
     ViewSet para integração com API QAcadêmico (mock).
@@ -200,6 +246,77 @@ class ConectaGovViewSet(viewsets.ViewSet):
             'cpf': cpf,
             'beneficios': beneficios
         })
+
+
+from integrations.oauth_service import gerar_token_acesso
+
+
+class DadosFamiliarView(APIView):
+    """
+    View para consulta de dados familiares do CadÚnico.
+    
+    Endpoint: GET /api-cadunico-servicos-dados/v1/dp/dadosFamiliar/{cpf}
+    
+    Integra com API externa CadÚnico para obter dados familiares do cidadão.
+    Requer token OAuth obtido via endpoint /api-cpf-light/v2/oauth2/token.
+    """
+    
+    def get(self, request, cpf=None):
+        """Consulta dados familiares do CPF informado."""
+        from integrations.cadunico_service import buscar_dados_familiar, validar_cpf
+        
+        # Validar CPF
+        if not cpf:
+            return Response(
+                {'error': 'CPF é obrigatório'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Validar formato do CPF
+        if not validar_cpf(cpf):
+            return Response(
+                {'status': 'fail', 'status_code': '400', 'error_message': 'CPF inválido'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Obter token de autorização do header ou gerar novo
+        auth_header = request.headers.get('Authorization')
+        access_token = None
+        
+        if auth_header and auth_header.startswith('Bearer '):
+            access_token = auth_header.split(' ')[1]
+        else:
+            # Gerar novo token usando o serviço OAuth
+            try:
+                access_token = gerar_token_acesso(cpf)
+            except Exception as e:
+                return Response(
+                    {'status': 'fail', 'status_code': '500', 'error_message': 'Erro ao gerar token de acesso'},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+        
+        # Consultar API CadÚnico
+        dados_api, erro = buscar_dados_familiar(cpf, access_token)
+        
+        if dados_api:
+            return Response(dados_api, status=status.HTTP_200_OK)
+        else:
+            # Mapear erros para respostas padronizadas
+            if erro == "CPF inválido":
+                return Response(
+                    {'status': 'fail', 'status_code': '400', 'error_message': erro},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            elif erro == "CPF não encontrado":
+                return Response(
+                    {'status': 'fail', 'status_code': '404', 'error_message': erro},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            else:
+                return Response(
+                    {'status': 'fail', 'status_code': '500', 'error_message': 'Erro Interno no Sistema. Tente mais tarde'},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
 
 
 class ConsultaElegibilidadeView(APIView):

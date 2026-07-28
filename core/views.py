@@ -104,8 +104,11 @@ def student_dashboard_view(request):
     """
     View para dashboard do estudante.
     Primeiro o estudante deve selecionar um edital ativo, depois pode buscar por matrícula.
+    Exibe card de Avaliação da Renda Familiar com dados do CadÚnico.
     """
     from inscricoes.models import Edital, Inscricao
+    from integrations.oauth_service import gerar_token_oauth
+    from integrations.cadunico_service import buscar_dados_familiar, validar_cpf
     
     # Verifica se é assistente social, se for redireciona
     if hasattr(request.user, 'is_assistente_social') and request.user.is_assistente_social:
@@ -115,6 +118,9 @@ def student_dashboard_view(request):
     edital_selecionado = None
     inscricao_existente = None
     message = None
+    dados_familiar = None
+    erro_familiar = None
+    faixa_renda_descricao = None
     
     # Verifica se deve limpar o edital selecionado (quando volta para seleção)
     if request.method == 'GET' and request.GET.get('clear_edital'):
@@ -124,6 +130,28 @@ def student_dashboard_view(request):
     
     # Passo 1: Selecionar edital ativo (somente para visualização do estudante)
     editais_ativos = Edital.objects.filter(ativo=True, status='ATIVO')
+    
+    # Buscar dados familiares do CadÚnico se tiver CPF do usuário
+    cpf_usuario = request.user.username if hasattr(request.user, 'username') else None
+    if cpf_usuario and validar_cpf(cpf_usuario):
+        try:
+            # Gerar token OAuth
+            token, erro_token = gerar_token_oauth(cpf_usuario)
+            
+            if token and not erro_token:
+                # Buscar dados familiares
+                dados_familiar, erro_familiar = buscar_dados_familiar(cpf_usuario, token)
+                
+                if dados_familiar and not erro_familiar:
+                    # Extrair descrição da faixa de renda per capita
+                    faixa_renda = dados_familiar.get('faixaRendaFamiliarPerCapita', {})
+                    if isinstance(faixa_renda, dict):
+                        faixa_renda_descricao = faixa_renda.get('descricao', '')
+                    elif isinstance(faixa_renda, list) and len(faixa_renda) > 0:
+                        faixa_renda_descricao = faixa_renda[0].get('descricao', '') if isinstance(faixa_renda[0], dict) else ''
+        except Exception as e:
+            # Em caso de erro, apenas não exibe os dados (não quebra a página)
+            pass
     
     if request.method == 'POST':
         # Verifica se está limpando a seleção do edital
@@ -276,6 +304,9 @@ def student_dashboard_view(request):
         'editais_ativos': editais_ativos,
         'inscricao': inscricao_existente,
         'message': message,
+        'dados_familiar': dados_familiar,
+        'erro_familiar': erro_familiar,
+        'faixa_renda_descricao': faixa_renda_descricao,
     }
     
     return render(request, 'dashboard/student.html', context)
@@ -304,6 +335,120 @@ def step3_cards_view(request):
         request.session.pop('edital_selecionado_id', None)
         messages.warning(request, 'Edital não encontrado ou não está mais ativo.')
         return redirect('student_dashboard')
+
+
+@login_required
+def avaliacoes_grid_view(request):
+    """
+    View para grid de avaliações do estudante.
+    Exibe cards com resultados das avaliações, incluindo Avaliação da Renda Familiar.
+    """
+    from integrations.oauth_service import gerar_token_oauth
+    from integrations.cadunico_service import buscar_dados_familiar, validar_cpf
+    
+    dados_familiar = None
+    erro_familiar = None
+    faixa_renda_descricao = None
+    
+    # Buscar dados familiares do CadÚnico se tiver CPF do usuário
+    cpf_usuario = request.user.username if hasattr(request.user, 'username') else None
+    
+    if cpf_usuario and validar_cpf(cpf_usuario):
+        try:
+            # Gerar token OAuth
+            token, erro_token = gerar_token_oauth(cpf_usuario)
+            
+            if token and not erro_token:
+                # Buscar dados familiares
+                dados_familiar, erro_familiar = buscar_dados_familiar(cpf_usuario, token)
+                
+                if dados_familiar and not erro_familiar:
+                    # Extrair descrição da faixa de renda per capita
+                    faixa_renda = dados_familiar.get('faixaRendaFamiliarPerCapita', {})
+                    if isinstance(faixa_renda, dict):
+                        faixa_renda_descricao = faixa_renda.get('descricao', '')
+                    elif isinstance(faixa_renda, list) and len(faixa_renda) > 0:
+                        faixa_renda_descricao = faixa_renda[0].get('descricao', '') if isinstance(faixa_renda[0], dict) else ''
+        except Exception as e:
+            # Em caso de erro, apenas não exibe os dados (não quebra a página)
+            pass
+    
+    context = {
+        'dados_familiar': dados_familiar,
+        'erro_familiar': erro_familiar,
+        'faixa_renda_descricao': faixa_renda_descricao,
+    }
+    
+    return render(request, 'student/avaliacoes_grid.html', context)
+
+
+@login_required
+def resultado_avaliacao_renda_view(request):
+    """
+    View para página de resultado da avaliação da renda familiar.
+    Exibe detalhes completos dos dados familiares do CadÚnico.
+    """
+    from integrations.oauth_service import gerar_token_oauth
+    from integrations.cadunico_service import buscar_dados_familiar, validar_cpf
+    
+    dados_familiar = None
+    erro_familiar = None
+    faixa_renda_descricao = None
+    
+    # Buscar dados familiares do CadÚnico se tiver CPF do usuário
+    cpf_usuario = request.user.username if hasattr(request.user, 'username') else None
+    
+    if cpf_usuario and validar_cpf(cpf_usuario):
+        try:
+            # Gerar token OAuth
+            token, erro_token = gerar_token_oauth(cpf_usuario)
+            
+            if token and not erro_token:
+                # Buscar dados familiares
+                dados_familiar, erro_familiar = buscar_dados_familiar(cpf_usuario, token)
+                
+                if dados_familiar and not erro_familiar:
+                    # Extrair descrição da faixa de renda per capita
+                    faixa_renda = dados_familiar.get('faixaRendaFamiliarPerCapita', {})
+                    if isinstance(faixa_renda, dict):
+                        faixa_renda_descricao = faixa_renda.get('descricao', '')
+                    elif isinstance(faixa_renda, list) and len(faixa_renda) > 0:
+                        faixa_renda_descricao = faixa_renda[0].get('descricao', '') if isinstance(faixa_renda[0], dict) else ''
+        except Exception as e:
+            # Em caso de erro, apenas não exibe os dados (não quebra a página)
+            erro_familiar = f"Erro ao buscar dados: {str(e)}"
+    else:
+        erro_familiar = "CPF inválido ou não informado"
+    
+    context = {
+        'dados_familiar': dados_familiar,
+        'erro_familiar': erro_familiar,
+        'faixa_renda_descricao': faixa_renda_descricao,
+    }
+    
+    return render(request, 'student/resultado_avaliacao_renda.html', context)
+
+
+@login_required
+def minhas_submissoes_view(request):
+    """
+    View para listar todas as submissões do estudante.
+    Mostra inscrições em todos os editais que o estudante participou.
+    """
+    from inscricoes.models import Inscricao
+    from core.models import Estudante
+    
+    try:
+        estudante = Estudante.objects.get(cpf=request.user.username)
+        inscricoes = Inscricao.objects.filter(estudante=estudante).select_related('edital').order_by('-criado_em')
+    except Estudante.DoesNotExist:
+        inscricoes = []
+    
+    context = {
+        'inscricoes': inscricoes,
+    }
+    
+    return render(request, 'student/minhas_submissoes.html', context)
 
 
 @login_required

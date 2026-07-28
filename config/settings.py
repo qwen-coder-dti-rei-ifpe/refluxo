@@ -17,7 +17,16 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-dev-key-change-in-pro
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 # Hosts permitidos (configure para seu domínio em produção)
+# Inclui .vercel.app para permitir todos os subdomínios de preview da Vercel
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,.vercel.app').split(',')
+
+# Garante que .vercel.app esteja sempre presente (caso a variável de ambiente sobrescreva)
+if '.vercel.app' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('.vercel.app')
+if 'localhost' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('localhost')
+if '127.0.0.1' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('127.0.0.1')
 
 # CSRF Trusted Origins for Vercel deployment
 CSRF_TRUSTED_ORIGINS = [
@@ -171,3 +180,11 @@ AUTH_USER_MODEL = 'core.Usuario'
 LOGIN_REDIRECT_URL = 'assistente_dashboard'
 LOGIN_URL = 'login'
 LOGOUT_REDIRECT_URL = 'login'
+
+# Configurações de Integração CadÚnico
+X_CPF_USUARIO = config('X_CPF_USUARIO', default='03256858430')
+X_CONSUMER_ID = config('X_CONSUMER_ID', default='IFPE')
+X_CONSUMER_ID_TYPE = config('X_CONSUMER_ID_TYPE', default='CPF')
+X_AUTHORIZATION_ID = config('X_AUTHORIZATION_ID', default='0002452-51.2016.2.00.0001')
+X_AUTHORIZATION_ID_TYPE = config('X_AUTHORIZATION_ID_TYPE', default='Processo')
+CADUNICO_API_BASE_URL = config('CADUNICO_API_BASE_URL', default='https://ee18227e-74c8-4cf4-97c0-daa3f5908982.mock.pstmn.io')

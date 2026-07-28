@@ -26,6 +26,8 @@ def enrollment_period_list(request):
 def enrollment_dashboard(request, pk):
     """Dashboard com blocos dos eixos para atualização da inscrição (Step 3 - Cards)."""
     from inscricoes.models import Edital
+    from integrations.oauth_service import gerar_token_oauth
+    from integrations.cadunico_service import buscar_dados_familiar, validar_cpf
     
     # Tenta obter como EnrollmentPeriod primeiro, senão tenta como Edital
     try:
@@ -64,11 +66,40 @@ def enrollment_dashboard(request, pk):
         defaults={'status': 'RASCUNHO'}
     )
     
+    # Buscar dados familiares do CadÚnico se tiver CPF do usuário
+    cpf_usuario = request.user.username if hasattr(request.user, 'username') else None
+    dados_familiar = None
+    erro_familiar = None
+    faixa_renda_descricao = None
+    
+    if cpf_usuario and validar_cpf(cpf_usuario):
+        try:
+            # Gerar token OAuth
+            token, erro_token = gerar_token_oauth(cpf_usuario)
+            
+            if token and not erro_token:
+                # Buscar dados familiares
+                dados_familiar, erro_familiar = buscar_dados_familiar(cpf_usuario, token)
+                
+                if dados_familiar and not erro_familiar:
+                    # Extrair descrição da faixa de renda per capita
+                    faixa_renda = dados_familiar.get('faixaRendaFamiliarPerCapita', {})
+                    if isinstance(faixa_renda, dict):
+                        faixa_renda_descricao = faixa_renda.get('descricao', '')
+                    elif isinstance(faixa_renda, list) and len(faixa_renda) > 0:
+                        faixa_renda_descricao = faixa_renda[0].get('descricao', '') if isinstance(faixa_renda[0], dict) else ''
+        except Exception as e:
+            # Em caso de erro, apenas não exibe os dados (não quebra a página)
+            pass
+    
     context = {
         'period': period,
         'enrollment': enrollment,
         'can_edit': period.esta_aberto(),
         'student': student,
+        'dados_familiar': dados_familiar,
+        'erro_familiar': erro_familiar,
+        'faixa_renda_descricao': faixa_renda_descricao,
     }
     return render(request, 'enrollments/step3_cards.html', context)
 
