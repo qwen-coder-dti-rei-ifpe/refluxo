@@ -33,8 +33,8 @@
             </div>
             <div class="card-body text-center">
                 <p class="text-muted">Dados pessoais, acadêmicos e bancários</p>
-                {% if enrollment and can_edit %}
-                    <a href="{% url 'student_update' enrollment.student.pk %}" class="btn btn-primary">
+                {% if enrollment and student and can_edit %}
+                    <a href="{% url 'student_update' student.pk %}" class="btn btn-primary">
                         <i class="fas fa-edit"></i> Editar
                     </a>
                 {% elif enrollment %}
@@ -48,7 +48,7 @@
             {% if enrollment %}
             <div class="card-footer">
                 <small>Status: 
-                    {% if enrollment.student %}
+                    {% if student %}
                         <span class="text-success"><i class="fas fa-check"></i> Preenchido</span>
                     {% else %}
                         <span class="text-danger"><i class="fas fa-times"></i> Pendente</span>
