@@ -172,8 +172,8 @@
         <a href="{% url 'step3_cards' %}" class="progress-step completed" title="Visão Geral">
             <i class="fas fa-check"></i>
         </a>
-        <div class="progress-line {% if enrollment.student %}completed{% endif %}"></div>
-        <a href="{% url 'student_data_form' enrollment.pk %}" class="progress-step {% if enrollment.student %}completed{% else %}pending{% endif %}" title="Dados do Estudante">2</a>
+        <div class="progress-line {% if student %}completed{% endif %}"></div>
+        <a href="{% url 'student_data_form' enrollment.pk %}" class="progress-step {% if student %}completed{% else %}pending{% endif %}" title="Dados do Estudante">2</a>
         <div class="progress-line completed"></div>
         <a href="{% url 'address_data_form' enrollment.pk %}" class="progress-step active" title="Dados de Endereço">3</a>
         <div class="progress-line"></div>
