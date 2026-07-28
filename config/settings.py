@@ -17,7 +17,16 @@ SECRET_KEY = config('SECRET_KEY', default='django-insecure-dev-key-change-in-pro
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 # Hosts permitidos (configure para seu domínio em produção)
+# Inclui .vercel.app para permitir todos os subdomínios de preview da Vercel
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,.vercel.app').split(',')
+
+# Garante que .vercel.app esteja sempre presente (caso a variável de ambiente sobrescreva)
+if '.vercel.app' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('.vercel.app')
+if 'localhost' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('localhost')
+if '127.0.0.1' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('127.0.0.1')
 
 # CSRF Trusted Origins for Vercel deployment
 CSRF_TRUSTED_ORIGINS = [
