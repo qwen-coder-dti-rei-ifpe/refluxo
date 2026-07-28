@@ -109,6 +109,13 @@
             margin-left: 260px;
             padding: 2rem;
             min-height: 100vh;
+            transition: all 0.3s;
+        }
+        
+        /* Ensure content doesn't overlap sidebar */
+        .content-wrapper {
+            position: relative;
+            z-index: 1;
         }
         
         /* Top Bar */
