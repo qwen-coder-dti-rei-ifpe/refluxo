@@ -1,0 +1,332 @@
+{% extends 'student_base.html' %}
+
+{% block title %}Resultado Avaliação da Renda Familiar - PAMA{% endblock %}
+
+{% block extra_css %}
+<style>
+    .resultado-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+        margin-bottom: 1.5rem;
+    }
+    
+    .card-header-custom {
+        background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+        color: white;
+        padding: 1.25rem 1.5rem;
+        border-radius: 12px 12px 0 0 !important;
+    }
+    
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
+        padding: 1.5rem;
+    }
+    
+    .info-item {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        border-left: 4px solid #0d6efd;
+    }
+    
+    .info-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        text-transform: uppercase;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .info-value {
+        font-size: 1rem;
+        color: #2d3748;
+        font-weight: 500;
+    }
+    
+    .info-value.success {
+        color: #198754;
+        font-weight: 600;
+    }
+    
+    .info-value.warning {
+        color: #ffc107;
+        font-weight: 600;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: #e9ecef;
+        margin-bottom: 1rem;
+    }
+    
+    .loading-state {
+        text-align: center;
+        padding: 3rem;
+    }
+    
+    .badge-cadunico {
+        background: rgba(255,255,255,0.2);
+        padding: 0.35rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-2"><i class="fas fa-chart-line"></i> Resultado Avaliação da Renda Familiar</h2>
+            <p class="text-muted">Detalhes completos da avaliação baseada nos dados do CadÚnico</p>
+        </div>
+    </div>
+    
+    {% if erro_familiar %}
+    <!-- Estado de Erro -->
+    <div class="empty-state">
+        <i class="fas fa-exclamation-triangle"></i>
+        <h4 class="mb-3">Não foi possível carregar os dados</h4>
+        <p class="text-muted mb-4">{{ erro_familiar }}</p>
+        <button class="btn btn-primary" onclick="window.location.reload()">
+            <i class="fas fa-sync-alt"></i> Tentar Novamente
+        </button>
+    </div>
+    {% elif not dados_familiar %}
+    <!-- Estado de Carregamento -->
+    <div class="loading-state">
+        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Carregando...</span>
+        </div>
+        <p class="mt-3 text-muted">Consultando dados do CadÚnico...</p>
+    </div>
+    {% else %}
+    <!-- Dados Encontrados -->
+    <div class="resultado-card">
+        <div class="card-header-custom d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="fas fa-hand-holding-usd"></i> Avaliação da Renda Familiar</h5>
+            <span class="badge-cadunico"><i class="fas fa-database"></i> CadÚnico</span>
+        </div>
+        
+        <div class="info-grid">
+            <!-- Faixa de Renda Per Capita -->
+            <div class="info-item">
+                <div class="info-label">Faixa de Renda Per Capita</div>
+                <div class="info-value success">
+                    <i class="fas fa-check-circle"></i> 
+                    {% if faixa_renda_descricao %}
+                        {{ faixa_renda_descricao }}
+                    {% else %}
+                        Não informada
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Faixa de Renda Total -->
+            {% with faixa_total=dados_familiar.faixaRendaFamiliarTotal %}
+            {% if faixa_total %}
+            <div class="info-item">
+                <div class="info-label">Faixa de Renda Familiar Total</div>
+                <div class="info-value">
+                    {% if faixa_total.descricao %}
+                        {{ faixa_total.descricao }}
+                    {% else %}
+                        Não informada
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            {% endwith %}
+            
+            <!-- Município -->
+            {% with municipio=dados_familiar.municipio %}
+            {% if municipio %}
+            <div class="info-item">
+                <div class="info-label">Município</div>
+                <div class="info-value">
+                    <i class="fas fa-map-marker-alt"></i>
+                    {% if municipio.nomeMunicipio %}
+                        {{ municipio.nomeMunicipio }}/{{ municipio.siglaUf }}
+                    {% else %}
+                        Não informado
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            {% endwith %}
+            
+            <!-- Domicílio -->
+            {% with domicilio=dados_familiar.domicilio %}
+            {% if domicilio %}
+            <div class="info-item">
+                <div class="info-label">Características do Domicílio</div>
+                <div class="info-value">
+                    {% if domicilio.descricao %}
+                        <i class="fas fa-home"></i> {{ domicilio.descricao }}
+                    {% else %}
+                        Não informado
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            {% endwith %}
+            
+            <!-- Idade -->
+            {% if dados_familiar.idade %}
+            <div class="info-item">
+                <div class="info-label">Idade</div>
+                <div class="info-value">
+                    <i class="fas fa-birthday-cake"></i> {{ dados_familiar.idade }} anos
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Quantidade de Pessoas na Família -->
+            {% if dados_familiar.quantidadePessoasFamilia %}
+            <div class="info-item">
+                <div class="info-label">Quantidade de Pessoas na Família</div>
+                <div class="info-value">
+                    <i class="fas fa-users"></i> {{ dados_familiar.quantidadePessoasFamilia }} pessoas
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Família Beneficiária PBF -->
+            {% if dados_familiar.familiaBeneficiariaPBF is not None %}
+            <div class="info-item">
+                <div class="info-label">Família Beneficiária do PBF</div>
+                <div class="info-value {% if dados_familiar.familiaBeneficiariaPBF %}success{% else %}warning{% endif %}">
+                    {% if dados_familiar.familiaBeneficiariaPBF %}
+                        <i class="fas fa-check-circle"></i> Sim
+                    {% else %}
+                        <i class="fas fa-times-circle"></i> Não
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Sexo -->
+            {% with sexo=dados_familiar.sexo %}
+            {% if sexo %}
+            <div class="info-item">
+                <div class="info-label">Sexo</div>
+                <div class="info-value">
+                    {% if sexo.descricao %}
+                        <i class="fas fa-{% if sexo.descricao == 'Masculino' %}male{% else %}female{% endif %}"></i> {{ sexo.descricao }}
+                    {% else %}
+                        Não informado
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            {% endwith %}
+            
+            <!-- Raça/Cor -->
+            {% with raca=dados_familiar.racaCor %}
+            {% if raca %}
+            <div class="info-item">
+                <div class="info-label">Raça/Cor</div>
+                <div class="info-value">
+                    {% if raca.descricao %}
+                        {{ raca.descricao }}
+                    {% else %}
+                        Não informada
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            {% endwith %}
+            
+            <!-- GPT (Grupos Tradicionais) -->
+            {% with gpte=dados_familiar.gpte %}
+            {% if gpte and gpte|length > 0 %}
+            <div class="info-item">
+                <div class="info-label">Grupo Tradicional (GPT)</div>
+                <div class="info-value">
+                    {% for grupo in gpte %}
+                        {% if grupo.descricao and grupo.descricao != 'Nenhuma' %}
+                            {{ grupo.descricao }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    {% if gpte|length == 1 and gpte.0.descricao == 'Nenhuma' %}
+                        Nenhuma
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            {% endwith %}
+            
+            <!-- Pessoa Cadastrada -->
+            {% if dados_familiar.pessoaCadastrada is not None %}
+            <div class="info-item">
+                <div class="info-label">Pessoa Cadastrada</div>
+                <div class="info-value {% if dados_familiar.pessoaCadastrada %}success{% else %}warning{% endif %}">
+                    {% if dados_familiar.pessoaCadastrada %}
+                        <i class="fas fa-user-check"></i> Sim
+                    {% else %}
+                        <i class="fas fa-user-times"></i> Não
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Cadastro Atualizado -->
+            {% if dados_familiar.cadastroAtualizado is not None %}
+            <div class="info-item">
+                <div class="info-label">Cadastro Atualizado</div>
+                <div class="info-value {% if dados_familiar.cadastroAtualizado %}success{% else %}warning{% endif %}">
+                    {% if dados_familiar.cadastroAtualizado %}
+                        <i class="fas fa-sync-alt"></i> Sim
+                    {% else %}
+                        <i class="fas fa-exclamation-circle"></i> Não
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Data Última Atualização -->
+            {% if dados_familiar.dataUltimaAtualizacao %}
+            <div class="info-item">
+                <div class="info-label">Data da Última Atualização</div>
+                <div class="info-value">
+                    <i class="fas fa-calendar-alt"></i> {{ dados_familiar.dataUltimaAtualizacao|date:"d/m/Y H:i" }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Card de Resumo -->
+    <div class="resultado-card">
+        <div class="card-header bg-light border-bottom">
+            <h6 class="mb-0"><i class="fas fa-info-circle"></i> Resumo da Avaliação</h6>
+        </div>
+        <div class="card-body">
+            <p class="mb-2">
+                <strong>Situação:</strong> 
+                {% if faixa_renda_descricao %}
+                    <span class="text-success"><i class="fas fa-check-circle"></i> Avaliação concluída com sucesso</span>
+                {% else %}
+                    <span class="text-warning"><i class="fas fa-exclamation-triangle"></i> Dados incompletos</span>
+                {% endif %}
+            </p>
+            <p class="mb-0 text-muted small">
+                <i class="fas fa-info-circle"></i> 
+                Os dados acima são provenientes do Cadastro Único (CadÚnico) e refletem a situação familiar no momento da última atualização.
+            </p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -193,18 +193,10 @@
             </li>
             
             <li class="sidebar-menu-item">
-                <a href="#" class="sidebar-menu-link" data-bs-toggle="collapse" data-bs-target="#submenuAvaliacoes">
-                    <i class="fas fa-clipboard-check"></i>
-                    <span>Avaliações</span>
-                    <i class="fas fa-chevron-down ms-auto" style="font-size: 0.8rem;"></i>
+                <a href="{% url 'step3_cards' %}" class="sidebar-menu-link {% if request.resolver_match.url_name == 'step3_cards' %}active{% endif %}">
+                    <i class="fas fa-edit"></i>
+                    <span>Nova Inscrição</span>
                 </a>
-                <ul class="collapse sidebar-submenu" id="submenuAvaliacoes">
-                    <li class="sidebar-submenu-item">
-                        <a href="{% url 'avaliacoes_grid' %}" class="sidebar-submenu-link">
-                            <i class="fas fa-th-large"></i> Grid de Avaliações
-                        </a>
-                    </li>
-                </ul>
             </li>
             
             <li class="sidebar-menu-item">
@@ -215,10 +207,23 @@
             </li>
             
             <li class="sidebar-menu-item">
-                <a href="{% url 'step3_cards' %}" class="sidebar-menu-link {% if request.resolver_match.url_name == 'step3_cards' %}active{% endif %}">
-                    <i class="fas fa-edit"></i>
-                    <span>Nova Inscrição</span>
+                <a href="#" class="sidebar-menu-link" data-bs-toggle="collapse" data-bs-target="#submenuAvaliacoes">
+                    <i class="fas fa-clipboard-check"></i>
+                    <span>Minhas Avaliações</span>
+                    <i class="fas fa-chevron-down ms-auto" style="font-size: 0.8rem;"></i>
                 </a>
+                <ul class="collapse sidebar-submenu" id="submenuAvaliacoes">
+                    <li class="sidebar-submenu-item">
+                        <a href="{% url 'avaliacoes_grid' %}" class="sidebar-submenu-link">
+                            <i class="fas fa-th-large"></i> Grid de Avaliações
+                        </a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="{% url 'resultado_avaliacao_renda' %}" class="sidebar-submenu-link">
+                            <i class="fas fa-chart-line"></i> Resultado Renda Familiar
+                        </a>
+                    </li>
+                </ul>
             </li>
         </ul>
     </nav>
@@ -231,7 +236,7 @@
                 <i class="fas fa-bars"></i>
             </button>
             
-            <div class="user-info">
+            <div class="user-info ms-auto">
                 <div class="text-end">
                     <div class="fw-semibold">{{ user.get_full_name|default:user.username }}</div>
                     <small class="text-muted">Estudante</small>
