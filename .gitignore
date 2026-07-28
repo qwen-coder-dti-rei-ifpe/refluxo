@@ -5,11 +5,38 @@ __pycache__/
 *.pyo
 *.pyd
 
-# Logs
+# Django
 *.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Coverage
+.coverage
+coverage/
+htmlcov/
 
 # Environment
 .env
 .env.local
 .env.*
+.venv/
+venv/
+ENV/
+
+# Dependencies
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
 ```

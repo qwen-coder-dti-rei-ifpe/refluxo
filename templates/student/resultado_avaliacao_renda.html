@@ -255,12 +255,14 @@
             <div class="info-item">
                 <div class="info-label">Grupo Tradicional (GPT)</div>
                 <div class="info-value">
-                    {% for grupo in gpte %}
-                        {% if grupo.descricao and grupo.descricao != 'Nenhuma' %}
-                            {{ grupo.descricao }}{% if not forloop.last %}, {% endif %}
-                        {% endfor %}
                     {% if gpte|length == 1 and gpte.0.descricao == 'Nenhuma' %}
                         Nenhuma
+                    {% else %}
+                        {% for grupo in gpte %}
+                            {% if grupo.descricao and grupo.descricao != 'Nenhuma' %}
+                                {{ grupo.descricao }}{% if not forloop.last %}, {% endif %}
+                            {% endif %}
+                        {% endfor %}
                     {% endif %}
                 </div>
             </div>
