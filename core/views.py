@@ -104,8 +104,11 @@ def student_dashboard_view(request):
     """
     View para dashboard do estudante.
     Primeiro o estudante deve selecionar um edital ativo, depois pode buscar por matrícula.
+    Exibe card de Avaliação da Renda Familiar com dados do CadÚnico.
     """
     from inscricoes.models import Edital, Inscricao
+    from integrations.oauth_service import gerar_token_oauth
+    from integrations.cadunico_service import buscar_dados_familiar, validar_cpf
     
     # Verifica se é assistente social, se for redireciona
     if hasattr(request.user, 'is_assistente_social') and request.user.is_assistente_social:
@@ -115,6 +118,9 @@ def student_dashboard_view(request):
     edital_selecionado = None
     inscricao_existente = None
     message = None
+    dados_familiar = None
+    erro_familiar = None
+    faixa_renda_descricao = None
     
     # Verifica se deve limpar o edital selecionado (quando volta para seleção)
     if request.method == 'GET' and request.GET.get('clear_edital'):
@@ -124,6 +130,28 @@ def student_dashboard_view(request):
     
     # Passo 1: Selecionar edital ativo (somente para visualização do estudante)
     editais_ativos = Edital.objects.filter(ativo=True, status='ATIVO')
+    
+    # Buscar dados familiares do CadÚnico se tiver CPF do usuário
+    cpf_usuario = request.user.username if hasattr(request.user, 'username') else None
+    if cpf_usuario and validar_cpf(cpf_usuario):
+        try:
+            # Gerar token OAuth
+            token, erro_token = gerar_token_oauth(cpf_usuario)
+            
+            if token and not erro_token:
+                # Buscar dados familiares
+                dados_familiar, erro_familiar = buscar_dados_familiar(cpf_usuario, token)
+                
+                if dados_familiar and not erro_familiar:
+                    # Extrair descrição da faixa de renda per capita
+                    faixa_renda = dados_familiar.get('faixaRendaFamiliarPerCapita', {})
+                    if isinstance(faixa_renda, dict):
+                        faixa_renda_descricao = faixa_renda.get('descricao', '')
+                    elif isinstance(faixa_renda, list) and len(faixa_renda) > 0:
+                        faixa_renda_descricao = faixa_renda[0].get('descricao', '') if isinstance(faixa_renda[0], dict) else ''
+        except Exception as e:
+            # Em caso de erro, apenas não exibe os dados (não quebra a página)
+            pass
     
     if request.method == 'POST':
         # Verifica se está limpando a seleção do edital
@@ -276,6 +304,9 @@ def student_dashboard_view(request):
         'editais_ativos': editais_ativos,
         'inscricao': inscricao_existente,
         'message': message,
+        'dados_familiar': dados_familiar,
+        'erro_familiar': erro_familiar,
+        'faixa_renda_descricao': faixa_renda_descricao,
     }
     
     return render(request, 'dashboard/student.html', context)

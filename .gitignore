@@ -1,51 +1,43 @@
-# Compiled and build artifacts
-*.pyc
+```
+# Python
 __pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# Dependencies
-.venv/
+# Virtual Environment
 venv/
-node_modules/
+ENV/
+env/
 
-# Logs and temp files
-*.log
-*.tmp
-*.swp
+# IDE
+.vscode/
+.idea/
 
 # Environment
 .env
 .env.local
-.env.*
 
-# Editors
-.vscode/
-.idea/
+# Logs
+*.log
 
-# OS specific
+# OS
 .DS_Store
 Thumbs.db
-
-# Coverage reports
-coverage/
-htmlcov/
-.coverage
-
-# Build outputs
-dist/
-build/
-target/
-*.out
-*.exe
-*.dll
-*.so
-*.a
-
-# Python specific
-*.pyo
-*.pyd
-.Python
-*.egg-info/
-
-# MyPy cache
-.mypy_cache/
-.pytest_cache/
+```
