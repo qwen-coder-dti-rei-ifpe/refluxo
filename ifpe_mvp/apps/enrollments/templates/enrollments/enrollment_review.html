@@ -328,24 +328,28 @@
     <!-- Dados de Deslocamento -->
     <div class="review-container">
         <h3 class="section-title"><i class="fas fa-bus"></i> Dados de Deslocamento</h3>
+        {% if displacement_data %}
         <div class="review-grid">
             <div class="review-item">
                 <div class="review-item-label">Tipo de Transporte</div>
-                <div class="review-item-value">{{ enrollment.get_tipo_transporte_display|default:enrollment.tipo_transporte|default:"Não informado" }}</div>
+                <div class="review-item-value">{{ displacement_data.get_tipo_transporte_display|default:displacement_data.tipo_transporte|default:"Não informado" }}</div>
             </div>
             <div class="review-item">
                 <div class="review-item-label">Distância (km)</div>
-                <div class="review-item-value">{{ enrollment.distancia_residencia_trabalho|default:"0" }} km</div>
+                <div class="review-item-value">{{ displacement_data.distancia_residencia_trabalho|default:"0" }} km</div>
             </div>
             <div class="review-item">
                 <div class="review-item-label">Tempo de Deslocamento</div>
-                <div class="review-item-value">{{ enrollment.tempo_deslocamento|default:"Não informado" }} minutos</div>
+                <div class="review-item-value">{{ displacement_data.tempo_deslocamento|default:"Não informado" }} minutos</div>
             </div>
             <div class="review-item">
                 <div class="review-item-label">Gasto com Transporte (R$)</div>
-                <div class="review-item-value">{{ enrollment.gasto_transporte|default:"0.00" }}</div>
+                <div class="review-item-value">{{ displacement_data.gasto_transporte|default:"0.00" }}</div>
             </div>
         </div>
+        {% else %}
+        <p class="text-muted">Nenhum dado de deslocamento cadastrado.</p>
+        {% endif %}
     </div>
     
     <!-- Dados de Inscrição -->

@@ -756,5 +756,6 @@ def enrollment_review(request, pk):
         'student': student,
         'step': 9,
         'total_steps': 9,
+        'displacement_data': enrollment.displacement if enrollment.displacement else None,
     }
     return render(request, 'enrollments/enrollment_review.html', context)
