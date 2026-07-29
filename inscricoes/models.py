@@ -35,6 +35,57 @@ class Edital(models.Model):
     periodo_avaliacao_abertura = models.DateTimeField(null=True, blank=True)
     periodo_avaliacao_fechamento = models.DateTimeField(null=True, blank=True)
     
+    # Períodos para recursos (assistente social)
+    periodo_recurso_solicitacao_abertura = models.DateTimeField(
+        'Período de solicitação de recursos - Abertura', 
+        null=True, 
+        blank=True,
+        help_text='Período para o assistente social solicitar recursos'
+    )
+    periodo_recurso_solicitacao_fechamento = models.DateTimeField(
+        'Período de solicitação de recursos - Fechamento', 
+        null=True, 
+        blank=True
+    )
+    
+    periodo_resultado_parcial_divulgacao = models.DateTimeField(
+        'Período de divulgação do resultado parcial', 
+        null=True, 
+        blank=True,
+        help_text='Data de divulgação do resultado parcial para os estudantes'
+    )
+    
+    periodo_recurso_estudante_submissao_abertura = models.DateTimeField(
+        'Período de submissão de recursos pelos estudantes - Abertura', 
+        null=True, 
+        blank=True,
+        help_text='Período para estudantes submeterem recursos após resultado parcial'
+    )
+    periodo_recurso_estudante_submissao_fechamento = models.DateTimeField(
+        'Período de submissão de recursos pelos estudantes - Fechamento', 
+        null=True, 
+        blank=True
+    )
+    
+    periodo_recurso_avaliacao_abertura = models.DateTimeField(
+        'Período de avaliação dos recursos - Abertura', 
+        null=True, 
+        blank=True,
+        help_text='Período para avaliação dos recursos dos estudantes após resultado parcial'
+    )
+    periodo_recurso_avaliacao_fechamento = models.DateTimeField(
+        'Período de avaliação dos recursos - Fechamento', 
+        null=True, 
+        blank=True
+    )
+    
+    periodo_resultado_final_divulgacao = models.DateTimeField(
+        'Período de divulgação do resultado final', 
+        null=True, 
+        blank=True,
+        help_text='Data de divulgação do resultado final'
+    )
+    
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='ATIVO')
     ativo = models.BooleanField(default=True)
     criado_em = models.DateTimeField(auto_now_add=True)

@@ -96,7 +96,7 @@ def assistente_dashboard_view(request):
         'editais': editais,
     }
     
-    return render(request, 'core/assistente_dashboard.html', context)
+    return render(request, 'core/assistente_social_dashboard.html', context)
 
 
 @login_required
@@ -435,17 +435,24 @@ def minhas_submissoes_view(request):
     View para listar todas as submissões do estudante.
     Mostra inscrições em todos os editais que o estudante participou.
     """
-    from inscricoes.models import Inscricao
+    from ifpe_mvp.apps.enrollments.models import Enrollment, EnrollmentPeriod
     from core.models import Estudante
     
     try:
         estudante = Estudante.objects.get(cpf=request.user.username)
-        inscricoes = Inscricao.objects.filter(estudante=estudante).select_related('edital').order_by('-criado_em')
+        # Tenta obter o Student do Django auth user primeiro
+        try:
+            student = request.user.student
+            enrollments = Enrollment.objects.filter(student=student).select_related('enrollment_period').order_by('-criado_em')
+        except:
+            # Fallback para o modelo antigo se não encontrar Student
+            enrollments = []
     except Estudante.DoesNotExist:
-        inscricoes = []
+        enrollments = []
     
     context = {
-        'inscricoes': inscricoes,
+        'inscricoes': enrollments,
+        'is_enrollment_model': True,  # Flag para indicar que estamos usando o novo modelo
     }
     
     return render(request, 'student/minhas_submissoes.html', context)
@@ -471,6 +478,158 @@ def assistente_edital_detalhes_view(request, edital_id):
     }
     
     return render(request, 'core/assistente_edital_detalhes.html', context)
+
+
+@login_required
+def assistente_novo_edital_view(request):
+    """
+    View para criar novo edital pelo assistente social.
+    Redireciona para o admin do Django para criação do edital.
+    """
+    # Verifica se o usuário é assistente social
+    if not hasattr(request.user, 'is_assistente_social') or not request.user.is_assistente_social:
+        return render(request, 'core/sem_permissao.html')
+    
+    return redirect('/admin/inscricoes/edital/add/')
+
+
+@login_required
+def assistente_buscar_estudante_view(request):
+    """
+    View para buscar estudante por CPF ou matrícula pelo assistente social.
+    Similar à busca do estudante, mas com contexto do assistente.
+    """
+    # Verifica se o usuário é assistente social
+    if not hasattr(request.user, 'is_assistente_social') or not request.user.is_assistente_social:
+        return render(request, 'core/sem_permissao.html')
+    
+    from core.models import Estudante
+    from inscricoes.models import Inscricao
+    
+    search_query = None
+    estudante_encontrado = None
+    inscricoes_estudante = None
+    message = None
+    
+    if request.method == 'POST':
+        search_query = request.POST.get('search_query', '').strip()
+        
+        if search_query:
+            # Tenta buscar por CPF ou matrícula
+            try:
+                # Primeiro tenta buscar por CPF
+                estudante_encontrado = Estudante.objects.get(cpf=search_query)
+            except Estudante.DoesNotExist:
+                try:
+                    # Se não encontrar por CPF, tenta por matrícula
+                    estudante_encontrado = Estudante.objects.get(matricula=search_query)
+                except Estudante.DoesNotExist:
+                    message = "Estudante não encontrado com o CPF ou matrícula informado."
+            
+            if estudante_encontrado:
+                # Buscar todas as inscrições do estudante
+                inscricoes_estudante = Inscricao.objects.filter(
+                    estudante=estudante_encontrado
+                ).select_related('edital').order_by('-criado_em')
+                message = f"Estudante encontrado: {estudante_encontrado.nome_completo}"
+    else:
+        # GET - limpa a busca
+        search_query = None
+        estudante_encontrado = None
+        inscricoes_estudante = None
+    
+    context = {
+        'search_query': search_query,
+        'estudante': estudante_encontrado,
+        'inscricoes': inscricoes_estudante,
+        'message': message,
+    }
+    
+    return render(request, 'core/assistente_buscar_estudante.html', context)
+
+
+@login_required
+def assistente_analise_inscricao_view(request, edital_id=None):
+    """
+    View para análise de inscrições por edital pelo assistente social.
+    Permite visualizar e avaliar as inscrições submetidas pelos estudantes.
+    Apenas mostra inscrições dentro do período de submissão configurado no edital.
+    """
+    # Verifica se o usuário é assistente social
+    if not hasattr(request.user, 'is_assistente_social') or not request.user.is_assistente_social:
+        return render(request, 'core/sem_permissao.html')
+    
+    from inscricoes.models import Edital, Inscricao
+    from django.utils import timezone
+    
+    edital_selecionado = None
+    inscricoes = None
+    fora_do_periodo = False
+    
+    if edital_id:
+        edital_selecionado = get_object_or_404(Edital, pk=edital_id)
+        
+        # Verifica se está dentro do período de submissão de inscrições
+        agora = timezone.now()
+        if edital_selecionado.periodo_inscricao_abertura and edital_selecionado.periodo_inscricao_fechamento:
+            if not (edital_selecionado.periodo_inscricao_abertura <= agora <= edital_selecionado.periodo_inscricao_fechamento):
+                fora_do_periodo = True
+        
+        # Filtra inscrições do edital selecionado
+        inscricoes = Inscricao.objects.filter(
+            edital=edital_selecionado
+        ).select_related('estudante').order_by('-criado_em')
+    else:
+        # Se não tem edital selecionado, mostra lista de editais para seleção
+        pass
+    
+    # Lista todos os editais para seleção
+    editais = Edital.objects.all().order_by('-criado_em')
+    
+    context = {
+        'edital_selecionado': edital_selecionado,
+        'inscricoes': inscricoes,
+        'editais': editais,
+        'fora_do_periodo': fora_do_periodo,
+    }
+    
+    return render(request, 'core/assistente_analise_inscricao.html', context)
+
+
+@login_required
+def assistente_analise_recurso_view(request, edital_id=None):
+    """
+    View para análise de recursos por edital pelo assistente social.
+    Permite visualizar e avaliar os recursos interpostos pelos estudantes.
+    """
+    # Verifica se o usuário é assistente social
+    if not hasattr(request.user, 'is_assistente_social') or not request.user.is_assistente_social:
+        return render(request, 'core/sem_permissao.html')
+    
+    from inscricoes.models import Edital, Inscricao, Recurso
+    
+    edital_selecionado = None
+    recursos = None
+    
+    if edital_id:
+        edital_selecionado = get_object_or_404(Edital, pk=edital_id)
+        recursos = Recurso.objects.filter(
+            inscricao__edital=edital_selecionado
+        ).select_related('inscricao', 'inscricao__estudante').order_by('-criado_em')
+    else:
+        # Se não tem edital selecionado, mostra lista de editais para seleção
+        pass
+    
+    # Lista todos os editais para seleção
+    editais = Edital.objects.all().order_by('-criado_em')
+    
+    context = {
+        'edital_selecionado': edital_selecionado,
+        'recursos': recursos,
+        'editais': editais,
+    }
+    
+    return render(request, 'core/assistente_analise_recurso.html', context)
 
 
 @login_required

@@ -1,11 +1,17 @@
 ```
-# Compiled Python files
+# Python
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
 
-# Environment variables
-.env
-.env.local
-*.env.*
+# Virtual Environment
+venv/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+media/
+staticfiles/
 ```

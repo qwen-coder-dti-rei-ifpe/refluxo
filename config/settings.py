@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_spectacular',
     'widget_tweaks',
+    'django.contrib.humanize',
     
     # Apps do projeto
     'core',
