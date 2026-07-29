@@ -228,7 +228,7 @@
                         </a>
                     </li>
                     <li class="sidebar-submenu-item">
-                        <a href="/admin/inscricoes/edital/add/" class="sidebar-submenu-link">
+                        <a href="{% url 'assistente_novo_edital' %}" class="sidebar-submenu-link">
                             <i class="fas fa-plus"></i> Novo Edital
                         </a>
                     </li>
@@ -241,15 +241,10 @@
                     <span>2º Estudantes</span>
                     <i class="fas fa-chevron-down ms-auto" style="font-size: 0.8rem;"></i>
                 </a>
-                <ul class="collapse sidebar-submenu {% if 'estudante' in request.resolver_match.url_name %}show{% endif %}" id="submenuEstudantes">
+                <ul class="collapse sidebar-submenu {% if 'buscar_estudante' in request.resolver_match.url_name %}show{% endif %}" id="submenuEstudantes">
                     <li class="sidebar-submenu-item">
-                        <a href="#" class="sidebar-submenu-link">
-                            <i class="fas fa-search"></i> Buscar Estudantes
-                        </a>
-                    </li>
-                    <li class="sidebar-submenu-item">
-                        <a href="#" class="sidebar-submenu-link">
-                            <i class="fas fa-list-alt"></i> Lista de Estudantes
+                        <a href="{% url 'assistente_buscar_estudante' %}" class="sidebar-submenu-link">
+                            <i class="fas fa-search"></i> Buscar Estudante
                         </a>
                     </li>
                 </ul>
@@ -263,7 +258,7 @@
                 </a>
                 <ul class="collapse sidebar-submenu {% if 'analise_inscricao' in request.resolver_match.url_name %}show{% endif %}" id="submenuAnaliseInscricoes">
                     <li class="sidebar-submenu-item">
-                        <a href="{% url 'assistente_dashboard' %}" class="sidebar-submenu-link">
+                        <a href="{% url 'assistente_analise_inscricao' %}" class="sidebar-submenu-link">
                             <i class="fas fa-eye"></i> Analisar por Edital
                         </a>
                     </li>
@@ -278,7 +273,7 @@
                 </a>
                 <ul class="collapse sidebar-submenu {% if 'analise_recurso' in request.resolver_match.url_name %}show{% endif %}" id="submenuAnaliseRecursos">
                     <li class="sidebar-submenu-item">
-                        <a href="{% url 'assistente_dashboard' %}" class="sidebar-submenu-link">
+                        <a href="{% url 'assistente_analise_recurso' %}" class="sidebar-submenu-link">
                             <i class="fas fa-tasks"></i> Analisar Recursos por Edital
                         </a>
                     </li>

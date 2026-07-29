@@ -1,0 +1,157 @@
+{% extends 'assistente_social_base.html' %}
+
+{% block title %}Análise de Recursos - PAMA{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-3" style="color: #417690;">
+                <i class="fas fa-comments me-2"></i>Análise de Recursos por Edital
+            </h2>
+            <p class="text-muted">Visualize e avalie os recursos interpostos pelos estudantes</p>
+        </div>
+    </div>
+    
+    <!-- Seleção de Edital -->
+    {% if not edital_selecionado %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0" style="color: #417690;">
+                        <i class="fas fa-file-alt me-2"></i>Selecione um Edital
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Número</th>
+                                    <th>Título</th>
+                                    <th>Status</th>
+                                    <th>Recursos</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for edital in editais %}
+                                <tr>
+                                    <td><strong>{{ edital.numero }}</strong></td>
+                                    <td>{{ edital.titulo }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if edital.status == 'ATIVO' %}success{% elif edital.status == 'SUSPENSO' %}warning{% else %}danger{% endif %}">
+                                            {{ edital.get_status_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% load humanize %}
+                                        {{ edital.recurso_set.count|default:0|intcomma }} recursos
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'assistente_analise_recurso_detail' edital.id %}" 
+                                           class="btn btn-sm btn-primary">
+                                            <i class="fas fa-eye me-1"></i>Analisar Recursos
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">
+                                        Nenhum edital cadastrado.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- Recursos do Edital Selecionado -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-0" style="color: #417690;">
+                            <i class="fas fa-list me-2"></i>Recursos - Edital {{ edital_selecionado.numero }}
+                        </h5>
+                        <small class="text-muted">{{ edital_selecionado.titulo }}</small>
+                    </div>
+                    <a href="{% url 'assistente_analise_recurso' %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>Voltar
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if recursos %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Estudante</th>
+                                    <th>Inscrição</th>
+                                    <th>Data do Recurso</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for recurso in recursos %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ recurso.inscricao.estudante.nome_completo }}</strong><br>
+                                        <small class="text-muted">CPF: {{ recurso.inscricao.estudante.cpf }}</small>
+                                    </td>
+                                    <td>
+                                        {{ recurso.inscricao.edital.numero }}<br>
+                                        <small class="text-muted">{{ recurso.inscricao.criado_em|date:"d/m/Y" }}</small>
+                                    </td>
+                                    <td>{{ recurso.criado_em|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if recurso.status == 'PENDENTE' %}warning{% elif recurso.status == 'ANALISADO' %}primary{% elif recurso.status == 'DEFERIDO' %}success{% elif recurso.status == 'INDEFERIDO' %}danger{% else %}secondary{% endif %}">
+                                            {{ recurso.get_status_display|default:recurso.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="#" 
+                                               class="btn btn-primary"
+                                               title="Ver Detalhes do Recurso">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            {% if recurso.status == 'PENDENTE' %}
+                                            <a href="#" 
+                                               class="btn btn-success"
+                                               title="Deferir Recurso">
+                                                <i class="fas fa-check"></i>
+                                            </a>
+                                            <a href="#" 
+                                               class="btn btn-danger"
+                                               title="Indeferir Recurso">
+                                                <i class="fas fa-times"></i>
+                                            </a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Nenhum recurso encontrado para este edital.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

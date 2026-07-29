@@ -20,7 +20,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-from core.views import home_view, buscar_cpf_view, CustomLoginView, assistente_dashboard_view, assistente_edital_detalhes_view, jornada_estudante_view, student_dashboard_view, step3_cards_view, avaliacoes_grid_view, resultado_avaliacao_renda_view, minhas_submissoes_view
+from core.views import home_view, buscar_cpf_view, CustomLoginView, assistente_dashboard_view, assistente_edital_detalhes_view, assistente_novo_edital_view, assistente_buscar_estudante_view, assistente_analise_inscricao_view, assistente_analise_recurso_view, jornada_estudante_view, student_dashboard_view, step3_cards_view, avaliacoes_grid_view, resultado_avaliacao_renda_view, minhas_submissoes_view
 
 urlpatterns = [
     # Página inicial do programa
@@ -64,6 +64,12 @@ urlpatterns = [
     # Área do Assistente Social
     path('dashboard/assistente/', assistente_dashboard_view, name='assistente_dashboard'),
     path('assistente/edital/<int:edital_id>/', assistente_edital_detalhes_view, name='assistente_edital_detalhes'),
+    path('assistente/novo-edital/', assistente_novo_edital_view, name='assistente_novo_edital'),
+    path('assistente/buscar-estudante/', assistente_buscar_estudante_view, name='assistente_buscar_estudante'),
+    path('assistente/analise-inscricao/', assistente_analise_inscricao_view, name='assistente_analise_inscricao'),
+    path('assistente/analise-inscricao/<int:edital_id>/', assistente_analise_inscricao_view, name='assistente_analise_inscricao_detail'),
+    path('assistente/analise-recurso/', assistente_analise_recurso_view, name='assistente_analise_recurso'),
+    path('assistente/analise-recurso/<int:edital_id>/', assistente_analise_recurso_view, name='assistente_analise_recurso_detail'),
     
     # Admin Django
     path('admin/', admin.site.urls),
