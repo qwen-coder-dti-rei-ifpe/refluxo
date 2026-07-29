@@ -435,17 +435,24 @@ def minhas_submissoes_view(request):
     View para listar todas as submissões do estudante.
     Mostra inscrições em todos os editais que o estudante participou.
     """
-    from inscricoes.models import Inscricao
+    from ifpe_mvp.apps.enrollments.models import Enrollment, EnrollmentPeriod
     from core.models import Estudante
     
     try:
         estudante = Estudante.objects.get(cpf=request.user.username)
-        inscricoes = Inscricao.objects.filter(estudante=estudante).select_related('edital').order_by('-criado_em')
+        # Tenta obter o Student do Django auth user primeiro
+        try:
+            student = request.user.student
+            enrollments = Enrollment.objects.filter(student=student).select_related('enrollment_period').order_by('-criado_em')
+        except:
+            # Fallback para o modelo antigo se não encontrar Student
+            enrollments = []
     except Estudante.DoesNotExist:
-        inscricoes = []
+        enrollments = []
     
     context = {
-        'inscricoes': inscricoes,
+        'inscricoes': enrollments,
+        'is_enrollment_model': True,  # Flag para indicar que estamos usando o novo modelo
     }
     
     return render(request, 'student/minhas_submissoes.html', context)
@@ -546,18 +553,29 @@ def assistente_analise_inscricao_view(request, edital_id=None):
     """
     View para análise de inscrições por edital pelo assistente social.
     Permite visualizar e avaliar as inscrições submetidas pelos estudantes.
+    Apenas mostra inscrições dentro do período de submissão configurado no edital.
     """
     # Verifica se o usuário é assistente social
     if not hasattr(request.user, 'is_assistente_social') or not request.user.is_assistente_social:
         return render(request, 'core/sem_permissao.html')
     
     from inscricoes.models import Edital, Inscricao
+    from django.utils import timezone
     
     edital_selecionado = None
     inscricoes = None
+    fora_do_periodo = False
     
     if edital_id:
         edital_selecionado = get_object_or_404(Edital, pk=edital_id)
+        
+        # Verifica se está dentro do período de submissão de inscrições
+        agora = timezone.now()
+        if edital_selecionado.periodo_inscricao_abertura and edital_selecionado.periodo_inscricao_fechamento:
+            if not (edital_selecionado.periodo_inscricao_abertura <= agora <= edital_selecionado.periodo_inscricao_fechamento):
+                fora_do_periodo = True
+        
+        # Filtra inscrições do edital selecionado
         inscricoes = Inscricao.objects.filter(
             edital=edital_selecionado
         ).select_related('estudante').order_by('-criado_em')
@@ -572,6 +590,7 @@ def assistente_analise_inscricao_view(request, edital_id=None):
         'edital_selecionado': edital_selecionado,
         'inscricoes': inscricoes,
         'editais': editais,
+        'fora_do_periodo': fora_do_periodo,
     }
     
     return render(request, 'core/assistente_analise_inscricao.html', context)

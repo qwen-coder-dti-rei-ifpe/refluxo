@@ -696,7 +696,8 @@ def enrollment_submit(request, enrollment_pk):
     if request.method == 'POST':
         enrollment.submeter()
         messages.success(request, 'Inscrição submetida com sucesso para análise!')
-        return redirect('enrollment_dashboard', pk=enrollment.enrollment_period.pk)
+        # Redireciona para página de Minhas Submissões após submeter
+        return redirect('minhas_submissoes')
     
     context = {'enrollment': enrollment}
     return render(request, 'enrollments/enrollment_submit.html', context)
@@ -748,7 +749,8 @@ def enrollment_review(request, pk):
         # Submeter a inscrição
         enrollment.submeter()
         messages.success(request, 'Inscrição submetida com sucesso para análise!')
-        return redirect('enrollment_dashboard', pk=pk)
+        # Redireciona para página de Minhas Submissões após submeter
+        return redirect('minhas_submissoes')
 
     context = {
         'period': period,

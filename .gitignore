@@ -4,44 +4,31 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
-*.py~
-*.pyc~
-*.pyo~
-*.pyd~
 
-# Virtual Environment
-venv/
+# Dependencies
 .venv/
+venv/
 env/
-.ENV/
-
-# Django
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-
-# Build artifacts
-dist/
-build/
-*.egg-info/
+.env
+.env.local
+.env.*
 
 # Logs
 *.log
 
-# Temporary files
-*.tmp
-*.temp
-*~
-.swp
-.swo
+# Coverage
+.coverage
+coverage/
+htmlcov/
 
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build
+build/
+dist/
+*.egg-info/
 ```
