@@ -37,5 +37,8 @@ urlpatterns = [
     path('<int:enrollment_pk>/update/', views.enrollment_update, name='enrollment_update'),
     
     # Submeter inscrição
+    path('<int:pk>/review/', views.enrollment_review, name='enrollment_review'),
+    
+    # Submeter inscrição
     path('<int:enrollment_pk>/submit/', views.enrollment_submit, name='enrollment_submit'),
 ]

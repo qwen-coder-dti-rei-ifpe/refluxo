@@ -107,7 +107,7 @@ def enrollment_dashboard(request, pk):
 @login_required
 def step3_cards(request, pk):
     """Página de cards (Step 3) - Redireciona para o dashboard de cards."""
-    return redirect('enrollment_dashboard', pk=pk)
+    return redirect('enrollment_review', pk=pk)
 
 
 @login_required
@@ -602,7 +602,7 @@ def enrollment_data_form(request, pk):
     if request.method == 'POST':
         # Salvar dados de inscrição
         messages.success(request, 'Dados de inscrição salvos com sucesso!')
-        return redirect('enrollment_dashboard', pk=pk)
+        return redirect('enrollment_review', pk=pk)
     
     context = {
         'period': period,
@@ -681,3 +681,61 @@ def enrollment_submit(request, enrollment_pk):
     
     context = {'enrollment': enrollment}
     return render(request, 'enrollments/enrollment_submit.html', context)
+
+
+@login_required
+def enrollment_review(request, pk):
+    """Step 9: Revisão da Inscrição antes de submeter."""
+    from inscricoes.models import Edital
+    
+    # Tenta obter como EnrollmentPeriod primeiro, senão tenta como Edital
+    try:
+        period = EnrollmentPeriod.objects.get(pk=pk)
+    except EnrollmentPeriod.DoesNotExist:
+        # Se não encontrar EnrollmentPeriod, tenta buscar como Edital
+        edital = get_object_or_404(Edital, pk=pk)
+        # Cria ou obtém um EnrollmentPeriod correspondente ao Edital
+        period, created = EnrollmentPeriod.objects.get_or_create(
+            pk=pk,
+            defaults={
+                'titulo': edital.titulo,
+                'descricao': edital.descricao or '',
+                'data_inicio': edital.periodo_inscricao_abertura or timezone.now(),
+                'data_fim': edital.periodo_inscricao_fechamento or (edital.periodo_inscricao_abertura + timezone.timedelta(days=30)) if edital.periodo_inscricao_abertura else timezone.now() + timezone.timedelta(days=30),
+                'status': 'ABERTO' if edital.status == 'ATIVO' else 'FECHADO',
+                'ativo': edital.ativo,
+            }
+        )
+
+    try:
+        student = request.user.student
+        enrollment = Enrollment.objects.get(student=student, enrollment_period=period)
+    except (Student.DoesNotExist, Enrollment.DoesNotExist):
+        messages.error(request, 'Você precisa iniciar uma inscrição primeiro.')
+        return redirect('enrollment_dashboard', pk=pk)
+
+    # Verifica se o estudante já tem uma inscrição submetida para este edital
+    existing_enrollment = Enrollment.objects.filter(
+        student=student,
+        enrollment_period=period,
+        status='SUBMETIDA'
+    ).first()
+    
+    if existing_enrollment and existing_enrollment.pk != enrollment.pk:
+        messages.warning(request, 'Você já possui uma inscrição submetida para este edital.')
+        return redirect('enrollment_dashboard', pk=pk)
+
+    if request.method == 'POST':
+        # Submeter a inscrição
+        enrollment.submeter()
+        messages.success(request, 'Inscrição submetida com sucesso para análise!')
+        return redirect('enrollment_dashboard', pk=pk)
+
+    context = {
+        'period': period,
+        'enrollment': enrollment,
+        'student': student,
+        'step': 9,
+        'total_steps': 9,
+    }
+    return render(request, 'enrollments/enrollment_review.html', context)

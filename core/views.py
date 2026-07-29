@@ -96,7 +96,7 @@ def assistente_dashboard_view(request):
         'editais': editais,
     }
     
-    return render(request, 'core/assistente_dashboard.html', context)
+    return render(request, 'core/assistente_social_dashboard.html', context)
 
 
 @login_required
