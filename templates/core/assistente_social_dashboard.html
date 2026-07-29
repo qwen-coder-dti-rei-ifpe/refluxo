@@ -1,0 +1,269 @@
+{% extends 'assistente_social_base.html' %}
+
+{% block title %}Dashboard do Assistente Social - PAMA{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-card {
+        transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
+        height: 100%;
+    }
+    
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    }
+    
+    .dashboard-card-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #417690;
+    }
+    
+    .card-title-custom {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .card-text-custom {
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    .periodo-info {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .periodo-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .periodo-item:last-child {
+        border-bottom: none;
+    }
+    
+    .periodo-label {
+        font-weight: 600;
+        color: #555;
+        font-size: 0.85rem;
+    }
+    
+    .periodo-datas {
+        color: #666;
+        font-size: 0.85rem;
+        text-align: right;
+    }
+    
+    .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .status-ativo {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-suspenso {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-inativo {
+        background: #f8d7da;
+        color: #721c24;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="mb-3" style="color: #417690;">
+                <i class="fas fa-chart-line me-2"></i>Dashboard do Assistente Social
+            </h2>
+            <p class="text-muted">Gerencie editais, inscrições e recursos do programa PAMA</p>
+        </div>
+    </div>
+    
+    <!-- Cards de Ações Principais -->
+    <div class="row mb-4">
+        <div class="col-md-6 mb-3">
+            <div class="card dashboard-card" onclick="window.location.href='{% url 'assistente_dashboard' %}?acao=analise_inscricoes'">
+                <div class="card-body text-center p-4">
+                    <div class="dashboard-card-icon">
+                        <i class="fas fa-clipboard-check"></i>
+                    </div>
+                    <h5 class="card-title-custom">Realizar Análise das Inscrições por Edital</h5>
+                    <p class="card-text-custom">Avalie as inscrições submetidas pelos estudantes para cada edital</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-3">
+            <div class="card dashboard-card" onclick="window.location.href='{% url 'assistente_dashboard' %}?acao=analise_recursos'">
+                <div class="card-body text-center p-4">
+                    <div class="dashboard-card-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h5 class="card-title-custom">Realizar Análise dos Recursos por Edital</h5>
+                    <p class="card-text-custom">Analise os recursos interpostos pelos estudantes após resultado parcial</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Lista de Editais -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0" style="color: #417690;">
+                        <i class="fas fa-file-alt me-2"></i>Editais Cadastrados
+                    </h5>
+                    <a href="/admin/inscricoes/edital/add/" class="btn btn-sm btn-success">
+                        <i class="fas fa-plus me-1"></i>Novo Edital
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if editais %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Número</th>
+                                        <th>Título</th>
+                                        <th>Status</th>
+                                        <th>Inscrições</th>
+                                        <th>Avaliação</th>
+                                        <th>Período de Recursos</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for edital in editais %}
+                                    <tr>
+                                        <td><strong>{{ edital.numero }}</strong></td>
+                                        <td>{{ edital.titulo }}</td>
+                                        <td>
+                                            <span class="status-badge {% if edital.status == 'ATIVO' %}status-ativo{% elif edital.status == 'SUSPENSO' %}status-suspenso{% else %}status-inativo{% endif %}">
+                                                {{ edital.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if edital.periodo_inscricao_abertura and edital.periodo_inscricao_fechamento %}
+                                                <small>{{ edital.periodo_inscricao_abertura|date:"d/m/Y" }} até {{ edital.periodo_inscricao_fechamento|date:"d/m/Y" }}</small>
+                                            {% else %}
+                                                <span class="text-muted">Não definido</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if edital.periodo_avaliacao_abertura and edital.periodo_avaliacao_fechamento %}
+                                                <small>{{ edital.periodo_avaliacao_abertura|date:"d/m/Y" }} até {{ edital.periodo_avaliacao_fechamento|date:"d/m/Y" }}</small>
+                                            {% else %}
+                                                <span class="text-muted">Não definido</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if edital.periodo_recurso_solicitacao_abertura %}
+                                                <small>{{ edital.periodo_recurso_solicitacao_abertura|date:"d/m/Y" }}</small>
+                                            {% else %}
+                                                <span class="text-muted">Não definido</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a href="{% url 'assistente_edital_detalhes' edital.id %}" 
+                                                   class="btn btn-primary" 
+                                                   title="Ver Submissões">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="/admin/inscricoes/edital/{{ edital.id }}/change/" 
+                                                   class="btn btn-secondary" 
+                                                   title="Editar Edital">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info" role="alert">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Nenhum período/edital cadastrado no momento.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Informações sobre Períodos de Recurso -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0" style="color: #417690;">
+                        <i class="fas fa-clock me-2"></i>Períodos de Recurso (Configuração por Edital)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold">Para cada edital, o assistente social pode configurar:</h6>
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-calendar-alt text-primary me-2"></i>
+                                    <strong>Período para solicitação de recursos</strong> pelo assistente social
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-calendar-alt text-success me-2"></i>
+                                    <strong>Período para divulgação do resultado parcial</strong>
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-calendar-alt text-warning me-2"></i>
+                                    <strong>Período de submissão de recursos</strong> pelos estudantes após resultado parcial
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-calendar-alt text-info me-2"></i>
+                                    <strong>Período para avaliação dos recursos</strong> dos estudantes após resultado parcial
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-calendar-alt text-danger me-2"></i>
+                                    <strong>Período para divulgação do resultado final</strong>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="alert alert-light border">
+                                <h6 class="fw-bold"><i class="fas fa-lightbulb text-warning me-2"></i>Importante:</h6>
+                                <p class="mb-0 small">
+                                    Os períodos de recurso devem ser configurados no momento da criação ou edição do edital.
+                                    Certifique-se de definir todas as datas corretamente para garantir o fluxo adequado
+                                    do processo seletivo.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
