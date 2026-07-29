@@ -1,4 +1,5 @@
 {% extends 'assistente_social_base.html' %}
+{% load humanize %}
 
 {% block title %}Análise de Recursos - PAMA{% endblock %}
 
@@ -46,7 +47,6 @@
                                         </span>
                                     </td>
                                     <td>
-                                        {% load humanize %}
                                         {{ edital.recurso_set.count|default:0|intcomma }} recursos
                                     </td>
                                     <td>
