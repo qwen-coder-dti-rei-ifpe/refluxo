@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'student_base.html' %}
 
 {% block title %}Passo 8: Dados de Inscrição - IFPE{% endblock %}
 
@@ -337,9 +337,12 @@
                 <a href="{% url 'displacement_data_form' enrollment.pk %}" class="btn btn-secondary me-3">
                     <i class="fas fa-arrow-left"></i> Anterior: Deslocamento
                 </a>
-                <button type="submit" class="btn btn-save btn-lg">
-                    <i class="fas fa-save"></i> Salvar
+                <button type="submit" class="btn btn-save btn-lg me-3">
+                    <i class="fas fa-save"></i> Salvar Dados
                 </button>
+                <a href="{% url 'enrollment_review' enrollment.pk %}" class="btn btn-primary btn-lg">
+                    <i class="fas fa-eye"></i> Próximo: Rever Dados
+                </a>
             </div>
         </form>
     </div>

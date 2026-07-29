@@ -399,7 +399,7 @@ def student_data_form(request, pk):
                             'enrollment': enrollment,
                             'student': student,
                             'step': 4,
-                            'total_steps': 8,
+                            'total_steps': 9,
                             'estudante_dados': estudante_dados,
                         }
                         return render(request, 'enrollments/student_data_form.html', context)
@@ -476,7 +476,7 @@ def student_data_form(request, pk):
         'enrollment': enrollment,
         'student': student,
         'step': 4,
-        'total_steps': 8,
+        'total_steps': 9,
         'estudante_dados': estudante_dados,  # Passar dados da API explicitamente para o template
         'form_data': estudante_dados,  # Alias para compatibilidade com o template
     }
@@ -509,7 +509,7 @@ def address_data_form(request, pk):
         'enrollment': enrollment,
         'address': enrollment.address if enrollment.address else None,
         'step': 5,
-        'total_steps': 8,
+        'total_steps': 9,
         'student': student,
     }
     return render(request, 'enrollments/address_data_form.html', context)
@@ -545,7 +545,7 @@ def family_members_form(request, pk):
         'enrollment': enrollment,
         'family_members': family_members,
         'step': 6,
-        'total_steps': 8,
+        'total_steps': 9,
         'student': student,
     }
     return render(request, 'enrollments/family_members_form.html', context)
@@ -577,7 +577,7 @@ def displacement_data_form(request, pk):
         'enrollment': enrollment,
         'displacement': enrollment.displacement if enrollment.displacement else None,
         'step': 7,
-        'total_steps': 8,
+        'total_steps': 9,
         'student': student,
     }
     return render(request, 'enrollments/displacement_data_form.html', context)
