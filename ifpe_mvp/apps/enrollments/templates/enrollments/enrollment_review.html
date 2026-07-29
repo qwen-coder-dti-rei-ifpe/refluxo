@@ -1,0 +1,426 @@
+{% extends 'student_base.html' %}
+
+{% block title %}Revisão da Inscrição - IFPE{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        min-height: 100vh;
+    }
+    
+    .progress-indicator {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+    }
+    
+    .progress-step {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .progress-step.active {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: white;
+    }
+    
+    .progress-step.completed {
+        background: #27ae60;
+        color: white;
+    }
+    
+    .progress-step.pending {
+        background: #e2e8f0;
+        color: #718096;
+    }
+    
+    .progress-step:hover {
+        transform: scale(1.1);
+    }
+    
+    .progress-line {
+        width: 60px;
+        height: 3px;
+        background: #e2e8f0;
+        border-radius: 2px;
+    }
+    
+    .progress-line.completed {
+        background: #27ae60;
+    }
+    
+    .review-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding: 2rem 0;
+    }
+    
+    .review-header h1 {
+        color: #27ae60;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .review-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .review-section {
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .review-section:last-child {
+        border-bottom: none;
+    }
+    
+    .section-title {
+        color: #27ae60;
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .review-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .review-item {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        border-left: 4px solid #27ae60;
+    }
+    
+    .review-item-label {
+        font-size: 0.85rem;
+        color: #6c757d;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+    
+    .review-item-value {
+        font-size: 1rem;
+        color: #212529;
+        font-weight: 500;
+    }
+    
+    .btn-submit {
+        background: linear-gradient(to right, #27ae60, #2ecc71);
+        border: none;
+        padding: 1rem 3rem;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+        color: white;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+        color: white;
+    }
+    
+    .btn-back {
+        background: #6c757d;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.2s;
+        color: white;
+    }
+    
+    .btn-back:hover {
+        background: #5a6268;
+        color: white;
+    }
+    
+    .alert-info {
+        background: #e3f2fd;
+        border: 1px solid #90caf9;
+        color: #1565c0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Progress Indicator -->
+    <div class="progress-indicator">
+        <a href="{% url 'step3_cards' period.pk %}" class="progress-step completed" title="Visão Geral">
+            <i class="fas fa-check"></i>
+        </a>
+        <div class="progress-line completed"></div>
+        <a href="{% url 'student_data_form' period.pk %}" class="progress-step completed" title="Dados do Estudante">4</a>
+        <div class="progress-line completed"></div>
+        <a href="{% url 'address_data_form' period.pk %}" class="progress-step completed" title="Dados de Endereço">5</a>
+        <div class="progress-line completed"></div>
+        <a href="{% url 'family_members_form' period.pk %}" class="progress-step completed" title="Membros Familiares">6</a>
+        <div class="progress-line completed"></div>
+        <a href="{% url 'displacement_data_form' period.pk %}" class="progress-step completed" title="Deslocamento">7</a>
+        <div class="progress-line completed"></div>
+        <a href="{% url 'enrollment_data_form' period.pk %}" class="progress-step completed" title="Inscrição">8</a>
+        <div class="progress-line completed"></div>
+        <span class="progress-step active" title="Revisão">9</span>
+    </div>
+
+    <div class="review-header">
+        <h1><i class="fas fa-clipboard-check"></i> Revisão da Inscrição</h1>
+        <p>Revise todas as informações antes de submeter sua inscrição</p>
+        {% if existing_enrollment %}
+        <div class="alert alert-warning mt-3">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>Atenção:</strong> Você já possui uma inscrição submetida para este edital.
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Dados do Edital -->
+    <div class="review-container">
+        <h3 class="section-title"><i class="fas fa-file-alt"></i> Informações do Edital</h3>
+        <div class="review-grid">
+            <div class="review-item">
+                <div class="review-item-label">Edital</div>
+                <div class="review-item-value">{{ period.titulo }}</div>
+            </div>
+            <div class="review-item">
+                <div class="review-item-label">Período de Inscrição</div>
+                <div class="review-item-value">
+                    {{ period.data_inicio|date:"d/m/Y" }} até {{ period.data_fim|date:"d/m/Y" }}
+                </div>
+            </div>
+            <div class="review-item">
+                <div class="review-item-label">Status</div>
+                <div class="review-item-value">
+                    <span class="badge {% if period.esta_aberto %}bg-success{% else %}bg-secondary{% endif %}">
+                        {% if period.esta_aberto %}ABERTO{% else %}FECHADO{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dados do Estudante -->
+    <div class="review-container">
+        <h3 class="section-title"><i class="fas fa-user-graduate"></i> Dados do Estudante</h3>
+        <div class="review-grid">
+            <div class="review-item">
+                <div class="review-item-label">Nome Completo</div>
+                <div class="review-item-value">{{ student.nome_completo|default:"Não informado" }}</div>
+            </div>
+            <div class="review-item">
+                <div class="review-item-label">CPF</div>
+                <div class="review-item-value">{{ student.cpf|default:"Não informado" }}</div>
+            </div>
+            <div class="review-item">
+                <div class="review-item-label">Matrícula</div>
+                <div class="review-item-value">{{ student.matricula|default:"Não informado" }}</div>
+            </div>
+            <div class="review-item">
+                <div class="review-item-label">Curso</div>
+                <div class="review-item-value">{{ student.curso|default:"Não informado" }}</div>
+            </div>
+            <div class="review-item">
+                <div class="review-item-label">Campus</div>
+                <div class="review-item-value">{{ student.campus|default:"Não informado" }}</div>
+            </div>
+            <div class="review-item">
+                <div class="review-item-label">Período</div>
+                <div class="review-item-value">{{ student.periodo|default:"Não informado" }}º</div>
+            </div>
+            <div class="review-item">
+                <div class="review-item-label">Turno</div>
+                <div class="review-item-value">{{ student.turno|default:"Não informado" }}</div>
+            </div>
+            <div class="review-item">
+                <div class="review-item-label">É Cotista</div>
+                <div class="review-item-value">{% if student.eh_cotista %}Sim{% else %}Não{% endif %}</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dados de Endereço -->
+    <div class="review-container">
+        <h3 class="section-title"><i class="fas fa-map-marker-alt"></i> Dados de Endereço</h3>
+        <div class="review-grid">
+            <div class="review-item">
+                <div class="review-item-label">CEP</div>
+                <div class="review-item-value">{{ enrollment.cep|default:"Não informado" }}</div>
+            </div>
+            <div class="review-item">
+                <div class="review-item-label">Logradouro</div>
+                <div class="review-item-value">{{ enrollment.logradouro|default:"Não informado" }}</div>
+            </div>
+            <div class="review-item">
+                <div class="review-item-label">Número</div>
+                <div class="review-item-value">{{ enrollment.numero|default:"Não informado" }}</div>
+            </div>
+            <div class="review-item">
+                <div class="review-item-label">Bairro</div>
+                <div class="review-item-value">{{ enrollment.bairro|default:"Não informado" }}</div>
+            </div>
+            <div class="review-item">
+                <div class="review-item-label">Cidade/UF</div>
+                <div class="review-item-value">{{ enrollment.cidade|default:"Não informado" }}/{{ enrollment.uf|default:"" }}</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Membros Familiares -->
+    <div class="review-container">
+        <h3 class="section-title"><i class="fas fa-users"></i> Membros Familiares</h3>
+        {% if enrollment.family_members.exists %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Parentesco</th>
+                        <th>CPF</th>
+                        <th>Renda (R$)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for member in enrollment.family_members.all %}
+                    <tr>
+                        <td>{{ member.nome }}</td>
+                        <td>{{ member.get_parentesco_display|default:member.parentesco }}</td>
+                        <td>{{ member.cpf|default:"-" }}</td>
+                        <td>{{ member.renda|default:"0.00" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted">Nenhum membro familiar cadastrado.</p>
+        {% endif %}
+    </div>
+    
+    <!-- Dados de Deslocamento -->
+    <div class="review-container">
+        <h3 class="section-title"><i class="fas fa-bus"></i> Dados de Deslocamento</h3>
+        <div class="review-grid">
+            <div class="review-item">
+                <div class="review-item-label">Tipo de Transporte</div>
+                <div class="review-item-value">{{ enrollment.get_tipo_transporte_display|default:enrollment.tipo_transporte|default:"Não informado" }}</div>
+            </div>
+            <div class="review-item">
+                <div class="review-item-label">Distância (km)</div>
+                <div class="review-item-value">{{ enrollment.distancia_residencia_trabalho|default:"0" }} km</div>
+            </div>
+            <div class="review-item">
+                <div class="review-item-label">Tempo de Deslocamento</div>
+                <div class="review-item-value">{{ enrollment.tempo_deslocamento|default:"Não informado" }} minutos</div>
+            </div>
+            <div class="review-item">
+                <div class="review-item-label">Gasto com Transporte (R$)</div>
+                <div class="review-item-value">{{ enrollment.gasto_transporte|default:"0.00" }}</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dados de Inscrição -->
+    <div class="review-container">
+        <h3 class="section-title"><i class="fas fa-clipboard-list"></i> Dados de Inscrição</h3>
+        <div class="review-grid">
+            <div class="review-item">
+                <div class="review-item-label">Índice de Vulnerabilidade</div>
+                <div class="review-item-value">{{ enrollment.indice_vulnerabilidade|default:"Não informado" }}</div>
+            </div>
+            <div class="review-item">
+                <div class="review-item-label">Renda Bruta Familiar (R$)</div>
+                <div class="review-item-value">{{ enrollment.renda_bruta_familiar|default:"0.00" }}</div>
+            </div>
+            <div class="review-item">
+                <div class="review-item-label">Renda Per Capita (R$)</div>
+                <div class="review-item-value">{{ enrollment.renda_per_capita|default:"0.00" }}</div>
+            </div>
+            <div class="review-item">
+                <div class="review-item-label">Faixa de Renda</div>
+                <div class="review-item-value">{{ enrollment.get_faixa_renda_per_capita_display|default:enrollment.faixa_renda_per_capita|default:"Não informado" }}</div>
+            </div>
+            <div class="review-item">
+                <div class="review-item-label">Origem da Renda</div>
+                <div class="review-item-value">{{ enrollment.get_origem_renda_principal_display|default:enrollment.origem_renda_principal|default:"Não informado" }}</div>
+            </div>
+            <div class="review-item">
+                <div class="review-item-label">Foi Beneficiado Última Edição</div>
+                <div class="review-item-value">{% if enrollment.foi_beneficiado_ultima_edicao %}Sim{% else %}Não{% endif %}</div>
+            </div>
+            <div class="review-item">
+                <div class="review-item-label">Benefício Eventual</div>
+                <div class="review-item-value">{% if enrollment.foi_beneficiado_beneficio_eventual %}Sim{% else %}Não{% endif %}</div>
+            </div>
+            <div class="review-item">
+                <div class="review-item-label">Auxílio Digital</div>
+                <div class="review-item-value">{% if enrollment.auxilio_digital %}Sim{% else %}Não{% endif %}</div>
+            </div>
+        </div>
+        
+        <div class="mt-4">
+            <div class="review-item">
+                <div class="review-item-label">Relato de Vida</div>
+                <div class="review-item-value" style="white-space: pre-wrap;">{{ enrollment.relato_vida|default:"Não informado" }}</div>
+            </div>
+        </div>
+        
+        <div class="mt-3">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" disabled {% if enrollment.declaracao_veracidade %}checked{% endif %}>
+                <label class="form-check-label">
+                    Declaro que todas as informações fornecidas são verdadeiras
+                </label>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Botões de Ação -->
+    <div class="text-center mt-4 mb-5">
+        <form method="post" style="display: inline;">
+            {% csrf_token %}
+            <a href="{% url 'enrollment_data_form' period.pk %}" class="btn btn-back me-3">
+                <i class="fas fa-arrow-left"></i> Anterior: Inscrição
+            </a>
+            <button type="submit" class="btn btn-submit" {% if existing_enrollment %}disabled{% endif %}>
+                <i class="fas fa-paper-plane"></i> Submeter Inscrição
+            </button>
+        </form>
+        
+        {% if existing_enrollment %}
+        <div class="alert alert-info mt-3">
+            <i class="fas fa-info-circle"></i>
+            Sua inscrição já foi submetida para este edital. Não é possível enviar outra.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -107,7 +107,7 @@ def enrollment_dashboard(request, pk):
 @login_required
 def step3_cards(request, pk):
     """Página de cards (Step 3) - Redireciona para o dashboard de cards."""
-    return redirect('enrollment_review', pk=pk)
+    return redirect('enrollment_dashboard', pk=pk)
 
 
 @login_required
@@ -586,7 +586,26 @@ def displacement_data_form(request, pk):
 @login_required
 def enrollment_data_form(request, pk):
     """Step 8: Formulário de Dados de Inscrição."""
-    period = get_object_or_404(EnrollmentPeriod, pk=pk)
+    from inscricoes.models import Edital
+    
+    # Tenta obter como EnrollmentPeriod primeiro, senão tenta como Edital
+    try:
+        period = EnrollmentPeriod.objects.get(pk=pk)
+    except EnrollmentPeriod.DoesNotExist:
+        # Se não encontrar EnrollmentPeriod, tenta buscar como Edital
+        edital = get_object_or_404(Edital, pk=pk)
+        # Cria ou obtém um EnrollmentPeriod correspondente ao Edital
+        period, created = EnrollmentPeriod.objects.get_or_create(
+            pk=pk,
+            defaults={
+                'titulo': edital.titulo,
+                'descricao': edital.descricao or '',
+                'data_inicio': edital.periodo_inscricao_abertura or timezone.now(),
+                'data_fim': edital.periodo_inscricao_fechamento or (edital.periodo_inscricao_abertura + timezone.timedelta(days=30)) if edital.periodo_inscricao_abertura else timezone.now() + timezone.timedelta(days=30),
+                'status': 'ABERTO' if edital.status == 'ATIVO' else 'FECHADO',
+                'ativo': edital.ativo,
+            }
+        )
     
     try:
         student = request.user.student
@@ -608,7 +627,7 @@ def enrollment_data_form(request, pk):
         'period': period,
         'enrollment': enrollment,
         'step': 8,
-        'total_steps': 8,
+        'total_steps': 9,
         'student': student,
     }
     return render(request, 'enrollments/enrollment_data_form.html', context)
