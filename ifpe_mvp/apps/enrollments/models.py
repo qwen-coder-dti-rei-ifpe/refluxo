@@ -34,6 +34,15 @@ class EnrollmentPeriod(models.Model):
     )
     ativo = models.BooleanField(_('Ativo?'), default=False)
     
+    # Relacionamento opcional com Edital do app inscricoes
+    edital = models.ForeignKey(
+        'inscricoes.Edital',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='enrollment_periods'
+    )
+    
     # Timestamps
     criado_em = models.DateTimeField(_('Criado em'), auto_now_add=True)
     atualizado_em = models.DateTimeField(_('Atualizado em'), auto_now=True)
@@ -394,11 +403,11 @@ class Enrollment(models.Model):
             edital = None
             if hasattr(self.enrollment_period, 'pk'):
                 try:
-                    edital = Edital.objects.get(pk=self.enrollment_period.pk)
-                except Edital.DoesNotExist:
+                    # Primeiro tenta buscar Edital existente vinculado ao EnrollmentPeriod
+                    edital = Edital.objects.get(enrollmentperiod_id=self.enrollment_period.pk)
+                except (Edital.DoesNotExist, AttributeError):
                     # Se não existir, criar um Edital baseado no EnrollmentPeriod
                     edital = Edital.objects.create(
-                        pk=self.enrollment_period.pk,
                         titulo=self.enrollment_period.titulo,
                         descricao=self.enrollment_period.descricao or '',
                         numero=f"EDITAL-{self.enrollment_period.pk}",
@@ -407,6 +416,9 @@ class Enrollment(models.Model):
                         status='ATIVO' if self.enrollment_period.status == 'ABERTO' else 'FINALIZADO',
                         ativo=self.enrollment_period.ativo,
                     )
+                    # Vincular o EnrollmentPeriod ao Edital criado
+                    self.enrollment_period.edital = edital
+                    self.enrollment_period.save()
             
             if edital:
                 # Criar ou atualizar a inscrição na tabela Inscricoes
