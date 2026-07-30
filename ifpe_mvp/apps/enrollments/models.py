@@ -112,6 +112,17 @@ class Enrollment(models.Model):
         ('CANCELADA', 'Cancelada'),
     ]
     
+    CLASSIFICACAO_CHOICES = [
+        ('ANALISE', 'Em Análise'),
+        ('COM_PENDENCIA', 'Com Pendência'),
+        ('NAO_REGULARIZADO', 'Não Regularizado'),
+        ('REGULARIZADO', 'Regularizado'),
+        ('NAO_ELEGIVEL', 'Não Elegível'),
+        ('ELEGIVEL', 'Elegível'),
+        ('CONTEMPLADO', 'Contemplado'),
+        ('NAO_CONTEMPLADO', 'Não Contemplado'),
+    ]
+    
     FAIXA_RENDA_CHOICES = [
         ('ATE_05_SALARIOS', 'Até 0,5 salário mínimo per capita'),
         ('ATE_1_SALARIO', 'Até 1 salário mínimo per capita'),
@@ -321,6 +332,32 @@ class Enrollment(models.Model):
     data_conclusao = models.DateTimeField(_('Data de conclusão da inscrição'), null=True, blank=True)
     documentacao_correta = models.BooleanField(_('Documentação correta?'), default=False)
     
+    # Classificação da inscrição pelo assistente social
+    classificacao = models.CharField(
+        _('Classificação'), 
+        max_length=30, 
+        choices=CLASSIFICACAO_CHOICES, 
+        default='ANALISE',
+        help_text=_('Classificação da situação da inscrição pelo assistente social')
+    )
+    comentario_assistente_social = models.TextField(
+        _('Comentário do assistente social'), 
+        null=True, 
+        blank=True,
+        help_text=_('Observações do assistente social sobre a classificação')
+    )
+    data_classificacao = models.DateTimeField(
+        _('Data da classificação'), 
+        null=True, 
+        blank=True
+    )
+    assistente_social_responsavel = models.CharField(
+        _('Assistente social responsável'), 
+        max_length=255, 
+        null=True, 
+        blank=True
+    )
+    
     # Análise do pedagogo
     aluno_contemplado_bolsa = models.BooleanField(
         _('Aluno contemplado com bolsa?'), 
@@ -378,6 +415,27 @@ class Enrollment(models.Model):
         """Submete a inscrição para análise."""
         self.status = 'SUBMETIDA'
         self.data_conclusao = timezone.now()
+        # Inicializa a classificação como 'Em Análise' quando submetida
+        self.classificacao = 'ANALISE'
+        self.save()
+    
+    def classificar(self, classificacao, assistente_social=None, comentario=None):
+        """
+        Classifica a inscrição pelo assistente social.
+        
+        Args:
+            classificacao: Código da classificação (ex: 'ELEGIVEL', 'NAO_ELEGIVEL')
+            assistente_social: Nome ou usuário do assistente social responsável
+            comentario: Observações sobre a classificação
+        """
+        from django.utils import timezone
+        
+        self.classificacao = classificacao
+        self.data_classificacao = timezone.now()
+        if assistente_social:
+            self.assistente_social_responsavel = assistente_social
+        if comentario:
+            self.comentario_assistente_social = comentario
         self.save()
     
     def pode_editar(self):
