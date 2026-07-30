@@ -192,8 +192,14 @@ class FamilyMember(models.Model):
         ('OUTRO', 'Outro'),
     ]
     
-    # Relacionamento com estudante (será definido no enrollment)
-    # student = models.ForeignKey('students.Student', on_delete=models.CASCADE, related_name='family_members')
+    # Relacionamento com estudante
+    student = models.ForeignKey(
+        'students.Student', 
+        on_delete=models.CASCADE, 
+        related_name='family_members',
+        null=True,
+        blank=True
+    )
     
     # Informações pessoais
     data_nascimento = models.DateField(_('Data de nascimento'))
