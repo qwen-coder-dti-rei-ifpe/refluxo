@@ -454,6 +454,14 @@ def student_data_form(request, pk):
         student.banco = request.POST.get('banco', student.banco)
         student.banco_outro = request.POST.get('banco_outro', student.banco_outro)
         
+        # Calcular idade automaticamente se data_nascimento foi definida
+        if student.data_nascimento:
+            from datetime import date
+            hoje = date.today()
+            student.idade = hoje.year - student.data_nascimento.year - (
+                (hoje.month, hoje.day) < (student.data_nascimento.month, student.data_nascimento.day)
+            )
+        
         student.save()
         
         # Limpar dados da sessão após salvar para permitir recarregamento na próxima visita
