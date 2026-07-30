@@ -536,9 +536,9 @@ def family_members_form(request, pk):
         messages.success(request, 'Dados de membros familiares salvos com sucesso!')
         return redirect('displacement_data_form', pk=pk)
     
-    # Get family members (all existing ones)
+    # Get family members for this student only
     from ifpe_mvp.apps.family.models import FamilyMember
-    family_members = FamilyMember.objects.all()
+    family_members = FamilyMember.objects.filter(student=student)
     
     context = {
         'period': period,

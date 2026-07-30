@@ -297,7 +297,7 @@
     <!-- Membros Familiares -->
     <div class="review-container">
         <h3 class="section-title"><i class="fas fa-users"></i> Membros Familiares</h3>
-        {% if enrollment.family_members.exists %}
+        {% if student.family_members.exists %}
         <div class="table-responsive">
             <table class="table table-hover">
                 <thead>
@@ -309,12 +309,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for member in enrollment.family_members.all %}
+                    {% for member in student.family_members.all %}
                     <tr>
                         <td>{{ member.nome }}</td>
-                        <td>{{ member.get_parentesco_display|default:member.parentesco }}</td>
+                        <td>{{ member.get_grau_parentesco_display|default:member.grau_parentesco }}</td>
                         <td>{{ member.cpf|default:"-" }}</td>
-                        <td>{{ member.renda|default:"0.00" }}</td>
+                        <td>{{ member.renda_mensal|default:"0.00" }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
