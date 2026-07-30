@@ -470,7 +470,7 @@ def assistente_edital_detalhes_view(request, edital_id):
     
     from inscricoes.models import Edital, Inscricao
     edital = get_object_or_404(Edital, pk=edital_id)
-    inscricoes = Inscricao.objects.filter(edital=edital).select_related('estudante').order_by('-criado_em')
+    inscricoes = Inscricao.objects.filter(edital=edital).select_related('estudante').prefetch_related('familiares').order_by('-criado_em')
     
     context = {
         'edital': edital,

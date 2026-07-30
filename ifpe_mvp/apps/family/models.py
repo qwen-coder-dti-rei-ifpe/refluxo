@@ -56,6 +56,9 @@ class Address(models.Model):
     bairro = models.CharField(_('Bairro'), max_length=100)
     cidade = models.CharField(_('Cidade'), max_length=100)
     estado = models.CharField(_('Estado'), max_length=2)
+    rua = models.CharField(_('Rua'), max_length=255, null=True, blank=True)
+    numero = models.CharField(_('Número'), max_length=20, null=True, blank=True)
+    complemento = models.CharField(_('Complemento'), max_length=100, null=True, blank=True)
     endereco_completo = models.TextField(_('Endereço completo'), null=True, blank=True)
     ponto_referencia = models.CharField(_('Ponto de referência'), max_length=255, null=True, blank=True)
     horario_visita = models.CharField(_('Horário de visita'), max_length=100, null=True, blank=True)
@@ -192,8 +195,14 @@ class FamilyMember(models.Model):
         ('OUTRO', 'Outro'),
     ]
     
-    # Relacionamento com estudante (será definido no enrollment)
-    # student = models.ForeignKey('students.Student', on_delete=models.CASCADE, related_name='family_members')
+    # Relacionamento com estudante
+    student = models.ForeignKey(
+        'students.Student', 
+        on_delete=models.CASCADE, 
+        related_name='family_members',
+        null=True,
+        blank=True
+    )
     
     # Informações pessoais
     data_nascimento = models.DateField(_('Data de nascimento'))

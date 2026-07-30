@@ -5,13 +5,44 @@ __pycache__/
 *.pyo
 *.pyd
 
-# Virtual Environment
-venv/
-
 # Django
+*.pyc
+__pycache__/
+*.mo
+*.pot
 *.log
 local_settings.py
 db.sqlite3
-media/
-staticfiles/
+db.sqlite3-journal
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Dependencies
+.venv/
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Coverage
+.coverage
+htmlcov/
+coverage/
+
+# Build
+dist/
+build/
+*.egg-info/
 ```

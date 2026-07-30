@@ -486,6 +486,8 @@ def student_data_form(request, pk):
 @login_required
 def address_data_form(request, pk):
     """Step 5: Formulário de Dados de Endereço."""
+    from ifpe_mvp.apps.family.models import Address
+    
     period = get_object_or_404(EnrollmentPeriod, pk=pk)
     
     try:
@@ -500,7 +502,38 @@ def address_data_form(request, pk):
         student = enrollment.student
     
     if request.method == 'POST':
-        # Salvar dados de endereço
+        # Obter ou criar endereço
+        address = enrollment.address
+        if not address:
+            address = Address.objects.create()
+            enrollment.address = address
+            enrollment.save()
+        
+        # Atualizar campos do endereço
+        address.cep = request.POST.get('cep', '')
+        address.bairro = request.POST.get('bairro', '')
+        address.cidade = request.POST.get('cidade', '')
+        address.estado = request.POST.get('estado', '')
+        address.rua = request.POST.get('rua', '')
+        address.numero = request.POST.get('numero', '')
+        address.complemento = request.POST.get('complemento', '')
+        address.ponto_referencia = request.POST.get('ponto_referencia', '')
+        address.horario_visita = request.POST.get('horario_visita', '')
+        address.telefone_celular = request.POST.get('telefone_celular', '')
+        address.procurar_pessoa = request.POST.get('procurar_pessoa', '')
+        address.com_que_mora = request.POST.get('com_que_mora', '')
+        address.condicoes_moradia = request.POST.get('condicoes_moradia', '')
+        address.regiao_moradia = request.POST.get('regiao_moradia', '')
+        address.abastecimento_agua = request.POST.get('abastecimento_agua', '')
+        address.material_construcao = request.POST.get('material_construcao', '')
+        address.saneamento = request.POST.get('saneamento', '')
+        address.mudou_endereco_estudar = request.POST.get('mudou_endereco_estudar') == 'on'
+        address.endereco_anterior = request.POST.get('endereco_anterior', '')
+        address.contato_referencia_nome = request.POST.get('contato_referencia_nome', '')
+        address.contato_referencia_telefone = request.POST.get('contato_referencia_telefone', '')
+        
+        address.save()
+        
         messages.success(request, 'Dados de endereço salvos com sucesso!')
         return redirect('family_members_form', pk=pk)
     
@@ -518,6 +551,8 @@ def address_data_form(request, pk):
 @login_required
 def family_members_form(request, pk):
     """Step 6: Formulário de Dados de Membros Familiares."""
+    from ifpe_mvp.apps.family.models import FamilyMember
+    
     period = get_object_or_404(EnrollmentPeriod, pk=pk)
     
     try:
@@ -532,13 +567,97 @@ def family_members_form(request, pk):
         student = enrollment.student
     
     if request.method == 'POST':
-        # Salvar dados de membros familiares
+        # Obter lista de membros do POST
+        membros = request.POST.getlist('membros[]') or []
+        
+        # Processar dados dos membros familiares
+        # Os dados vêm no formato: membros[0][campo], membros[1][campo], etc.
+        index = 0
+        while True:
+            # Verificar se existe membro neste índice
+            nome = request.POST.get(f'membros[{index}][nome]')
+            if not nome:
+                # Tentar próximo índice
+                index += 1
+                if index > 20:  # Limite de segurança
+                    break
+                continue
+            
+            # Obter dados do membro
+            cpf = request.POST.get(f'membros[{index}][cpf]', '')
+            data_nascimento = request.POST.get(f'membros[{index}][data_nascimento]', '')
+            idade = request.POST.get(f'membros[{index}][idade]', 0)
+            grau_parentesco = request.POST.get(f'membros[{index}][grau_parentesco]', '')
+            escolaridade = request.POST.get(f'membros[{index}][escolaridade]', '')
+            vinculo_empregaticio = request.POST.get(f'membros[{index}][vinculo_empregaticio]', '')
+            rendimento_mensal = request.POST.get(f'membros[{index}][rendimento_mensal]', 0)
+            possui_agravo_saude = request.POST.get(f'membros[{index}][possui_agravo_saude]') == 'on'
+            possui_necessidade_especifica = request.POST.get(f'membros[{index}][possui_necessidade_especifica]') == 'on'
+            descricao_agravo = request.POST.get(f'membros[{index}][descricao_agravo]', '')
+            descricao_necessidade = request.POST.get(f'membros[{index}][descricao_necessidade]', '')
+            estado_civil = request.POST.get(f'membros[{index}][estado_civil]', '')
+            inscricao = request.POST.get(f'membros[{index}][inscricao]', '')
+            recebe_pensao = request.POST.get(f'membros[{index}][recebe_pensao]') == 'on'
+            valor_pensao = request.POST.get(f'membros[{index}][valor_pensao]', 0)
+            
+            # Criar ou atualizar membro familiar
+            # Usar CPF como identificador único para evitar duplicação
+            family_member, created = FamilyMember.objects.get_or_create(
+                cpf=cpf,
+                student=student,
+                defaults={
+                    'nome': nome,
+                    'data_nascimento': data_nascimento if data_nascimento else None,
+                    'idade': int(idade) if idade else 0,
+                    'grau_parentesco': grau_parentesco,
+                    'escolaridade': escolaridade,
+                    'vinculo_empregaticio': vinculo_empregaticio,
+                    'rendimento_mensal': float(rendimento_mensal.replace(',', '.')) if rendimento_mensal else 0.0,
+                    'possui_agravo_saude': possui_agravo_saude,
+                    'possui_necessidade_especifica': possui_necessidade_especifica,
+                    'descricao_agravo': descricao_agravo,
+                    'descricao_necessidade': descricao_necessidade,
+                    'estado_civil': estado_civil,
+                    'inscricao': inscricao,
+                    'recebe_pensao': recebe_pensao,
+                    'valor_pensao': float(valor_pensao.replace(',', '.')) if valor_pensao else 0.0,
+                }
+            )
+            
+            if not created:
+                # Atualizar membro existente
+                family_member.nome = nome
+                family_member.data_nascimento = data_nascimento if data_nascimento else None
+                family_member.idade = int(idade) if idade else 0
+                family_member.grau_parentesco = grau_parentesco
+                family_member.escolaridade = escolaridade
+                family_member.vinculo_empregaticio = vinculo_empregaticio
+                family_member.rendimento_mensal = float(rendimento_mensal.replace(',', '.')) if rendimento_mensal else 0.0
+                family_member.possui_agravo_saude = possui_agravo_saude
+                family_member.possui_necessidade_especifica = possui_necessidade_especifica
+                family_member.descricao_agravo = descricao_agravo
+                family_member.descricao_necessidade = descricao_necessidade
+                family_member.estado_civil = estado_civil
+                family_member.inscricao = inscricao
+                family_member.recebe_pensao = recebe_pensao
+                family_member.valor_pensao = float(valor_pensao.replace(',', '.')) if valor_pensao else 0.0
+                
+                # Processar upload de arquivo CPF anexo
+                cpf_anexo = request.FILES.get(f'membros[{index}][cpf_anexo]')
+                if cpf_anexo:
+                    family_member.cpf_anexo = cpf_anexo
+                
+                family_member.save()
+            
+            index += 1
+            if index > 20:  # Limite de segurança
+                break
+        
         messages.success(request, 'Dados de membros familiares salvos com sucesso!')
         return redirect('displacement_data_form', pk=pk)
     
-    # Get family members (all existing ones)
-    from ifpe_mvp.apps.family.models import FamilyMember
-    family_members = FamilyMember.objects.all()
+    # Get family members for this student only
+    family_members = FamilyMember.objects.filter(student=student)
     
     context = {
         'period': period,
@@ -568,7 +687,21 @@ def displacement_data_form(request, pk):
         student = enrollment.student
     
     if request.method == 'POST':
-        # Salvar dados de deslocamento
+        # Obter ou criar deslocamento
+        displacement = enrollment.displacement
+        if not displacement:
+            displacement = Displacement.objects.create()
+            enrollment.displacement = displacement
+            enrollment.save()
+        
+        # Atualizar campos do deslocamento
+        displacement.tipo_transporte = request.POST.get('tipo_transporte', '')
+        displacement.valor_mensal_transporte = request.POST.get('valor_mensal_transporte', 0)
+        displacement.trajeto_percorrido = request.POST.get('trajeto_percorrido', '')
+        displacement.observacoes = request.POST.get('observacoes', '')
+        
+        displacement.save()
+        
         messages.success(request, 'Dados de deslocamento salvos com sucesso!')
         return redirect('enrollment_data_form', pk=pk)
     
@@ -619,7 +752,21 @@ def enrollment_data_form(request, pk):
         student = enrollment.student
     
     if request.method == 'POST':
-        # Salvar dados de inscrição
+        # Atualizar campos da inscrição
+        enrollment.indice_vulnerabilidade = request.POST.get('indice_vulnerabilidade', 0)
+        enrollment.foi_beneficiado_ultima_edicao = request.POST.get('foi_beneficiado_ultima_edicao') == 'on'
+        enrollment.foi_beneficiado_beneficio_eventual = request.POST.get('foi_beneficiado_beneficio_eventual') == 'on'
+        enrollment.auxilio_digital = request.POST.get('auxilio_digital') == 'on'
+        enrollment.renda_bruta_familiar = request.POST.get('renda_bruta_familiar', 0)
+        enrollment.renda_per_capita = request.POST.get('renda_per_capita', 0)
+        enrollment.faixa_renda_per_capita = request.POST.get('faixa_renda_per_capita', '')
+        enrollment.renda_per_capita_extenso = request.POST.get('renda_per_capita_extenso', '')
+        enrollment.origem_renda_principal = request.POST.get('origem_renda_principal', '')
+        enrollment.relato_vida = request.POST.get('relato_vida', '')
+        enrollment.declaracao_veracidade = request.POST.get('declaracao_veracidade') == 'on'
+        
+        enrollment.save()
+        
         messages.success(request, 'Dados de inscrição salvos com sucesso!')
         return redirect('enrollment_review', pk=pk)
     
