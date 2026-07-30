@@ -1,17 +1,1 @@
-```
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Virtual Environment
-venv/
-
-# Django
-*.log
-local_settings.py
-db.sqlite3
-media/
-staticfiles/
-```
+Nothing should be ignored in this case, as only a template file (`templates/student_base.html`) was modified and no build artifacts, dependencies, or temporary files were detected in the changes.
