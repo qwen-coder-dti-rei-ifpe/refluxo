@@ -600,6 +600,14 @@ def family_members_form(request, pk):
             recebe_pensao = request.POST.get(f'membros[{index}][recebe_pensao]') == 'on'
             valor_pensao = request.POST.get(f'membros[{index}][valor_pensao]', 0)
             
+            # Converter data_nascimento de string para objeto date
+            data_nascimento_obj = None
+            if data_nascimento:
+                try:
+                    data_nascimento_obj = datetime.strptime(data_nascimento, '%Y-%m-%d').date()
+                except (ValueError, TypeError):
+                    data_nascimento_obj = None
+            
             # Criar ou atualizar membro familiar
             # Usar CPF como identificador único para evitar duplicação
             family_member, created = FamilyMember.objects.get_or_create(
@@ -607,7 +615,7 @@ def family_members_form(request, pk):
                 student=student,
                 defaults={
                     'nome': nome,
-                    'data_nascimento': data_nascimento if data_nascimento else None,
+                    'data_nascimento': data_nascimento_obj,
                     'idade': int(idade) if idade else 0,
                     'grau_parentesco': grau_parentesco,
                     'escolaridade': escolaridade,
@@ -627,7 +635,7 @@ def family_members_form(request, pk):
             if not created:
                 # Atualizar membro existente
                 family_member.nome = nome
-                family_member.data_nascimento = data_nascimento if data_nascimento else None
+                family_member.data_nascimento = data_nascimento_obj
                 family_member.idade = int(idade) if idade else 0
                 family_member.grau_parentesco = grau_parentesco
                 family_member.escolaridade = escolaridade
