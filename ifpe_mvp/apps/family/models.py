@@ -294,6 +294,22 @@ class FamilyMember(models.Model):
         """Calcula automaticamente a idade ao salvar."""
         from datetime import date
         if self.data_nascimento and not self.idade:
+            # Ensure data_nascimento is a date object, not a string
+            if isinstance(self.data_nascimento, str):
+                try:
+                    from datetime import datetime
+                    # Try common date formats
+                    for fmt in ['%Y-%m-%d', '%d/%m/%Y', '%Y/%m/%d']:
+                        try:
+                            self.data_nascimento = datetime.strptime(self.data_nascimento, fmt).date()
+                            break
+                        except ValueError:
+                            continue
+                except Exception:
+                    # If parsing fails, skip age calculation
+                    super().save(*args, **kwargs)
+                    return
+            
             hoje = date.today()
             self.idade = hoje.year - self.data_nascimento.year - (
                 (hoje.month, hoje.day) < (self.data_nascimento.month, self.data_nascimento.day)
