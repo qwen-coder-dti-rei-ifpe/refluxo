@@ -1,48 +1,14 @@
 ```
-# Python
+# Python cache files
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# Django
-*.pyc
-__pycache__/
-*.mo
-*.pot
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-
-# Environment
-.env
-.env.local
-*.env.*
-
-# Dependencies
-.venv/
+# Virtual environment
 venv/
-env/
-ENV/
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
+# Dependencies in virtual environment
+venv/lib/python*/site-packages/
 
-# OS
-.DS_Store
-Thumbs.db
-
-# Coverage
-.coverage
-htmlcov/
-coverage/
-
-# Build
-dist/
-build/
-*.egg-info/
 ```

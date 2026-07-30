@@ -6,6 +6,10 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
 
+# Import Estudante for creating Inscricao instances
+from core.models import Estudante
+
+
 class EnrollmentPeriod(models.Model):
     """
     Modelo de Período de Inscrição (Edital).
@@ -376,9 +380,67 @@ class Enrollment(models.Model):
     
     def submeter(self):
         """Submete a inscrição para análise."""
+        from inscricoes.models import Inscricao, Edital
+        
         self.status = 'SUBMETIDA'
         self.data_conclusao = timezone.now()
         self.save()
+        
+        # Criar ou atualizar instância na tabela Inscricoes para o assistente social ver
+        try:
+            estudante = Estudante.objects.get(cpf=self.student.cpf)
+            
+            # Tentar obter o Edital correspondente ao EnrollmentPeriod
+            edital = None
+            if hasattr(self.enrollment_period, 'pk'):
+                try:
+                    edital = Edital.objects.get(pk=self.enrollment_period.pk)
+                except Edital.DoesNotExist:
+                    # Se não existir, criar um Edital baseado no EnrollmentPeriod
+                    edital = Edital.objects.create(
+                        pk=self.enrollment_period.pk,
+                        titulo=self.enrollment_period.titulo,
+                        descricao=self.enrollment_period.descricao or '',
+                        numero=f"EDITAL-{self.enrollment_period.pk}",
+                        periodo_inscricao_abertura=self.enrollment_period.data_inicio,
+                        periodo_inscricao_fechamento=self.enrollment_period.data_fim,
+                        status='ATIVO' if self.enrollment_period.status == 'ABERTO' else 'FINALIZADO',
+                        ativo=self.enrollment_period.ativo,
+                    )
+            
+            if edital:
+                # Criar ou atualizar a inscrição na tabela Inscricoes
+                inscricao, created = Inscricao.objects.update_or_create(
+                    edital=edital,
+                    estudante=estudante,
+                    defaults={
+                        'status': 'SUBMETIDA',
+                        'classificacao': 'ANALISE',
+                        'submetida_em': timezone.now(),
+                        'informacoes_estudante': {
+                            'nome_completo': self.student.nome_completo,
+                            'cpf': self.student.cpf,
+                            'matricula': self.student.matricula,
+                            'curso': self.student.curso,
+                            'campus': self.student.campus,
+                        },
+                        'informacoes_endereco': {},
+                        'informacoes_familiares': [],
+                        'informacoes_deslocamento': {},
+                        'informacoes_inscricao': {
+                            'renda_bruta_familiar': str(self.renda_bruta_familiar) if self.renda_bruta_familiar else '0',
+                            'renda_per_capita': str(self.renda_per_capita) if self.renda_per_capita else '0',
+                            'faixa_renda_per_capita': self.faixa_renda_per_capita,
+                        },
+                        'documentos': [],
+                    }
+                )
+        except Estudante.DoesNotExist:
+            # Se não encontrar Estudante, apenas continua sem criar a instância em Inscricoes
+            pass
+        except Exception as e:
+            # Em caso de erro, loga mas não impede a submissão
+            print(f"Erro ao criar instância em Inscricoes: {e}")
     
     def pode_editar(self):
         """Verifica se a inscrição ainda pode ser editada."""

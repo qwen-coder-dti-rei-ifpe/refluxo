@@ -433,7 +433,7 @@ def resultado_avaliacao_renda_view(request):
 def minhas_submissoes_view(request):
     """
     View para listar todas as submissões do estudante.
-    Mostra inscrições em todos os editais que o estudante participou.
+    Mostra apenas inscrições que foram realmente submetidas (status='SUBMETIDA' ou superior).
     """
     from ifpe_mvp.apps.enrollments.models import Enrollment, EnrollmentPeriod
     from core.models import Estudante
@@ -443,7 +443,11 @@ def minhas_submissoes_view(request):
         # Tenta obter o Student do Django auth user primeiro
         try:
             student = request.user.student
-            enrollments = Enrollment.objects.filter(student=student).select_related('enrollment_period').order_by('-criado_em')
+            # Filtra apenas inscrições submetidas (não mostra rascunhos)
+            enrollments = Enrollment.objects.filter(
+                student=student, 
+                status__in=['SUBMETIDA', 'EM_ANALISE', 'APROVADA', 'REPROVADA']
+            ).select_related('enrollment_period').order_by('-criado_em')
         except:
             # Fallback para o modelo antigo se não encontrar Student
             enrollments = []
