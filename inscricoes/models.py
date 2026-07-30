@@ -108,6 +108,15 @@ class Edital(models.Model):
                 self.periodo_inscricao_fechamento and
                 self.periodo_inscricao_abertura <= agora <= self.periodo_inscricao_fechamento)
     
+    def esta_dentro_periodo_inscricoes(self):
+        """Verifica se o edital está ativo e dentro do período de inscrições."""
+        agora = timezone.now()
+        return (self.ativo and 
+                self.status == 'ATIVO' and
+                self.periodo_inscricao_abertura and
+                self.periodo_inscricao_fechamento and
+                self.periodo_inscricao_abertura <= agora <= self.periodo_inscricao_fechamento)
+    
     def esta_com_avaliacao_aberta(self):
         """Verifica se o edital está com avaliação aberta."""
         agora = timezone.now()
