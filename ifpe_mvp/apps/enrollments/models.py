@@ -443,7 +443,7 @@ class Enrollment(models.Model):
             estudante = Estudante.objects.get(cpf=self.student.cpf)
             created_estudante = False
         except Estudante.DoesNotExist:
-            # Se não existe, cria um novo estudante
+            # Se não existe, cria um novo estudante com todos os campos obrigatórios
             estudante = Estudante.objects.create(
                 cpf=self.student.cpf,
                 nome_completo=self.student.nome_completo or '',
@@ -452,23 +452,28 @@ class Enrollment(models.Model):
                 curso=self.student.curso or '',
                 campus=self.student.campus or '',
                 idade=self.student.idade or 18,  # Valor padrão se não tiver idade
-                raca=self.student.raca or '',
-                sexo=self.student.sexo or '',
-                turno=self.student.turno or 'INTEGRAL',
-                periodo=str(self.student.periodo) if self.student.periodo else '',
+                raca=self.student.raca or 'PARDA',  # Valor padrão se não tiver raça
+                sexo=self.student.sexo or 'O',  # Valor padrão se não tiver sexo
+                turno=self.student.turno or 'INTEGRAL',  # Valor padrão se não tiver turno
+                periodo=str(self.student.periodo) if self.student.periodo else '1',  # Valor padrão se não tiver período
                 eh_cotista=self.student.eh_cotista,
             )
             created_estudante = True
         
         # Se o estudante já existe mas precisa de atualização, atualiza os campos
+        # CUIDADO: Não atualizar matrícula se já existir outro estudante com essa matrícula
         if not created_estudante:
             updated = False
             if self.student.nome_completo and self.student.nome_completo != estudante.nome_completo:
                 estudante.nome_completo = self.student.nome_completo
                 updated = True
+            # Só atualiza matrícula se for diferente e não houver conflito
             if self.student.matricula and self.student.matricula != estudante.matricula:
-                estudante.matricula = self.student.matricula
-                updated = True
+                # Verificar se já existe outro estudante com esta matrícula
+                conflito_matricula = Estudante.objects.filter(matricula=self.student.matricula).exclude(pk=estudante.pk).exists()
+                if not conflito_matricula:
+                    estudante.matricula = self.student.matricula
+                    updated = True
             if self.student.email_institucional and self.student.email_institucional != estudante.email_institucional:
                 estudante.email_institucional = self.student.email_institucional
                 updated = True
@@ -478,20 +483,45 @@ class Enrollment(models.Model):
             if self.student.campus and self.student.campus != estudante.campus:
                 estudante.campus = self.student.campus
                 updated = True
-            if self.student.idade and self.student.idade != estudante.idade:
-                estudante.idade = self.student.idade
+            if self.student.idade:
+                if self.student.idade != estudante.idade:
+                    estudante.idade = self.student.idade
+                    updated = True
+            elif not estudante.idade:
+                # Garantir que idade tenha valor (campo obrigatório)
+                estudante.idade = 18
                 updated = True
-            if self.student.raca and self.student.raca != estudante.raca:
-                estudante.raca = self.student.raca
+            if self.student.raca:
+                if self.student.raca != estudante.raca:
+                    estudante.raca = self.student.raca
+                    updated = True
+            elif not estudante.raca:
+                # Garantir que raca tenha valor (campo obrigatório no banco, mas blank=True no model)
+                estudante.raca = 'PARDA'
                 updated = True
-            if self.student.sexo and self.student.sexo != estudante.sexo:
-                estudante.sexo = self.student.sexo
+            if self.student.sexo:
+                if self.student.sexo != estudante.sexo:
+                    estudante.sexo = self.student.sexo
+                    updated = True
+            elif not estudante.sexo:
+                # Garantir que sexo tenha valor (campo obrigatório no banco, mas blank=True no model)
+                estudante.sexo = 'O'
                 updated = True
-            if self.student.turno and self.student.turno != estudante.turno:
-                estudante.turno = self.student.turno
+            if self.student.turno:
+                if self.student.turno != estudante.turno:
+                    estudante.turno = self.student.turno
+                    updated = True
+            elif not estudante.turno:
+                # Garantir que turno tenha valor (campo obrigatório)
+                estudante.turno = 'INTEGRAL'
                 updated = True
-            if self.student.periodo and str(self.student.periodo) != estudante.periodo:
-                estudante.periodo = str(self.student.periodo)
+            if self.student.periodo:
+                if str(self.student.periodo) != estudante.periodo:
+                    estudante.periodo = str(self.student.periodo)
+                    updated = True
+            elif not estudante.periodo:
+                # Garantir que periodo tenha valor (campo obrigatório)
+                estudante.periodo = '1'
                 updated = True
             if updated:
                 estudante.save()

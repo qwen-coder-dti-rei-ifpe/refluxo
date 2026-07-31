@@ -1074,6 +1074,17 @@ def enrollment_review(request, pk):
         return redirect('enrollment_dashboard', pk=pk)
 
     if request.method == 'POST':
+        # Verificar se já existe uma inscrição submetida para este estudante e edital (chave única)
+        existing_enrollment = Enrollment.objects.filter(
+            student=student,
+            enrollment_period=period,
+            status='SUBMETIDA'
+        ).exclude(pk=enrollment.pk).first()
+        
+        if existing_enrollment:
+            messages.error(request, 'Você já possui uma inscrição submetida para este edital. Não é permitido enviar mais de uma inscrição por edital.')
+            return redirect('enrollment_review', pk=pk)
+        
         # Submeter a inscrição
         enrollment.submeter()
         messages.success(request, 'Inscrição submetida com sucesso para análise!')
