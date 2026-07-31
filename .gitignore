@@ -4,42 +4,32 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
-
-# Virtual Environment
+.Python
+env/
 venv/
+.venv/
+.ENV
+.venv.bak/
+pip-log.txt
+pip-delete-this-directory.txt
 
 # Django
 *.log
 local_settings.py
 db.sqlite3
+db.sqlite3-journal
 media/
 staticfiles/
-
-# Coverage
-.coverage
-htmlcov/
-coverage/
-
-# Temporary files
-*.tmp
-*.swp
-*.swo
-
-# OS generated files
-.DS_Store
-Thumbs.db
-
-# Environment variables
 .env
-.env.local
-*.env.*
 
 # IDE
 .vscode/
 .idea/
+*.swp
+*.swo
+*.tmp
 
-# Build and distribution
-build/
-dist/
-*.egg-info/
+# OS
+.DS_Store
+Thumbs.db
 ```
