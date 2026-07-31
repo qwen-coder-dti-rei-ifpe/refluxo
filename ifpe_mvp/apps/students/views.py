@@ -37,8 +37,36 @@ def student_search(request):
                 # Tenta encontrar o estudante no banco local pela matrícula
                 try:
                     student = Student.objects.get(matricula=valor_busca)
+                    
+                    # Estudante JÁ EXISTE no banco - usar dados do banco (mais completos/atualizados)
+                    dados_sessao = {
+                        'nome_completo': student.nome_completo or '',
+                        'cpf': student.cpf or '',
+                        'identidade': student.identidade or '',
+                        'data_nascimento': student.data_nascimento.strftime('%Y-%m-%d') if student.data_nascimento else '',
+                        'idade': student.idade or '',
+                        'raca': student.raca or '',
+                        'sexo': student.sexo or '',
+                        'genero': student.genero or student.sexo or '',
+                        'matricula': student.matricula or '',
+                        'campus': student.campus or '',
+                        'curso': student.curso or '',
+                        'turno': student.turno or '',
+                        'periodo': str(student.periodo) if student.periodo else '',
+                        'eh_cotista': student.eh_cotista,
+                        'email_pessoal': student.email_pessoal or '',
+                        'origem_escolar': student.origem_escolar or '',
+                        'moradia_estudantil': student.moradia_estudantil,
+                        'source': 'database',  # Indicar que veio do banco
+                        'student_id': student.id,
+                    }
+                    request.session['estudanteDados'] = dados_sessao
+                    request.session['student_data_source'] = 'database'
+                    
+                    messages.success(request, f'Estudante encontrado no banco de dados com matrícula {valor_busca}')
+                    
                 except Student.DoesNotExist:
-                    # Cria um novo estudante com os dados da API
+                    # Cria um novo estudante com os dados da API (ainda não salva)
                     student = Student(
                         matricula=dados_api.get('matricula', valor_busca),
                         nome_completo=dados_api.get('nome_completo', ''),
@@ -57,50 +85,53 @@ def student_search(request):
                         # email_institucional NÃO é preenchido pela API, será mantido vazio ou do banco
                     )
                     # Não salva ainda, apenas prepara para exibição
-                
-                # Armazena dados na sessão para pré-preenchimento do formulário
-                # Mapeamento completo dos campos da API para o formulário
-                email_value = dados_api.get('email', '')
-                
-                # Formatar data de nascimento para DD/MM/YYYY
-                data_nascimento_fmt = ''
-                if dados_api.get('data_nascimento'):
-                    try:
-                        from datetime import datetime
-                        date_obj = datetime.strptime(dados_api.get('data_nascimento'), '%Y-%m-%d')
-                        data_nascimento_fmt = date_obj.strftime('%d/%m/%Y')
-                    except (ValueError, TypeError):
-                        data_nascimento_fmt = dados_api.get('data_nascimento', '')
-                
-                dados_sessao = {
-                    'nome_completo': dados_api.get('nome_completo', ''),
-                    'cpf': dados_api.get('cpf', ''),
-                    'identidade': dados_api.get('identidade', ''),  # brRG
-                    'data_nascimento': dados_api.get('data_nascimento', ''),  # birthday
-                    'data_nascimento_fmt': data_nascimento_fmt,
-                    'idade': dados_api.get('idade', ''),
-                    'raca': dados_api.get('raca', ''),
-                    'sexo': dados_api.get('sexo', ''),  # gender (M/F -> MASCULINO/FEMININO)
-                    'genero': dados_api.get('sexo', ''),  # Gênero igual ao sexo para pré-preenchimento
-                    'matricula': dados_api.get('matricula', ''),
-                    'campus': dados_api.get('campus', ''),
-                    'curso': dados_api.get('curso', ''),
-                    'turno': dados_api.get('turno', ''),
-                    'periodo': dados_api.get('periodo', ''),  # currentPeriod formatado como "1º"
-                    'eh_cotista': dados_api.get('eh_cotista', False),
-                    'email_pessoal': email_value,  # Email Pessoal (campo email da API)
-                    # Email Institucional NÃO é preenchido pela API, será mantido do banco de dados
-                    'nome_mae': dados_api.get('nome_mae', ''),
-                    'nome_pai': dados_api.get('nome_pai', ''),
-                    'estado_civil': dados_api.get('estado_civil', ''),
-                    'numero_filhos': dados_api.get('numero_filhos', 0),
-                    'status_matricula': dados_api.get('status_matricula', ''),
-                    'nivel_curso': dados_api.get('nivel_curso', ''),
-                    'media_geral': dados_api.get('media_geral', 0.0),
-                }
-                request.session['estudanteDados'] = dados_sessao
-                
-                messages.success(request, f'Dados encontrados na API QAcadêmico para matrícula {valor_busca}')
+                    
+                    # Armazena dados na sessão para pré-preenchimento do formulário
+                    # Mapeamento completo dos campos da API para o formulário
+                    email_value = dados_api.get('email', '')
+                    
+                    # Formatar data de nascimento para DD/MM/YYYY
+                    data_nascimento_fmt = ''
+                    if dados_api.get('data_nascimento'):
+                        try:
+                            from datetime import datetime
+                            date_obj = datetime.strptime(dados_api.get('data_nascimento'), '%Y-%m-%d')
+                            data_nascimento_fmt = date_obj.strftime('%d/%m/%Y')
+                        except (ValueError, TypeError):
+                            data_nascimento_fmt = dados_api.get('data_nascimento', '')
+                    
+                    dados_sessao = {
+                        'nome_completo': dados_api.get('nome_completo', ''),
+                        'cpf': dados_api.get('cpf', ''),
+                        'identidade': dados_api.get('identidade', ''),  # brRG
+                        'data_nascimento': dados_api.get('data_nascimento', ''),  # birthday
+                        'data_nascimento_fmt': data_nascimento_fmt,
+                        'idade': dados_api.get('idade', ''),
+                        'raca': dados_api.get('raca', ''),
+                        'sexo': dados_api.get('sexo', ''),  # gender (M/F -> MASCULINO/FEMININO)
+                        'genero': dados_api.get('sexo', ''),  # Gênero igual ao sexo para pré-preenchimento
+                        'matricula': dados_api.get('matricula', ''),
+                        'campus': dados_api.get('campus', ''),
+                        'curso': dados_api.get('curso', ''),
+                        'turno': dados_api.get('turno', ''),
+                        'periodo': dados_api.get('periodo', ''),  # currentPeriod formatado como "1º"
+                        'eh_cotista': dados_api.get('eh_cotista', False),
+                        'email_pessoal': email_value,  # Email Pessoal (campo email da API)
+                        # Email Institucional NÃO é preenchido pela API, será mantido do banco de dados
+                        'nome_mae': dados_api.get('nome_mae', ''),
+                        'nome_pai': dados_api.get('nome_pai', ''),
+                        'estado_civil': dados_api.get('estado_civil', ''),
+                        'numero_filhos': dados_api.get('numero_filhos', 0),
+                        'status_matricula': dados_api.get('status_matricula', ''),
+                        'nivel_curso': dados_api.get('nivel_curso', ''),
+                        'media_geral': dados_api.get('media_geral', 0.0),
+                        'source': 'qacademico_api',  # Indicar que veio da API
+                        'student_id': None,  # Nenhum estudante existente ainda
+                    }
+                    request.session['estudanteDados'] = dados_sessao
+                    request.session['student_data_source'] = 'qacademico_api'
+                    
+                    messages.success(request, f'Dados encontrados na API QAcadêmico para matrícula {valor_busca}')
                 
             elif erro:
                 # Erro ou não encontrado na API, busca apenas no banco local
@@ -120,7 +151,32 @@ def student_search(request):
                 elif tipo_busca == 'MATRICULA' and not student:
                     student = Student.objects.get(matricula=valor_busca)
                 
-                messages.info(request, 'Dados buscados na base local.')
+                # Estudante encontrado no banco local - armazenar dados completos na sessão
+                dados_sessao = {
+                    'nome_completo': student.nome_completo or '',
+                    'cpf': student.cpf or '',
+                    'identidade': student.identidade or '',
+                    'data_nascimento': student.data_nascimento.strftime('%Y-%m-%d') if student.data_nascimento else '',
+                    'idade': student.idade or '',
+                    'raca': student.raca or '',
+                    'sexo': student.sexo or '',
+                    'genero': student.genero or student.sexo or '',
+                    'matricula': student.matricula or '',
+                    'campus': student.campus or '',
+                    'curso': student.curso or '',
+                    'turno': student.turno or '',
+                    'periodo': str(student.periodo) if student.periodo else '',
+                    'eh_cotista': student.eh_cotista,
+                    'email_pessoal': student.email_pessoal or '',
+                    'origem_escolar': student.origem_escolar or '',
+                    'moradia_estudantil': student.moradia_estudantil,
+                    'source': 'database',
+                    'student_id': student.id,
+                }
+                request.session['estudanteDados'] = dados_sessao
+                request.session['student_data_source'] = 'database'
+                
+                messages.info(request, 'Dados buscados na base local e carregados no formulário.')
             except Student.DoesNotExist:
                 if not erro_api:
                     messages.warning(request, 'Estudante não encontrado. Realize o cadastro.')

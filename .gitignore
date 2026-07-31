@@ -5,40 +5,41 @@ __pycache__/
 *.pyo
 *.pyd
 
-# Environment
-.venv/
+# Virtual Environment
 venv/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+media/
+staticfiles/
+
+# Coverage
+.coverage
+htmlcov/
+coverage/
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Environment variables
 .env
 .env.local
 *.env.*
 
-# Logs
-*.log
-
-# Dependencies
-node_modules/
-
-# Build artifacts
-dist/
-build/
-target/
-
-# Editors
+# IDE
 .vscode/
 .idea/
 
-# OS
-.DS_Store
-Thumbs.db
-
-# Testing
-.coverage
-htmlcov/
-.coverage.*
-.nox/
-.tox/
-
-# Type checking
-.mypy_cache/
-.pytest_cache/
+# Build and distribution
+build/
+dist/
+*.egg-info/
 ```
