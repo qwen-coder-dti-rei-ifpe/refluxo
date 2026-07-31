@@ -129,7 +129,15 @@ def student_dashboard_view(request):
         matricula_search = None  # Limpa também a matrícula pesquisada
     
     # Passo 1: Selecionar edital ativo (somente para visualização do estudante)
-    editais_ativos = Edital.objects.filter(ativo=True, status='ATIVO')
+    # Filtra apenas editais com status ATIVO e dentro do período de inscrições
+    from django.utils import timezone
+    agora = timezone.now()
+    editais_ativos = Edital.objects.filter(
+        ativo=True, 
+        status='ATIVO',
+        periodo_inscricao_abertura__lte=agora,
+        periodo_inscricao_fechamento__gte=agora
+    )
     
     # Buscar dados familiares do CadÚnico se tiver CPF do usuário
     cpf_usuario = request.user.username if hasattr(request.user, 'username') else None

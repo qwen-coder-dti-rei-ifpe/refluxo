@@ -112,6 +112,17 @@ class Enrollment(models.Model):
         ('CANCELADA', 'Cancelada'),
     ]
     
+    CLASSIFICACAO_CHOICES = [
+        ('ANALISE', 'Em Análise'),
+        ('COM_PENDENCIA', 'Com Pendência'),
+        ('NAO_REGULARIZADO', 'Não Regularizado'),
+        ('REGULARIZADO', 'Regularizado'),
+        ('NAO_ELEGIVEL', 'Não Elegível'),
+        ('ELEGIVEL', 'Elegível'),
+        ('CONTEMPLADO', 'Contemplado'),
+        ('NAO_CONTEMPLADO', 'Não Contemplado'),
+    ]
+    
     FAIXA_RENDA_CHOICES = [
         ('ATE_05_SALARIOS', 'Até 0,5 salário mínimo per capita'),
         ('ATE_1_SALARIO', 'Até 1 salário mínimo per capita'),
@@ -321,6 +332,32 @@ class Enrollment(models.Model):
     data_conclusao = models.DateTimeField(_('Data de conclusão da inscrição'), null=True, blank=True)
     documentacao_correta = models.BooleanField(_('Documentação correta?'), default=False)
     
+    # Classificação da inscrição pelo assistente social
+    classificacao = models.CharField(
+        _('Classificação'), 
+        max_length=30, 
+        choices=CLASSIFICACAO_CHOICES, 
+        default='ANALISE',
+        help_text=_('Classificação da situação da inscrição pelo assistente social')
+    )
+    comentario_assistente_social = models.TextField(
+        _('Comentário do assistente social'), 
+        null=True, 
+        blank=True,
+        help_text=_('Observações do assistente social sobre a classificação')
+    )
+    data_classificacao = models.DateTimeField(
+        _('Data da classificação'), 
+        null=True, 
+        blank=True
+    )
+    assistente_social_responsavel = models.CharField(
+        _('Assistente social responsável'), 
+        max_length=255, 
+        null=True, 
+        blank=True
+    )
+    
     # Análise do pedagogo
     aluno_contemplado_bolsa = models.BooleanField(
         _('Aluno contemplado com bolsa?'), 
@@ -375,9 +412,108 @@ class Enrollment(models.Model):
         pass
     
     def submeter(self):
-        """Submete a inscrição para análise."""
+        """Submete a inscrição para análise e cria registro na tabela Inscricoes."""
+        from inscricoes.models import Inscricao, Edital
+        
         self.status = 'SUBMETIDA'
         self.data_conclusao = timezone.now()
+        # Inicializa a classificação como 'Em Análise' quando submetida
+        self.classificacao = 'ANALISE'
+        self.save()
+        
+        # Criar ou atualizar instância correspondente em Inscricoes
+        # Primeiro, obter ou criar o Edital correspondente ao EnrollmentPeriod
+        edital, created_edital = Edital.objects.get_or_create(
+            pk=self.enrollment_period.pk,
+            defaults={
+                'titulo': self.enrollment_period.titulo,
+                'descricao': self.enrollment_period.descricao or '',
+                'numero': f"EDITAL-{self.enrollment_period.pk}",
+                'periodo_inscricao_abertura': self.enrollment_period.data_inicio,
+                'periodo_inscricao_fechamento': self.enrollment_period.data_fim,
+                'status': 'ATIVO' if self.enrollment_period.status == 'ABERTO' else 'FECHADO',
+                'ativo': self.enrollment_period.ativo,
+            }
+        )
+        
+        # Obter ou criar o Estudante correspondente ao Student
+        from core.models import Estudante
+        estudante, created_estudante = Estudante.objects.get_or_create(
+            cpf=self.student.cpf,
+            defaults={
+                'nome_completo': self.student.nome_completo or '',
+                'matricula': self.student.matricula or '',
+                'email_institucional': self.student.email_institucional or '',
+                'curso': self.student.curso or '',
+                'campus': self.student.campus or '',
+            }
+        )
+        
+        # Criar ou atualizar a Inscrição correspondente
+        inscricao, created = Inscricao.objects.get_or_create(
+            edital=edital,
+            estudante=estudante,
+            defaults={
+                'status': 'SUBMETIDA',
+                'classificacao': 'ANALISE',
+                'submetida_em': self.data_conclusao,
+                'informacoes_estudante': {
+                    'nome': self.student.nome_completo,
+                    'cpf': self.student.cpf,
+                    'matricula': self.student.matricula,
+                    'data_nascimento': str(self.student.data_nascimento) if self.student.data_nascimento else '',
+                    'raca': self.student.raca or '',
+                    'sexo': self.student.sexo or '',
+                },
+                'informacoes_endereco': {
+                    'cep': self.address.cep if self.address else '',
+                    'bairro': self.address.bairro if self.address else '',
+                    'cidade': self.address.cidade if self.address else '',
+                    'estado': self.address.estado if self.address else '',
+                    'rua': self.address.rua if self.address else '',
+                    'numero': self.address.numero if self.address else '',
+                    'complemento': self.address.complemento if self.address else '',
+                } if self.address else {},
+                'informacoes_deslocamento': {
+                    'tipo_transporte': self.displacement.tipo_transporte if self.displacement else '',
+                    'valor_mensal_transporte': str(self.displacement.valor_mensal_transporte) if self.displacement else '0',
+                    'trajeto_percorrido': self.displacement.trajeto_percorrido if self.displacement else '',
+                } if self.displacement else {},
+                'informacoes_inscricao': {
+                    'renda_bruta_familiar': str(self.renda_bruta_familiar),
+                    'renda_per_capita': str(self.renda_per_capita),
+                    'faixa_renda_per_capita': self.faixa_renda_per_capita or '',
+                    'relato_vida': self.relato_vida or '',
+                    'eh_chefe_familia': self.eh_chefe_familia,
+                    'beneficiario_social': self.beneficiario_social,
+                },
+            }
+        )
+        
+        # Se a inscrição já existia, atualizar os dados
+        if not created:
+            inscricao.status = 'SUBMETIDA'
+            inscricao.classificacao = 'ANALISE'
+            inscricao.submetida_em = self.data_conclusao
+            inscricao.save()
+    
+    def classificar(self, classificacao, assistente_social=None, comentario=None):
+        """
+        Classifica a inscrição pelo assistente social.
+        
+        Args:
+            classificacao: Código da classificação (ex: 'ELEGIVEL', 'NAO_ELEGIVEL')
+            assistente_social: Nome ou usuário do assistente social responsável
+            comentario: Observações sobre a classificação
+        """
+        from django.utils import timezone
+        
+        self.classificacao = classificacao
+        self.data_classificacao = timezone.now()
+        if assistente_social:
+            self.assistente_social_responsavel = assistente_social
+        if comentario:
+            self.comentario_assistente_social = comentario
         self.save()
     
     def pode_editar(self):

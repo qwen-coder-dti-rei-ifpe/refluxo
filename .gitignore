@@ -5,44 +5,40 @@ __pycache__/
 *.pyo
 *.pyd
 
-# Django
-*.pyc
-__pycache__/
-*.mo
-*.pot
-*.log
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-
 # Environment
+.venv/
+venv/
 .env
 .env.local
 *.env.*
 
-# Dependencies
-.venv/
-venv/
-env/
-ENV/
+# Logs
+*.log
 
-# IDE
+# Dependencies
+node_modules/
+
+# Build artifacts
+dist/
+build/
+target/
+
+# Editors
 .vscode/
 .idea/
-*.swp
-*.swo
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Coverage
+# Testing
 .coverage
 htmlcov/
-coverage/
+.coverage.*
+.nox/
+.tox/
 
-# Build
-dist/
-build/
-*.egg-info/
+# Type checking
+.mypy_cache/
+.pytest_cache/
 ```
