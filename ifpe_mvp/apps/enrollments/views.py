@@ -211,23 +211,33 @@ def student_data_form(request, pk):
     from inscricoes.models import Edital
     
     # Tenta obter como EnrollmentPeriod primeiro, senão tenta como Edital
+    period = None
     try:
         period = EnrollmentPeriod.objects.get(pk=pk)
     except EnrollmentPeriod.DoesNotExist:
         # Se não encontrar EnrollmentPeriod, tenta buscar como Edital
-        edital = get_object_or_404(Edital, pk=pk)
-        # Cria ou obtém um EnrollmentPeriod correspondente ao Edital
-        period, created = EnrollmentPeriod.objects.get_or_create(
-            pk=pk,
-            defaults={
-                'titulo': edital.titulo,
-                'descricao': edital.descricao or '',
-                'data_inicio': edital.periodo_inscricao_abertura or timezone.now(),
-                'data_fim': edital.periodo_inscricao_fechamento or (edital.periodo_inscricao_abertura + timezone.timedelta(days=30)) if edital.periodo_inscricao_abertura else timezone.now() + timezone.timedelta(days=30),
-                'status': 'ABERTO' if edital.status == 'ATIVO' else 'FECHADO',
-                'ativo': edital.ativo,
-            }
-        )
+        try:
+            edital = Edital.objects.get(pk=pk)
+            # Cria ou obtém um EnrollmentPeriod correspondente ao Edital
+            period, created = EnrollmentPeriod.objects.get_or_create(
+                pk=pk,
+                defaults={
+                    'titulo': edital.titulo,
+                    'descricao': edital.descricao or '',
+                    'data_inicio': edital.periodo_inscricao_abertura or timezone.now(),
+                    'data_fim': edital.periodo_inscricao_fechamento or (edital.periodo_inscricao_abertura + timezone.timedelta(days=30)) if edital.periodo_inscricao_abertura else timezone.now() + timezone.timedelta(days=30),
+                    'status': 'ABERTO' if edital.status == 'ATIVO' else 'FECHADO',
+                    'ativo': edital.ativo,
+                }
+            )
+        except Edital.DoesNotExist:
+            # Se não encontrar nem Edital, retorna 404
+            from django.http import Http404
+            raise Http404("Nenhum Edital ou Período de Inscrição encontrado com este ID.")
+    
+    if period is None:
+        from django.http import Http404
+        raise Http404("Nenhum Edital ou Período de Inscrição encontrado com este ID.")
     
     try:
         student = request.user.student
@@ -498,23 +508,33 @@ def address_data_form(request, pk):
     from inscricoes.models import Edital
     
     # Tenta obter como EnrollmentPeriod primeiro, senão tenta como Edital
+    period = None
     try:
         period = EnrollmentPeriod.objects.get(pk=pk)
     except EnrollmentPeriod.DoesNotExist:
         # Se não encontrar EnrollmentPeriod, tenta buscar como Edital
-        edital = get_object_or_404(Edital, pk=pk)
-        # Cria ou obtém um EnrollmentPeriod correspondente ao Edital
-        period, created = EnrollmentPeriod.objects.get_or_create(
-            pk=pk,
-            defaults={
-                'titulo': edital.titulo,
-                'descricao': edital.descricao or '',
-                'data_inicio': edital.periodo_inscricao_abertura or timezone.now(),
-                'data_fim': edital.periodo_inscricao_fechamento or (edital.periodo_inscricao_abertura + timezone.timedelta(days=30)) if edital.periodo_inscricao_abertura else timezone.now() + timezone.timedelta(days=30),
-                'status': 'ABERTO' if edital.status == 'ATIVO' else 'FECHADO',
-                'ativo': edital.ativo,
-            }
-        )
+        try:
+            edital = Edital.objects.get(pk=pk)
+            # Cria ou obtém um EnrollmentPeriod correspondente ao Edital
+            period, created = EnrollmentPeriod.objects.get_or_create(
+                pk=pk,
+                defaults={
+                    'titulo': edital.titulo,
+                    'descricao': edital.descricao or '',
+                    'data_inicio': edital.periodo_inscricao_abertura or timezone.now(),
+                    'data_fim': edital.periodo_inscricao_fechamento or (edital.periodo_inscricao_abertura + timezone.timedelta(days=30)) if edital.periodo_inscricao_abertura else timezone.now() + timezone.timedelta(days=30),
+                    'status': 'ABERTO' if edital.status == 'ATIVO' else 'FECHADO',
+                    'ativo': edital.ativo,
+                }
+            )
+        except Edital.DoesNotExist:
+            # Se não encontrar nem Edital, retorna 404
+            from django.http import Http404
+            raise Http404("Nenhum Edital ou Período de Inscrição encontrado com este ID.")
+    
+    if period is None:
+        from django.http import Http404
+        raise Http404("Nenhum Edital ou Período de Inscrição encontrado com este ID.")
     
     try:
         student = request.user.student
@@ -581,23 +601,33 @@ def family_members_form(request, pk):
     from inscricoes.models import Edital
     
     # Tenta obter como EnrollmentPeriod primeiro, senão tenta como Edital
+    period = None
     try:
         period = EnrollmentPeriod.objects.get(pk=pk)
     except EnrollmentPeriod.DoesNotExist:
         # Se não encontrar EnrollmentPeriod, tenta buscar como Edital
-        edital = get_object_or_404(Edital, pk=pk)
-        # Cria ou obtém um EnrollmentPeriod correspondente ao Edital
-        period, created = EnrollmentPeriod.objects.get_or_create(
-            pk=pk,
-            defaults={
-                'titulo': edital.titulo,
-                'descricao': edital.descricao or '',
-                'data_inicio': edital.periodo_inscricao_abertura or timezone.now(),
-                'data_fim': edital.periodo_inscricao_fechamento or (edital.periodo_inscricao_abertura + timezone.timedelta(days=30)) if edital.periodo_inscricao_abertura else timezone.now() + timezone.timedelta(days=30),
-                'status': 'ABERTO' if edital.status == 'ATIVO' else 'FECHADO',
-                'ativo': edital.ativo,
-            }
-        )
+        try:
+            edital = Edital.objects.get(pk=pk)
+            # Cria ou obtém um EnrollmentPeriod correspondente ao Edital
+            period, created = EnrollmentPeriod.objects.get_or_create(
+                pk=pk,
+                defaults={
+                    'titulo': edital.titulo,
+                    'descricao': edital.descricao or '',
+                    'data_inicio': edital.periodo_inscricao_abertura or timezone.now(),
+                    'data_fim': edital.periodo_inscricao_fechamento or (edital.periodo_inscricao_abertura + timezone.timedelta(days=30)) if edital.periodo_inscricao_abertura else timezone.now() + timezone.timedelta(days=30),
+                    'status': 'ABERTO' if edital.status == 'ATIVO' else 'FECHADO',
+                    'ativo': edital.ativo,
+                }
+            )
+        except Edital.DoesNotExist:
+            # Se não encontrar nem Edital, retorna 404
+            from django.http import Http404
+            raise Http404("Nenhum Edital ou Período de Inscrição encontrado com este ID.")
+    
+    if period is None:
+        from django.http import Http404
+        raise Http404("Nenhum Edital ou Período de Inscrição encontrado com este ID.")
     
     try:
         student = request.user.student
@@ -728,23 +758,33 @@ def displacement_data_form(request, pk):
     from inscricoes.models import Edital
     
     # Tenta obter como EnrollmentPeriod primeiro, senão tenta como Edital
+    period = None
     try:
         period = EnrollmentPeriod.objects.get(pk=pk)
     except EnrollmentPeriod.DoesNotExist:
         # Se não encontrar EnrollmentPeriod, tenta buscar como Edital
-        edital = get_object_or_404(Edital, pk=pk)
-        # Cria ou obtém um EnrollmentPeriod correspondente ao Edital
-        period, created = EnrollmentPeriod.objects.get_or_create(
-            pk=pk,
-            defaults={
-                'titulo': edital.titulo,
-                'descricao': edital.descricao or '',
-                'data_inicio': edital.periodo_inscricao_abertura or timezone.now(),
-                'data_fim': edital.periodo_inscricao_fechamento or (edital.periodo_inscricao_abertura + timezone.timedelta(days=30)) if edital.periodo_inscricao_abertura else timezone.now() + timezone.timedelta(days=30),
-                'status': 'ABERTO' if edital.status == 'ATIVO' else 'FECHADO',
-                'ativo': edital.ativo,
-            }
-        )
+        try:
+            edital = Edital.objects.get(pk=pk)
+            # Cria ou obtém um EnrollmentPeriod correspondente ao Edital
+            period, created = EnrollmentPeriod.objects.get_or_create(
+                pk=pk,
+                defaults={
+                    'titulo': edital.titulo,
+                    'descricao': edital.descricao or '',
+                    'data_inicio': edital.periodo_inscricao_abertura or timezone.now(),
+                    'data_fim': edital.periodo_inscricao_fechamento or (edital.periodo_inscricao_abertura + timezone.timedelta(days=30)) if edital.periodo_inscricao_abertura else timezone.now() + timezone.timedelta(days=30),
+                    'status': 'ABERTO' if edital.status == 'ATIVO' else 'FECHADO',
+                    'ativo': edital.ativo,
+                }
+            )
+        except Edital.DoesNotExist:
+            # Se não encontrar nem Edital, retorna 404
+            from django.http import Http404
+            raise Http404("Nenhum Edital ou Período de Inscrição encontrado com este ID.")
+    
+    if period is None:
+        from django.http import Http404
+        raise Http404("Nenhum Edital ou Período de Inscrição encontrado com este ID.")
     
     try:
         student = request.user.student
@@ -793,23 +833,33 @@ def enrollment_data_form(request, pk):
     from inscricoes.models import Edital
     
     # Tenta obter como EnrollmentPeriod primeiro, senão tenta como Edital
+    period = None
     try:
         period = EnrollmentPeriod.objects.get(pk=pk)
     except EnrollmentPeriod.DoesNotExist:
         # Se não encontrar EnrollmentPeriod, tenta buscar como Edital
-        edital = get_object_or_404(Edital, pk=pk)
-        # Cria ou obtém um EnrollmentPeriod correspondente ao Edital
-        period, created = EnrollmentPeriod.objects.get_or_create(
-            pk=pk,
-            defaults={
-                'titulo': edital.titulo,
-                'descricao': edital.descricao or '',
-                'data_inicio': edital.periodo_inscricao_abertura or timezone.now(),
-                'data_fim': edital.periodo_inscricao_fechamento or (edital.periodo_inscricao_abertura + timezone.timedelta(days=30)) if edital.periodo_inscricao_abertura else timezone.now() + timezone.timedelta(days=30),
-                'status': 'ABERTO' if edital.status == 'ATIVO' else 'FECHADO',
-                'ativo': edital.ativo,
-            }
-        )
+        try:
+            edital = Edital.objects.get(pk=pk)
+            # Cria ou obtém um EnrollmentPeriod correspondente ao Edital
+            period, created = EnrollmentPeriod.objects.get_or_create(
+                pk=pk,
+                defaults={
+                    'titulo': edital.titulo,
+                    'descricao': edital.descricao or '',
+                    'data_inicio': edital.periodo_inscricao_abertura or timezone.now(),
+                    'data_fim': edital.periodo_inscricao_fechamento or (edital.periodo_inscricao_abertura + timezone.timedelta(days=30)) if edital.periodo_inscricao_abertura else timezone.now() + timezone.timedelta(days=30),
+                    'status': 'ABERTO' if edital.status == 'ATIVO' else 'FECHADO',
+                    'ativo': edital.ativo,
+                }
+            )
+        except Edital.DoesNotExist:
+            # Se não encontrar nem Edital, retorna 404
+            from django.http import Http404
+            raise Http404("Nenhum Edital ou Período de Inscrição encontrado com este ID.")
+    
+    if period is None:
+        from django.http import Http404
+        raise Http404("Nenhum Edital ou Período de Inscrição encontrado com este ID.")
     
     try:
         student = request.user.student
@@ -927,23 +977,33 @@ def enrollment_review(request, pk):
     from inscricoes.models import Edital
     
     # Tenta obter como EnrollmentPeriod primeiro, senão tenta como Edital
+    period = None
     try:
         period = EnrollmentPeriod.objects.get(pk=pk)
     except EnrollmentPeriod.DoesNotExist:
         # Se não encontrar EnrollmentPeriod, tenta buscar como Edital
-        edital = get_object_or_404(Edital, pk=pk)
-        # Cria ou obtém um EnrollmentPeriod correspondente ao Edital
-        period, created = EnrollmentPeriod.objects.get_or_create(
-            pk=pk,
-            defaults={
-                'titulo': edital.titulo,
-                'descricao': edital.descricao or '',
-                'data_inicio': edital.periodo_inscricao_abertura or timezone.now(),
-                'data_fim': edital.periodo_inscricao_fechamento or (edital.periodo_inscricao_abertura + timezone.timedelta(days=30)) if edital.periodo_inscricao_abertura else timezone.now() + timezone.timedelta(days=30),
-                'status': 'ABERTO' if edital.status == 'ATIVO' else 'FECHADO',
-                'ativo': edital.ativo,
-            }
-        )
+        try:
+            edital = Edital.objects.get(pk=pk)
+            # Cria ou obtém um EnrollmentPeriod correspondente ao Edital
+            period, created = EnrollmentPeriod.objects.get_or_create(
+                pk=pk,
+                defaults={
+                    'titulo': edital.titulo,
+                    'descricao': edital.descricao or '',
+                    'data_inicio': edital.periodo_inscricao_abertura or timezone.now(),
+                    'data_fim': edital.periodo_inscricao_fechamento or (edital.periodo_inscricao_abertura + timezone.timedelta(days=30)) if edital.periodo_inscricao_abertura else timezone.now() + timezone.timedelta(days=30),
+                    'status': 'ABERTO' if edital.status == 'ATIVO' else 'FECHADO',
+                    'ativo': edital.ativo,
+                }
+            )
+        except Edital.DoesNotExist:
+            # Se não encontrar nem Edital, retorna 404
+            from django.http import Http404
+            raise Http404("Nenhum Edital ou Período de Inscrição encontrado com este ID.")
+    
+    if period is None:
+        from django.http import Http404
+        raise Http404("Nenhum Edital ou Período de Inscrição encontrado com este ID.")
 
     try:
         student = request.user.student
