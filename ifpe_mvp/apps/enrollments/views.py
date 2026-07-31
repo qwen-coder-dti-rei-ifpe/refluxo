@@ -7,6 +7,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
 from .models import EnrollmentPeriod, Enrollment
 from ifpe_mvp.apps.students.models import Student
 
@@ -111,6 +112,7 @@ def step3_cards(request, pk):
 
 
 @login_required
+@csrf_exempt
 def store_matricula_search(request):
     """
     Endpoint AJAX para armazenar matrícula da busca na sessão e buscar dados do estudante.

@@ -1,32 +1,27 @@
 ```
-# Python cache files
+# Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# Virtual environment
+# Virtual Environment
 venv/
 
-# Dependencies
-node_modules/
-
-# Logs
+# Django
 *.log
+local_settings.py
+db.sqlite3
+media/
+staticfiles/
 
-# Environment variables
-.env
-.env.local
-*.env.*
-
-# Coverage reports
+# Coverage
 .coverage
 htmlcov/
 coverage/
 
-# IDE files
-.vscode/
-.idea/
+# Temporary files
+*.tmp
 *.swp
 *.swo
 
@@ -34,13 +29,17 @@ coverage/
 .DS_Store
 Thumbs.db
 
-# Build outputs
-dist/
-build/
-target/
-*.egg-info/
+# Environment variables
+.env
+.env.local
+*.env.*
 
-# Testing
-.pytest_cache/
-.mypy_cache/
+# IDE
+.vscode/
+.idea/
+
+# Build and distribution
+build/
+dist/
+*.egg-info/
 ```
