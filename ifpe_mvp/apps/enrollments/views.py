@@ -2,6 +2,7 @@
 Views do aplicativo Enrollments - Gestão de inscrições e editais
 """
 import re
+from decimal import Decimal, InvalidOperation
 from datetime import datetime
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
@@ -809,7 +810,19 @@ def displacement_data_form(request, pk):
         
         # Atualizar campos do deslocamento
         displacement.tipo_transporte = request.POST.get('tipo_transporte', '')
-        displacement.valor_mensal_transporte = request.POST.get('valor_mensal_transporte', 0)
+        
+        # Converter valor_mensal_transporte para Decimal, substituindo vírgula por ponto se necessário
+        valor_transporte = request.POST.get('valor_mensal_transporte', '0')
+        if valor_transporte:
+            # Substituir vírgula por ponto para garantir formato decimal correto
+            valor_transporte = str(valor_transporte).replace(',', '.')
+            try:
+                displacement.valor_mensal_transporte = Decimal(valor_transporte)
+            except (InvalidOperation, ValueError):
+                displacement.valor_mensal_transporte = Decimal('0')
+        else:
+            displacement.valor_mensal_transporte = Decimal('0')
+        
         displacement.trajeto_percorrido = request.POST.get('trajeto_percorrido', '')
         displacement.observacoes = request.POST.get('observacoes', '')
         
