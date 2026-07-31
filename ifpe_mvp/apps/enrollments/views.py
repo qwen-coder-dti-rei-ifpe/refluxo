@@ -4,6 +4,7 @@ Views do aplicativo Enrollments - Gestão de inscrições e editais
 import re
 from decimal import Decimal, InvalidOperation
 from datetime import datetime
+from django.db import IntegrityError
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -1086,10 +1087,18 @@ def enrollment_review(request, pk):
             return redirect('enrollment_review', pk=pk)
         
         # Submeter a inscrição
-        enrollment.submeter()
-        messages.success(request, 'Inscrição submetida com sucesso para análise!')
-        # Redireciona para página de Minhas Submissões após submeter
-        return redirect('minhas_submissoes')
+        try:
+            enrollment.submeter()
+            messages.success(request, 'Inscrição submetida com sucesso para análise!')
+            # Redireciona para página de Minhas Submissões após submeter
+            return redirect('minhas_submissoes')
+        except IntegrityError as e:
+            # Captura erro de chave única duplicada (estudante + edital)
+            if 'unique' in str(e).lower() or 'duplicate' in str(e).lower():
+                messages.error(request, 'Você já possui uma inscrição submetida para este edital. Não é permitido enviar mais de uma inscrição por edital.')
+            else:
+                messages.error(request, f'Erro ao submeter inscrição: {str(e)}')
+            return redirect('enrollment_review', pk=pk)
 
     context = {
         'period': period,

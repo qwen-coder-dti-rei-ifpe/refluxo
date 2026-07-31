@@ -24,8 +24,18 @@ wheels/
 # Virtual Environment
 venv/
 ENV/
-env.bak/
-venv.bak/
+env/
+.venv/
+.env/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+.env
 
 # IDE
 .vscode/
@@ -34,25 +44,7 @@ venv.bak/
 *.swo
 *.tmp
 
-# Logs
-*.log
-
-# Environment variables
-.env
-.env.local
-*.env.*
-
-# Coverage
-.coverage
-coverage/
-htmlcov/
-
-# Django specific
-*.mo
-*.pot
+# OS
 .DS_Store
-db.sqlite3
-db.sqlite3-journal
-media/
-staticfiles/
+Thumbs.db
 ```
