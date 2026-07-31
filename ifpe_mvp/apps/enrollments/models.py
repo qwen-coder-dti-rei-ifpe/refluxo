@@ -437,33 +437,118 @@ class Enrollment(models.Model):
         )
         
         # Obter ou criar o Estudante correspondente ao Student
+        # Primeiro tenta buscar por CPF (que é único)
         from core.models import Estudante
-        estudante, created_estudante = Estudante.objects.get_or_create(
-            cpf=self.student.cpf,
-            defaults={
-                'nome_completo': self.student.nome_completo or '',
-                'matricula': self.student.matricula or '',
-                'email_institucional': self.student.email_institucional or '',
-                'curso': self.student.curso or '',
-                'campus': self.student.campus or '',
-                'idade': self.student.idade or 0,
-                'raca': self.student.raca or '',
-                'sexo': self.student.sexo or '',
-                'turno': self.student.turno or 'INTEGRAL',
-                'periodo': str(self.student.periodo) if self.student.periodo else '',
-                'eh_cotista': self.student.eh_cotista,
-            }
-        )
+        try:
+            estudante = Estudante.objects.get(cpf=self.student.cpf)
+            created_estudante = False
+        except Estudante.DoesNotExist:
+            # Se não existe, cria um novo estudante
+            estudante = Estudante.objects.create(
+                cpf=self.student.cpf,
+                nome_completo=self.student.nome_completo or '',
+                matricula=self.student.matricula or '',
+                email_institucional=self.student.email_institucional or '',
+                curso=self.student.curso or '',
+                campus=self.student.campus or '',
+                idade=self.student.idade or 18,  # Valor padrão se não tiver idade
+                raca=self.student.raca or '',
+                sexo=self.student.sexo or '',
+                turno=self.student.turno or 'INTEGRAL',
+                periodo=str(self.student.periodo) if self.student.periodo else '',
+                eh_cotista=self.student.eh_cotista,
+            )
+            created_estudante = True
         
-        # Criar ou atualizar a Inscrição correspondente
-        inscricao, created = Inscricao.objects.get_or_create(
+        # Se o estudante já existe mas precisa de atualização, atualiza os campos
+        if not created_estudante:
+            updated = False
+            if self.student.nome_completo and self.student.nome_completo != estudante.nome_completo:
+                estudante.nome_completo = self.student.nome_completo
+                updated = True
+            if self.student.matricula and self.student.matricula != estudante.matricula:
+                estudante.matricula = self.student.matricula
+                updated = True
+            if self.student.email_institucional and self.student.email_institucional != estudante.email_institucional:
+                estudante.email_institucional = self.student.email_institucional
+                updated = True
+            if self.student.curso and self.student.curso != estudante.curso:
+                estudante.curso = self.student.curso
+                updated = True
+            if self.student.campus and self.student.campus != estudante.campus:
+                estudante.campus = self.student.campus
+                updated = True
+            if self.student.idade and self.student.idade != estudante.idade:
+                estudante.idade = self.student.idade
+                updated = True
+            if self.student.raca and self.student.raca != estudante.raca:
+                estudante.raca = self.student.raca
+                updated = True
+            if self.student.sexo and self.student.sexo != estudante.sexo:
+                estudante.sexo = self.student.sexo
+                updated = True
+            if self.student.turno and self.student.turno != estudante.turno:
+                estudante.turno = self.student.turno
+                updated = True
+            if self.student.periodo and str(self.student.periodo) != estudante.periodo:
+                estudante.periodo = str(self.student.periodo)
+                updated = True
+            if updated:
+                estudante.save()
+        
+        # Verificar se já existe uma inscrição SUBMETIDA para este estudante e edital
+        # Se já existir, apenas atualiza a existente em vez de criar nova
+        existing_inscricao = Inscricao.objects.filter(
             edital=edital,
             estudante=estudante,
-            defaults={
-                'status': 'SUBMETIDA',
-                'classificacao': 'ANALISE',
-                'submetida_em': self.data_conclusao,
-                'informacoes_estudante': {
+            status='SUBMETIDA'
+        ).first()
+        
+        if existing_inscricao:
+            # Atualiza a inscrição existente
+            existing_inscricao.status = 'SUBMETIDA'
+            existing_inscricao.classificacao = 'ANALISE'
+            existing_inscricao.submetida_em = self.data_conclusao
+            existing_inscricao.informacoes_estudante = {
+                'nome': self.student.nome_completo,
+                'cpf': self.student.cpf,
+                'matricula': self.student.matricula,
+                'data_nascimento': str(self.student.data_nascimento) if self.student.data_nascimento else '',
+                'raca': self.student.raca or '',
+                'sexo': self.student.sexo or '',
+            }
+            existing_inscricao.informacoes_endereco = {
+                'cep': self.address.cep if self.address else '',
+                'bairro': self.address.bairro if self.address else '',
+                'cidade': self.address.cidade if self.address else '',
+                'estado': self.address.estado if self.address else '',
+                'rua': self.address.rua if self.address else '',
+                'numero': self.address.numero if self.address else '',
+                'complemento': self.address.complemento if self.address else '',
+            } if self.address else {}
+            existing_inscricao.informacoes_deslocamento = {
+                'tipo_transporte': self.displacement.tipo_transporte if self.displacement else '',
+                'valor_mensal_transporte': str(self.displacement.valor_mensal_transporte) if self.displacement else '0',
+                'trajeto_percorrido': self.displacement.trajeto_percorrido if self.displacement else '',
+            } if self.displacement else {}
+            existing_inscricao.informacoes_inscricao = {
+                'renda_bruta_familiar': str(self.renda_bruta_familiar),
+                'renda_per_capita': str(self.renda_per_capita),
+                'faixa_renda_per_capita': self.faixa_renda_per_capita or '',
+                'relato_vida': self.relato_vida or '',
+                'eh_chefe_familia': self.eh_chefe_familia,
+                'beneficiario_social': self.beneficiario_social,
+            }
+            existing_inscricao.save()
+        else:
+            # Criar nova Inscrição
+            inscricao = Inscricao.objects.create(
+                edital=edital,
+                estudante=estudante,
+                status='SUBMETIDA',
+                classificacao='ANALISE',
+                submetida_em=self.data_conclusao,
+                informacoes_estudante={
                     'nome': self.student.nome_completo,
                     'cpf': self.student.cpf,
                     'matricula': self.student.matricula,
@@ -471,7 +556,7 @@ class Enrollment(models.Model):
                     'raca': self.student.raca or '',
                     'sexo': self.student.sexo or '',
                 },
-                'informacoes_endereco': {
+                informacoes_endereco={
                     'cep': self.address.cep if self.address else '',
                     'bairro': self.address.bairro if self.address else '',
                     'cidade': self.address.cidade if self.address else '',
@@ -480,12 +565,12 @@ class Enrollment(models.Model):
                     'numero': self.address.numero if self.address else '',
                     'complemento': self.address.complemento if self.address else '',
                 } if self.address else {},
-                'informacoes_deslocamento': {
+                informacoes_deslocamento={
                     'tipo_transporte': self.displacement.tipo_transporte if self.displacement else '',
                     'valor_mensal_transporte': str(self.displacement.valor_mensal_transporte) if self.displacement else '0',
                     'trajeto_percorrido': self.displacement.trajeto_percorrido if self.displacement else '',
                 } if self.displacement else {},
-                'informacoes_inscricao': {
+                informacoes_inscricao={
                     'renda_bruta_familiar': str(self.renda_bruta_familiar),
                     'renda_per_capita': str(self.renda_per_capita),
                     'faixa_renda_per_capita': self.faixa_renda_per_capita or '',
@@ -493,15 +578,7 @@ class Enrollment(models.Model):
                     'eh_chefe_familia': self.eh_chefe_familia,
                     'beneficiario_social': self.beneficiario_social,
                 },
-            }
-        )
-        
-        # Se a inscrição já existia, atualizar os dados
-        if not created:
-            inscricao.status = 'SUBMETIDA'
-            inscricao.classificacao = 'ANALISE'
-            inscricao.submetida_em = self.data_conclusao
-            inscricao.save()
+            )
     
     def classificar(self, classificacao, assistente_social=None, comentario=None):
         """

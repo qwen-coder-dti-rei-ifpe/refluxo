@@ -15,12 +15,47 @@ from ifpe_mvp.apps.students.models import Student
 
 def enrollment_period_list(request):
     """Lista todos os editais/periodos de inscrição ativos."""
+    from inscricoes.models import Edital, Inscricao
+    
+    # Obter períodos locais ativos
     periods = EnrollmentPeriod.objects.filter(
         ativo=True,
         data_fim__gte=timezone.now()
     ).order_by('-data_inicio')
     
-    context = {'periods': periods}
+    # Obter editais do app inscricoes que estão ativos e com inscrições abertas
+    editais_inscricoes = Edital.objects.filter(
+        ativo=True,
+        status='ATIVO',
+        periodo_inscricao_fechamento__gte=timezone.now()
+    ).order_by('-criado_em')
+    
+    # Se o usuário estiver logado, verificar quais editais ele já tem inscrição submetida
+    user_has_submitted = []
+    if request.user.is_authenticated:
+        try:
+            student = request.user.student
+            # Verificar inscrições SUBMETIDAS no modelo Enrollment (enrollments app)
+            submitted_enrollment_periods = Enrollment.objects.filter(
+                student=student,
+                status='SUBMETIDA'
+            ).values_list('enrollment_period_id', flat=True)
+            
+            # Verificar inscrições SUBMETIDAS no modelo Inscricao (inscricoes app)
+            submitted_inscricoes = Inscricao.objects.filter(
+                estudante__cpf=student.cpf,
+                status='SUBMETIDA'
+            ).values_list('edital_id', flat=True)
+            
+            user_has_submitted = list(submitted_enrollment_periods) + list(submitted_inscricoes)
+        except (Student.DoesNotExist, AttributeError):
+            pass
+    
+    context = {
+        'periods': periods,
+        'editais_inscricoes': editais_inscricoes,
+        'user_has_submitted': user_has_submitted,
+    }
     return render(request, 'enrollments/period_list.html', context)
 
 
