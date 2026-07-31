@@ -446,6 +446,12 @@ class Enrollment(models.Model):
                 'email_institucional': self.student.email_institucional or '',
                 'curso': self.student.curso or '',
                 'campus': self.student.campus or '',
+                'idade': self.student.idade or 0,
+                'raca': self.student.raca or '',
+                'sexo': self.student.sexo or '',
+                'turno': self.student.turno or 'INTEGRAL',
+                'periodo': str(self.student.periodo) if self.student.periodo else '',
+                'eh_cotista': self.student.eh_cotista,
             }
         )
         
