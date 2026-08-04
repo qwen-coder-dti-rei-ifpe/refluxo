@@ -178,7 +178,7 @@ AUTHENTICATION_BACKENDS = [
 AUTH_USER_MODEL = 'core.Usuario'
 
 # URL de redirecionamento após login
-LOGIN_REDIRECT_URL = 'assistente_dashboard'
+LOGIN_REDIRECT_URL = 'student_dashboard'
 LOGIN_URL = 'login'
 LOGOUT_REDIRECT_URL = 'login'
 

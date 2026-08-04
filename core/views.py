@@ -103,218 +103,30 @@ def assistente_dashboard_view(request):
 def student_dashboard_view(request):
     """
     View para dashboard do estudante.
-    Primeiro o estudante deve selecionar um edital ativo, depois pode buscar por matrícula.
-    Exibe card de Avaliação da Renda Familiar com dados do CadÚnico.
+    Exibe apenas as inscrições realizadas pelo estudante.
+    Para criar nova inscrição, o estudante deve clicar em "Nova Inscrição".
     """
     from inscricoes.models import Edital, Inscricao
-    from integrations.oauth_service import gerar_token_oauth
-    from integrations.cadunico_service import buscar_dados_familiar, validar_cpf
     
     # Verifica se é assistente social, se for redireciona
     if hasattr(request.user, 'is_assistente_social') and request.user.is_assistente_social:
         return redirect('/dashboard/assistente/')
     
-    matricula_search = None
-    edital_selecionado = None
-    inscricao_existente = None
-    message = None
-    dados_familiar = None
-    erro_familiar = None
-    faixa_renda_descricao = None
+    # Buscar estudante logado
+    estudante = None
+    try:
+        estudante = Estudante.objects.get(cpf=request.user.username)
+    except Estudante.DoesNotExist:
+        pass
     
-    # Verifica se deve limpar o edital selecionado (quando volta para seleção)
-    if request.method == 'GET' and request.GET.get('clear_edital'):
-        request.session.pop('edital_selecionado_id', None)
-        edital_selecionado = None
-        matricula_search = None  # Limpa também a matrícula pesquisada
-    
-    # Passo 1: Selecionar edital ativo (somente para visualização do estudante)
-    # Filtra apenas editais com status ATIVO e dentro do período de inscrições
-    from django.utils import timezone
-    agora = timezone.now()
-    editais_ativos = Edital.objects.filter(
-        ativo=True, 
-        status='ATIVO',
-        periodo_inscricao_abertura__lte=agora,
-        periodo_inscricao_fechamento__gte=agora
-    )
-    
-    # Buscar dados familiares do CadÚnico se tiver CPF do usuário
-    cpf_usuario = request.user.username if hasattr(request.user, 'username') else None
-    if cpf_usuario and validar_cpf(cpf_usuario):
-        try:
-            # Gerar token OAuth
-            token, erro_token = gerar_token_oauth(cpf_usuario)
-            
-            if token and not erro_token:
-                # Buscar dados familiares
-                dados_familiar, erro_familiar = buscar_dados_familiar(cpf_usuario, token)
-                
-                if dados_familiar and not erro_familiar:
-                    # Extrair descrição da faixa de renda per capita
-                    faixa_renda = dados_familiar.get('faixaRendaFamiliarPerCapita', {})
-                    if isinstance(faixa_renda, dict):
-                        faixa_renda_descricao = faixa_renda.get('descricao', '')
-                    elif isinstance(faixa_renda, list) and len(faixa_renda) > 0:
-                        faixa_renda_descricao = faixa_renda[0].get('descricao', '') if isinstance(faixa_renda[0], dict) else ''
-        except Exception as e:
-            # Em caso de erro, apenas não exibe os dados (não quebra a página)
-            pass
-    
-    if request.method == 'POST':
-        # Verifica se está limpando a seleção do edital
-        if request.POST.get('clear_edital'):
-            request.session.pop('edital_selecionado_id', None)
-            edital_selecionado = None
-        # Verifica se está selecionando um edital
-        elif 'edital_id' in request.POST:
-            edital_id = request.POST.get('edital_id')
-            if edital_id:
-                try:
-                    edital_selecionado = Edital.objects.get(id=edital_id, ativo=True, status='ATIVO')
-                    # Armazena o edital selecionado na sessão
-                    request.session['edital_selecionado_id'] = edital_id
-                    message = "Edital selecionado! Agora você pode buscar sua matrícula."
-                except Edital.DoesNotExist:
-                    message = "Edital não encontrado ou não está ativo."
-        # Verifica se está buscando por matrícula
-        elif 'matricula' in request.POST:
-            matricula_search = request.POST.get('matricula', '').strip()
-            
-            # Obtém o edital selecionado da sessão
-            edital_id = request.session.get('edital_selecionado_id')
-            if edital_id:
-                try:
-                    edital_selecionado = Edital.objects.get(id=edital_id, ativo=True, status='ATIVO')
-                except Edital.DoesNotExist:
-                    edital_selecionado = None
-            
-            if matricula_search and edital_selecionado:
-                # Primeiro, tentar buscar na API do QAcadêmico (Mock Postman)
-                dados_qacademico, erro_api = buscar_estudante_qacademico(matricula_search)
-                
-                if dados_qacademico and not erro_api:
-                    # Dados encontrados na API QAcadêmico - usar para preencher formulário
-                    message = "Matrícula encontrada no QAcadêmico! Preencha os dados abaixo para enviar sua submissão."
-                    
-                    # Armazenar dados do estudante na sessão para autopreenchimento
-                    request.session['estudanteDados'] = {
-                        'nome_completo': dados_qacademico.get('nome_completo', ''),
-                        'cpf': dados_qacademico.get('cpf', ''),
-                        'identidade': dados_qacademico.get('identidade', ''),
-                        'data_nascimento': dados_qacademico.get('data_nascimento', ''),
-                        'idade': dados_qacademico.get('idade'),
-                        'raca': dados_qacademico.get('raca', ''),
-                        'sexo': dados_qacademico.get('sexo', ''),
-                        'genero': dados_qacademico.get('sexo', ''),  # Gênero igual ao sexo por padrão
-                        'matricula': dados_qacademico.get('matricula', ''),
-                        'campus': dados_qacademico.get('campus', ''),
-                        'curso': dados_qacademico.get('curso', ''),
-                        'turno': dados_qacademico.get('turno', ''),
-                        'periodo': dados_qacademico.get('periodo', ''),
-                        'eh_cotista': dados_qacademico.get('eh_cotista', False),
-                        'email_institucional': dados_qacademico.get('email_institucional', dados_qacademico.get('email', '')),
-                        'email_pessoal': dados_qacademico.get('email_pessoal', dados_qacademico.get('email', '')),
-                        'moradia_estudantil': False,
-                    }
-                    
-                    # Redireciona para Step 3 (cards)
-                    return redirect('step3_cards')
-                
-                # Se não encontrou na API, tenta buscar no banco local
-                try:
-                    estudante = Estudante.objects.get(cpf=request.user.username, matricula=matricula_search)
-                    
-                    # Verificar se já existe inscrição para este edital
-                    inscricao_existente = Inscricao.objects.filter(
-                        edital=edital_selecionado,
-                        estudante=estudante
-                    ).first()
-                    
-                    if inscricao_existente:
-                        message = "Você já possui uma submissão para este edital."
-                        # Redireciona para Step 3 (cards)
-                        return redirect('step3_cards')
-                    else:
-                        message = "Matrícula encontrada! Preencha os dados abaixo para enviar sua submissão."
-                        # Armazena dados do estudante na sessão para autopreenchimento
-                        request.session['estudanteDados'] = {
-                            'nome_completo': estudante.nome_completo,
-                            'cpf': estudante.cpf,
-                            'identidade': estudante.identidade if hasattr(estudante, 'identidade') else '',
-                            'data_nascimento': str(estudante.data_nascimento) if hasattr(estudante, 'data_nascimento') and estudante.data_nascimento else '',
-                            'idade': estudante.idade,
-                            'raca': estudante.raca,
-                            'sexo': estudante.sexo,
-                            'genero': estudante.genero if hasattr(estudante, 'genero') else estudante.sexo,
-                            'matricula': estudante.matricula,
-                            'campus': estudante.campus,
-                            'curso': estudante.curso,
-                            'turno': estudante.turno,
-                            'periodo': estudante.periodo,
-                            'eh_cotista': estudante.eh_cotista,
-                            'email_institucional': estudante.email_institucional if hasattr(estudante, 'email_institucional') else '',
-                            'email_pessoal': estudante.email_pessoal if hasattr(estudante, 'email_pessoal') else '',
-                            'moradia_estudantil': estudante.moradia_estudantil,
-                        }
-                        # Se tiver endereço, armazena também
-                        if hasattr(estudante, 'endereco') and estudante.endereco:
-                            request.session['enderecoDados'] = {
-                                'cep': estudante.endereco.cep,
-                                'bairro': estudante.endereco.bairro,
-                                'cidade': estudante.endereco.cidade,
-                                'estado': estudante.endereco.estado,
-                            }
-                        # Redireciona para Step 3 (cards)
-                        return redirect('step3_cards')
-                        
-                except Estudante.DoesNotExist:
-                    # Não encontrou nem na API nem no banco local
-                    if erro_api:
-                        message = f"Erro ao buscar matrícula: {erro_api}"
-                    else:
-                        message = "Matrícula não encontrada para o seu CPF."
-            elif not edital_selecionado:
-                message = "Por favor, selecione um edital ativo antes de buscar a matrícula."
-    else:
-        # Tenta carregar o edital selecionado da sessão
-        edital_id = request.session.get('edital_selecionado_id')
-        if edital_id:
-            try:
-                edital_selecionado = Edital.objects.get(id=edital_id, ativo=True, status='ATIVO')
-            except Edital.DoesNotExist:
-                # Se o edital não existe mais ou não está ativo, limpa a sessão
-                request.session.pop('edital_selecionado_id', None)
-                edital_selecionado = None
-        
-        # Se já tem edital selecionado, tenta carregar automaticamente a matrícula do estudante
-        if edital_selecionado:
-            try:
-                estudante = Estudante.objects.get(cpf=request.user.username)
-                matricula_search = estudante.matricula
-                
-                # Verificar se já existe inscrição
-                inscricao_existente = Inscricao.objects.filter(
-                    edital=edital_selecionado,
-                    estudante=estudante
-                ).first()
-                
-                if inscricao_existente:
-                    message = "Você já possui uma submissão para este edital."
-                else:
-                    message = "Sua matrícula foi encontrada. Há um edital ativo disponível!"
-            except Estudante.DoesNotExist:
-                pass
+    # Buscar todas as inscrições do estudante ordenadas por data de criação
+    inscricoes = []
+    if estudante:
+        inscricoes = Inscricao.objects.filter(estudante=estudante).order_by('-criado_em')
     
     context = {
-        'matricula_search': matricula_search,
-        'edital': edital_selecionado,
-        'editais_ativos': editais_ativos,
-        'inscricao': inscricao_existente,
-        'message': message,
-        'dados_familiar': dados_familiar,
-        'erro_familiar': erro_familiar,
-        'faixa_renda_descricao': faixa_renda_descricao,
+        'inscricoes': inscricoes,
+        'estudante': estudante,
     }
     
     return render(request, 'dashboard/student.html', context)

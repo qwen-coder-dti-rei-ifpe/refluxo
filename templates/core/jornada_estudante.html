@@ -1,157 +1,233 @@
-{% extends 'admin/base_site.html' %}
+{% extends 'student_base.html' %}
 
-{% block title %}Jornada do Estudante{% endblock %}
-
-{% block branding %}
-<h1 id="site-name">Jornada do Estudante - Cadastro Completo</h1>
-{% endblock %}
+{% block title %}Jornada do Estudante - PAMA{% endblock %}
 
 {% block content %}
-<div style="max-width: 900px; margin: 0 auto;">
-    <div style="background: white; border-radius: 8px; padding: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-        <form method="post" novalidate>
-            {% csrf_token %}
-            
-            <!-- Etapa 1: Dados Pessoais -->
-            <div style="margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid #ddd;">
-                <h3 style="color: #417690; margin-bottom: 1rem;">1. Dados Pessoais</h3>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                    <div>
-                        <label for="{{ form.nome_completo.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Nome Completo *</label>
-                        {{ form.nome_completo }}
-                    </div>
-                    <div>
-                        <label for="{{ form.cpf.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">CPF *</label>
-                        {{ form.cpf }}
-                    </div>
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0"><i class="fas fa-graduation-cap me-2"></i>Jornada do Estudante - Cadastro Completo</h4>
                 </div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 1rem;">
-                    <div>
-                        <label for="{{ form.idade.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Idade *</label>
-                        {{ form.idade }}
-                    </div>
-                    <div>
-                        <label for="{{ form.raca.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Raça</label>
-                        {{ form.raca }}
-                    </div>
-                    <div>
-                        <label for="{{ form.sexo.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Sexo</label>
-                        {{ form.sexo }}
-                    </div>
+                <div class="card-body">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Etapa 1: Dados Pessoais -->
+                        <div class="mb-4 pb-3 border-bottom">
+                            <h5 class="text-primary mb-3">1. Dados Pessoais</h5>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="{{ form.nome_completo.id_for_label }}" class="form-label fw-bold">Nome Completo *</label>
+                                    {{ form.nome_completo }}
+                                    {% if form.nome_completo.errors %}
+                                        <div class="text-danger small">{{ form.nome_completo.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.cpf.id_for_label }}" class="form-label fw-bold">CPF *</label>
+                                    {{ form.cpf }}
+                                    {% if form.cpf.errors %}
+                                        <div class="text-danger small">{{ form.cpf.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="row g-3 mt-2">
+                                <div class="col-md-4">
+                                    <label for="{{ form.idade.id_for_label }}" class="form-label fw-bold">Idade *</label>
+                                    {{ form.idade }}
+                                    {% if form.idade.errors %}
+                                        <div class="text-danger small">{{ form.idade.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="{{ form.raca.id_for_label }}" class="form-label fw-bold">Raça</label>
+                                    {{ form.raca }}
+                                    {% if form.raca.errors %}
+                                        <div class="text-danger small">{{ form.raca.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="{{ form.sexo.id_for_label }}" class="form-label fw-bold">Sexo</label>
+                                    {{ form.sexo }}
+                                    {% if form.sexo.errors %}
+                                        <div class="text-danger small">{{ form.sexo.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Etapa 2: Dados Acadêmicos -->
+                        <div class="mb-4 pb-3 border-bottom">
+                            <h5 class="text-primary mb-3">2. Dados Acadêmicos</h5>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="{{ form.matricula.id_for_label }}" class="form-label fw-bold">Matrícula *</label>
+                                    {{ form.matricula }}
+                                    {% if form.matricula.errors %}
+                                        <div class="text-danger small">{{ form.matricula.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.campus.id_for_label }}" class="form-label fw-bold">Campus *</label>
+                                    {{ form.campus }}
+                                    {% if form.campus.errors %}
+                                        <div class="text-danger small">{{ form.campus.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="row g-3 mt-2">
+                                <div class="col-md-4">
+                                    <label for="{{ form.curso.id_for_label }}" class="form-label fw-bold">Curso *</label>
+                                    {{ form.curso }}
+                                    {% if form.curso.errors %}
+                                        <div class="text-danger small">{{ form.curso.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="{{ form.turno.id_for_label }}" class="form-label fw-bold">Turno *</label>
+                                    {{ form.turno }}
+                                    {% if form.turno.errors %}
+                                        <div class="text-danger small">{{ form.turno.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="{{ form.periodo.id_for_label }}" class="form-label fw-bold">Período *</label>
+                                    {{ form.periodo }}
+                                    {% if form.periodo.errors %}
+                                        <div class="text-danger small">{{ form.periodo.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="row g-3 mt-3">
+                                <div class="col-auto">
+                                    <div class="form-check">
+                                        {{ form.eh_cotista }}
+                                        <label class="form-check-label" for="{{ form.eh_cotista.id_for_label }}">É cotista?</label>
+                                    </div>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="form-check">
+                                        {{ form.moradia_estudantil }}
+                                        <label class="form-check-label" for="{{ form.moradia_estudantil.id_for_label }}">Moradia estudantil?</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Etapa 3: Endereço -->
+                        <div class="mb-4 pb-3 border-bottom">
+                            <h5 class="text-primary mb-3">3. Endereço Residencial</h5>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="{{ form.cep.id_for_label }}" class="form-label fw-bold">CEP *</label>
+                                    {{ form.cep }}
+                                    {% if form.cep.errors %}
+                                        <div class="text-danger small">{{ form.cep.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="{{ form.bairro.id_for_label }}" class="form-label fw-bold">Bairro *</label>
+                                    {{ form.bairro }}
+                                    {% if form.bairro.errors %}
+                                        <div class="text-danger small">{{ form.bairro.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="{{ form.cidade.id_for_label }}" class="form-label fw-bold">Cidade *</label>
+                                    {{ form.cidade }}
+                                    {% if form.cidade.errors %}
+                                        <div class="text-danger small">{{ form.cidade.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="row g-3 mt-2">
+                                <div class="col-md-4">
+                                    <label for="{{ form.estado.id_for_label }}" class="form-label fw-bold">Estado (UF) *</label>
+                                    {{ form.estado }}
+                                    {% if form.estado.errors %}
+                                        <div class="text-danger small">{{ form.estado.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Etapa 4: Dados Bancários -->
+                        <div class="mb-4 pb-3 border-bottom">
+                            <h5 class="text-primary mb-3">4. Dados Bancários (Opcional)</h5>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="{{ form.tipo_conta.id_for_label }}" class="form-label">Tipo de Conta</label>
+                                    {{ form.tipo_conta }}
+                                    {% if form.tipo_conta.errors %}
+                                        <div class="text-danger small">{{ form.tipo_conta.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="{{ form.numero_agencia.id_for_label }}" class="form-label">Agência</label>
+                                    {{ form.numero_agencia }}
+                                    {% if form.numero_agencia.errors %}
+                                        <div class="text-danger small">{{ form.numero_agencia.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="{{ form.numero_conta.id_for_label }}" class="form-label">Conta</label>
+                                    {{ form.numero_conta }}
+                                    {% if form.numero_conta.errors %}
+                                        <div class="text-danger small">{{ form.numero_conta.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="row g-3 mt-2">
+                                <div class="col-md-4">
+                                    <label for="{{ form.banco.id_for_label }}" class="form-label">Banco</label>
+                                    {{ form.banco }}
+                                    {% if form.banco.errors %}
+                                        <div class="text-danger small">{{ form.banco.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Etapa 5: Confirmação -->
+                        <div class="mb-4 p-3 bg-light rounded">
+                            <h5 class="text-primary mb-3">5. Confirmação</h5>
+                            
+                            <div class="form-check">
+                                {{ form.termo_ciencia }}
+                                <label class="form-check-label" for="{{ form.termo_ciencia.id_for_label }}">
+                                    {{ form.termo_ciencia.label }}
+                                </label>
+                            </div>
+                            {% if form.termo_ciencia.errors %}
+                                <div class="text-danger small mt-2">{{ form.termo_ciencia.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Botões de Ação -->
+                        <div class="d-flex gap-2 justify-content-end">
+                            <a href="javascript:history.back()" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Voltar
+                            </a>
+                            <a href="/" class="btn btn-outline-secondary">Cancelar</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Salvar Jornada
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
-            
-            <!-- Etapa 2: Dados Acadêmicos -->
-            <div style="margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid #ddd;">
-                <h3 style="color: #417690; margin-bottom: 1rem;">2. Dados Acadêmicos</h3>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                    <div>
-                        <label for="{{ form.matricula.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Matrícula *</label>
-                        {{ form.matricula }}
-                    </div>
-                    <div>
-                        <label for="{{ form.campus.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Campus *</label>
-                        {{ form.campus }}
-                    </div>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 1rem;">
-                    <div>
-                        <label for="{{ form.curso.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Curso *</label>
-                        {{ form.curso }}
-                    </div>
-                    <div>
-                        <label for="{{ form.turno.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Turno *</label>
-                        {{ form.turno }}
-                    </div>
-                    <div>
-                        <label for="{{ form.periodo.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Período *</label>
-                        {{ form.periodo }}
-                    </div>
-                </div>
-                
-                <div style="display: flex; gap: 2rem; margin-top: 1rem;">
-                    <label style="display: flex; align-items: center; gap: 0.5rem;">
-                        {{ form.eh_cotista }} É cotista?
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 0.5rem;">
-                        {{ form.moradia_estudantil }} Moradia estudantil?
-                    </label>
-                </div>
-            </div>
-            
-            <!-- Etapa 3: Endereço -->
-            <div style="margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid #ddd;">
-                <h3 style="color: #417690; margin-bottom: 1rem;">3. Endereço Residencial</h3>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
-                    <div>
-                        <label for="{{ form.cep.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">CEP *</label>
-                        {{ form.cep }}
-                    </div>
-                    <div>
-                        <label for="{{ form.bairro.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Bairro *</label>
-                        {{ form.bairro }}
-                    </div>
-                    <div>
-                        <label for="{{ form.cidade.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Cidade *</label>
-                        {{ form.cidade }}
-                    </div>
-                </div>
-                
-                <div style="margin-top: 1rem;">
-                    <label for="{{ form.estado.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Estado (UF) *</label>
-                    {{ form.estado }}
-                </div>
-            </div>
-            
-            <!-- Etapa 4: Dados Bancários -->
-            <div style="margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid #ddd;">
-                <h3 style="color: #417690; margin-bottom: 1rem;">4. Dados Bancários (Opcional)</h3>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
-                    <div>
-                        <label for="{{ form.tipo_conta.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Tipo de Conta</label>
-                        {{ form.tipo_conta }}
-                    </div>
-                    <div>
-                        <label for="{{ form.numero_agencia.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Agência</label>
-                        {{ form.numero_agencia }}
-                    </div>
-                    <div>
-                        <label for="{{ form.numero_conta.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Conta</label>
-                        {{ form.numero_conta }}
-                    </div>
-                </div>
-                
-                <div style="margin-top: 1rem;">
-                    <label for="{{ form.banco.id_for_label }}" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Banco</label>
-                    {{ form.banco }}
-                </div>
-            </div>
-            
-            <!-- Etapa 5: Confirmação -->
-            <div style="margin-bottom: 2rem; padding: 1rem; background: #f5f5f5; border-radius: 8px;">
-                <h3 style="color: #417690; margin-bottom: 1rem;">5. Confirmação</h3>
-                
-                <label style="display: flex; align-items: flex-start; gap: 0.5rem; cursor: pointer;">
-                    {{ form.termo_ciencia }}
-                    <span>{{ form.termo_ciencia.label }}</span>
-                </label>
-            </div>
-            
-            <!-- Botões de Ação -->
-            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-                <a href="javascript:history.back()" style="padding: 10px 20px; background: #f5f5f5; color: #333; text-decoration: none; border-radius: 4px;">← Voltar</a>
-                <a href="/" style="padding: 10px 20px; background: #f5f5f5; color: #333; text-decoration: none; border-radius: 4px;">Cancelar</a>
-                <button type="submit" style="padding: 10px 30px; background: #417690; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">
-                    Salvar Jornada
-                </button>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
@@ -165,8 +241,8 @@
     }
     .form-control:focus {
         outline: none;
-        border-color: #417690;
-        box-shadow: 0 0 0 2px rgba(65, 118, 144, 0.2);
+        border-color: #27ae60;
+        box-shadow: 0 0 0 2px rgba(39, 174, 96, 0.2);
     }
     input[type="checkbox"] {
         width: auto;
