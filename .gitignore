@@ -1,1 +1,1 @@
-(config/settings.py and core/views.py are source code files, and there are no build artifacts, dependencies, or temp files in the changes)
+Nothing should be ignored in this case, as the only modified file is a Python source file (`views.py`) which is part of the application code and not a build artifact, dependency, or temporary file.
