@@ -103,12 +103,24 @@ def assistente_dashboard_view(request):
 @login_required
 def student_dashboard_view(request):
     """
-    View para dashboard do estudante.
-    Redireciona para a tela de seleção de editais abertos (Passo 1 da jornada).
+    View para dashboard do estudante - Step 2 da jornada.
+    Exibe seleção de edital e campo para informar número da matrícula.
     """
-    from django.shortcuts import redirect
-    # Redireciona para a lista de períodos de inscrição onde o estudante pode selecionar um edital
-    return redirect('enrollment_period_list')
+    from inscricoes.models import Edital
+    from django.utils import timezone
+    
+    # Obter editais ativos com inscrições abertas
+    editais = Edital.objects.filter(
+        ativo=True,
+        status='ATIVO',
+        periodo_inscricao_fechamento__gte=timezone.now()
+    ).order_by('-criado_em')
+    
+    context = {
+        'editais': editais,
+    }
+    
+    return render(request, 'dashboard/student.html', context)
 
 
 @login_required
