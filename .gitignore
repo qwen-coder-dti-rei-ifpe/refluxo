@@ -1,1 +1,45 @@
-Nothing needs to be added to .gitignore since only a template HTML file was modified and no build artifacts, dependencies, or temporary files were detected in the changes.
+```gitignore
+# Python compiled files
+*.pyc
+__pycache__/
+
+# Virtual environment
+venv/
+
+# Dependencies in virtual environment
+venv/lib/python*/site-packages/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.swp
+
+# Environment files
+.env
+.env.local
+*.env.*
+
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+dist/
+build/
+target/
+
+# Cache directories
+.mypy_cache/
+.pytest_cache/
+```

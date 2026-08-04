@@ -105,6 +105,7 @@ def student_dashboard_view(request):
     View para dashboard do estudante.
     Primeiro o estudante deve selecionar um edital ativo, depois pode buscar por matrícula.
     Exibe card de Avaliação da Renda Familiar com dados do CadÚnico.
+    Mostra também as inscrições realizadas pelo estudante.
     """
     from inscricoes.models import Edital, Inscricao
     from integrations.oauth_service import gerar_token_oauth
@@ -121,6 +122,18 @@ def student_dashboard_view(request):
     dados_familiar = None
     erro_familiar = None
     faixa_renda_descricao = None
+    
+    # Buscar estudante logado
+    estudante = None
+    try:
+        estudante = Estudante.objects.get(cpf=request.user.username)
+    except Estudante.DoesNotExist:
+        pass
+    
+    # Buscar todas as inscrições do estudante
+    inscricoes = []
+    if estudante:
+        inscricoes = Inscricao.objects.filter(estudante=estudante).order_by('-criado_em')
     
     # Verifica se deve limpar o edital selecionado (quando volta para seleção)
     if request.method == 'GET' and request.GET.get('clear_edital'):
@@ -315,6 +328,8 @@ def student_dashboard_view(request):
         'dados_familiar': dados_familiar,
         'erro_familiar': erro_familiar,
         'faixa_renda_descricao': faixa_renda_descricao,
+        'inscricoes': inscricoes,
+        'estudante': estudante,
     }
     
     return render(request, 'dashboard/student.html', context)

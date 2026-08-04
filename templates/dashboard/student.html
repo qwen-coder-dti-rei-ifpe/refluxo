@@ -84,6 +84,79 @@
             </div>
             {% endif %}
             
+            <!-- Seções de Inscrições Realizadas -->
+            {% if inscricoes and inscricoes|length > 0 %}
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Minhas Inscrições</h5>
+                    <span class="badge bg-light text-dark">{{ inscricoes|length }}</span>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Edital</th>
+                                    <th>Data da Inscrição</th>
+                                    <th>Status</th>
+                                    <th>Classificação</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for inscricao in inscricoes %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ inscricao.edital.numero }}</strong><br>
+                                        <small class="text-muted">{{ inscricao.edital.titulo|truncatewords:5 }}</small>
+                                    </td>
+                                    <td>{{ inscricao.criado_em|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        {% if inscricao.status == 'RASCUNHO' %}
+                                            <span class="badge bg-secondary">{{ inscricao.get_status_display }}</span>
+                                        {% elif inscricao.status == 'SUBMETIDA' %}
+                                            <span class="badge bg-info">{{ inscricao.get_status_display }}</span>
+                                        {% elif inscricao.status == 'EM_ANALISE' %}
+                                            <span class="badge bg-warning text-dark">{{ inscricao.get_status_display }}</span>
+                                        {% elif inscricao.status == 'DEFERIDA' %}
+                                            <span class="badge bg-success">{{ inscricao.get_status_display }}</span>
+                                        {% elif inscricao.status == 'INDEFERIDA' %}
+                                            <span class="badge bg-danger">{{ inscricao.get_status_display }}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ inscricao.get_status_display }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if inscricao.classificacao == 'ANALISE' %}
+                                            <span class="badge bg-warning text-dark">{{ inscricao.get_classificacao_display }}</span>
+                                        {% elif inscricao.classificacao == 'COM_PENDENCIA' %}
+                                            <span class="badge bg-danger">{{ inscricao.get_classificacao_display }}</span>
+                                        {% elif inscricao.classificacao == 'REGULARIZADO' %}
+                                            <span class="badge bg-success">{{ inscricao.get_classificacao_display }}</span>
+                                        {% elif inscricao.classificacao == 'ELEGIVEL' %}
+                                            <span class="badge bg-success">{{ inscricao.get_classificacao_display }}</span>
+                                        {% elif inscricao.classificacao == 'CONTEMPLADO' %}
+                                            <span class="badge bg-success">{{ inscricao.get_classificacao_display }}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ inscricao.get_classificacao_display }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if inscricao.status == 'RASCUNHO' and inscricao.edital.esta_aberto %}
+                                            <a href="{% url 'step3_cards' %}" class="btn btn-sm btn-outline-primary">Continuar</a>
+                                        {% else %}
+                                            <a href="{% url 'enrollment_dashboard' inscricao.edital.id %}" class="btn btn-sm btn-outline-info">Ver Detalhes</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
             <!-- Progress Indicator -->
             <div class="progress-indicator">
                 <div class="progress-step {% if edital %}completed{% else %}active{% endif %}" title="Selecionar Edital">1</div>
