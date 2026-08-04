@@ -9,6 +9,137 @@
         min-height: 100vh;
     }
     
+    /* Left Panel Menu */
+    .left-panel {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 280px;
+        height: 100vh;
+        background: linear-gradient(180deg, #27ae60 0%, #2ecc71 100%);
+        box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+        z-index: 1000;
+        overflow-y: auto;
+        transition: transform 0.3s ease;
+    }
+    
+    .left-panel-header {
+        padding: 1.5rem 1rem;
+        text-align: center;
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .left-panel-header h3 {
+        color: white;
+        font-size: 1.2rem;
+        margin: 0;
+        font-weight: 700;
+    }
+    
+    .left-panel-header p {
+        color: rgba(255,255,255,0.9);
+        font-size: 0.85rem;
+        margin: 0.5rem 0 0 0;
+    }
+    
+    .left-panel-menu {
+        list-style: none;
+        padding: 1rem 0;
+        margin: 0;
+    }
+    
+    .left-panel-menu li {
+        margin: 0.25rem 0.5rem;
+    }
+    
+    .left-panel-menu a {
+        display: flex;
+        align-items: center;
+        padding: 0.875rem 1rem;
+        color: rgba(255,255,255,0.95);
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+    
+    .left-panel-menu a:hover {
+        background: rgba(255,255,255,0.15);
+        color: white;
+        transform: translateX(5px);
+    }
+    
+    .left-panel-menu a.active {
+        background: rgba(255,255,255,0.25);
+        color: white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    
+    .left-panel-menu i {
+        width: 24px;
+        margin-right: 0.75rem;
+        font-size: 1.1rem;
+        text-align: center;
+    }
+    
+    .menu-badge {
+        margin-left: auto;
+        background: rgba(255,255,255,0.2);
+        padding: 0.2rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+    }
+    
+    .menu-badge.completed {
+        background: rgba(255,255,255,0.3);
+    }
+    
+    .main-content {
+        margin-left: 280px;
+        padding: 2rem;
+        transition: margin-left 0.3s ease;
+    }
+    
+    .mobile-menu-toggle {
+        display: none;
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1001;
+        background: white;
+        color: #27ae60;
+        border: 2px solid #27ae60;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .mobile-menu-toggle:hover {
+        background: #27ae60;
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .left-panel {
+            transform: translateX(-100%);
+        }
+        
+        .left-panel.active {
+            transform: translateX(0);
+        }
+        
+        .main-content {
+            margin-left: 0;
+        }
+        
+        .mobile-menu-toggle {
+            display: block;
+        }
+    }
+    
     .step-header {
         text-align: center;
         margin-bottom: 2rem;
@@ -148,7 +279,7 @@
     .back-btn {
         position: fixed;
         top: 20px;
-        left: 20px;
+        right: 20px;
         background: white;
         color: #27ae60;
         border: 2px solid #27ae60;
@@ -173,146 +304,214 @@
         .progress-line {
             width: 30px;
         }
+        
+        .main-content {
+            padding: 1rem;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<a href="{% url 'student_dashboard' %}" class="back-btn">
-    <i class="fas fa-arrow-left"></i> Voltar
-</a>
+<!-- Mobile Menu Toggle -->
+<button class="mobile-menu-toggle" onclick="toggleMenu()">
+    <i class="fas fa-bars"></i> Menu
+</button>
 
-<div class="container py-4">
-    <div class="step-header">
-        <div class="progress-indicator">
-            <div class="progress-step completed"><i class="fas fa-check"></i></div>
-            <div class="progress-line completed"></div>
-            <div class="progress-step completed"><i class="fas fa-check"></i></div>
-            <div class="progress-line completed"></div>
-            <div class="progress-step active">3</div>
+<!-- Left Panel Menu -->
+<div class="left-panel" id="leftPanel">
+    <div class="left-panel-header">
+        <h3><i class="fas fa-graduation-cap"></i> Jornada do Estudante</h3>
+        <p>Navegue pelas etapas</p>
+    </div>
+    <ul class="left-panel-menu">
+        <li>
+            <a href="{% url 'student_dashboard' %}">
+                <i class="fas fa-home"></i>
+                Início
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'enrollment_period_list' %}" class="{% if request.resolver_match.url_name == 'enrollment_period_list' %}active{% endif %}">
+                <i class="fas fa-file-alt"></i>
+                Novas Inscrições
+                {% if periods_abertos|default:0 > 0 %}
+                    <span class="menu-badge">{{ periods_abertos }}</span>
+                {% endif %}
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'student_dashboard' %}?minhas_inscricoes=1" class="{% if request.GET.minhas_inscricoes %}active{% endif %}">
+                <i class="fas fa-clipboard-list"></i>
+                Minhas Inscrições
+            </a>
+        </li>
+        <li>
+            <a href="#" class="{% if 'avaliacao' in request.path %}active{% endif %}">
+                <i class="fas fa-star"></i>
+                Avaliação do Conecta Gov
+            </a>
+        </li>
+    </ul>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+    <a href="{% url 'student_dashboard' %}" class="back-btn">
+        <i class="fas fa-arrow-right"></i> Voltar
+    </a>
+
+    <div class="container py-4">
+        <div class="step-header">
+            <div class="progress-indicator">
+                <div class="progress-step completed"><i class="fas fa-check"></i></div>
+                <div class="progress-line completed"></div>
+                <div class="progress-step completed"><i class="fas fa-check"></i></div>
+                <div class="progress-line completed"></div>
+                <div class="progress-step active">1</div>
+            </div>
+            <h1><i class="fas fa-file-signature"></i> Etapa 3: Preenchimento da Inscrição</h1>
+            <p>Preencha todas as informações solicitadas nos cartões abaixo</p>
         </div>
-        <h1><i class="fas fa-file-signature"></i> Etapa 3: Preenchimento da Inscrição</h1>
-        <p>Preencha todas as informações solicitadas nos cartões abaixo</p>
-    </div>
-    
-    <div class="cards-grid">
-        <!-- Card 1: Dados do Estudante -->
-        <a href="{% url 'student_data_form' enrollment.pk %}" class="info-card" style="text-decoration: none; color: inherit;">
-            <div>
-                <div class="card-icon">
-                    <i class="fas fa-user-graduate"></i>
-                </div>
-                <h3 class="card-title">Dados do Estudante</h3>
-                <p class="card-description">
-                    Informações pessoais, acadêmicas e bancárias do estudante
-                </p>
-            </div>
-            <span class="card-status {% if student %}status-preenchido{% else %}status-pendente{% endif %}">
-                {% if student %}
-                    <i class="fas fa-check"></i> Preenchido
-                {% else %}
-                    <i class="fas fa-clock"></i> Pendente
-                {% endif %}
-            </span>
-        </a>
         
-        <!-- Card 2: Dados de Endereço -->
-        <a href="{% url 'address_data_form' enrollment.pk %}" class="info-card" style="text-decoration: none; color: inherit;">
-            <div>
-                <div class="card-icon">
-                    <i class="fas fa-home"></i>
+        <div class="cards-grid">
+            <!-- Card 1: Dados do Estudante -->
+            <a href="{% url 'student_data_form' enrollment.pk %}" class="info-card" style="text-decoration: none; color: inherit;">
+                <div>
+                    <div class="card-icon">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <h3 class="card-title">Dados do Estudante</h3>
+                    <p class="card-description">
+                        Informações pessoais, acadêmicas e bancárias do estudante
+                    </p>
                 </div>
-                <h3 class="card-title">Dados de Endereço</h3>
-                <p class="card-description">
-                    Informações residenciais e condições de moradia
-                </p>
-            </div>
-            <span class="card-status {% if enrollment.address %}status-preenchido{% else %}status-pendente{% endif %}">
-                {% if enrollment.address %}
-                    <i class="fas fa-check"></i> Preenchido
-                {% else %}
-                    <i class="fas fa-clock"></i> Pendente
-                {% endif %}
-            </span>
-        </a>
-        
-        <!-- Card 3: Dados de Membros Familiares -->
-        <a href="{% url 'family_members_form' enrollment.pk %}" class="info-card" style="text-decoration: none; color: inherit;">
-            <div>
-                <div class="card-icon">
-                    <i class="fas fa-users"></i>
-                </div>
-                <h3 class="card-title">Dados de Membros Familiares</h3>
-                <p class="card-description">
-                    Informações sobre o grupo familiar e renda
-                </p>
-            </div>
-            <span class="card-status {% if enrollment_has_family %}status-preenchido{% else %}status-pendente{% endif %}">
-                {% if enrollment_has_family %}
-                    <i class="fas fa-check"></i> Preenchido
-                {% else %}
-                    <i class="fas fa-clock"></i> Pendente
-                {% endif %}
-            </span>
-        </a>
-        
-        <!-- Card 4: Dados de Deslocamento -->
-        <a href="{% url 'displacement_data_form' enrollment.pk %}" class="info-card" style="text-decoration: none; color: inherit;">
-            <div>
-                <div class="card-icon">
-                    <i class="fas fa-bus"></i>
-                </div>
-                <h3 class="card-title">Dados de Deslocamento</h3>
-                <p class="card-description">
-                    Informações sobre transporte e trajeto diário
-                </p>
-            </div>
-            <span class="card-status {% if enrollment.displacement %}status-preenchido{% else %}status-pendente{% endif %}">
-                {% if enrollment.displacement %}
-                    <i class="fas fa-check"></i> Preenchido
-                {% else %}
-                    <i class="fas fa-clock"></i> Pendente
-                {% endif %}
-            </span>
-        </a>
-        
-        <!-- Card 5: Dados de Inscrição -->
-        <a href="{% url 'enrollment_data_form' enrollment.pk %}" class="info-card" style="text-decoration: none; color: inherit;">
-            <div>
-                <div class="card-icon">
-                    <i class="fas fa-clipboard-list"></i>
-                </div>
-                <h3 class="card-title">Dados de Inscrição</h3>
-                <p class="card-description">
-                    Informações socioeconômicas e declaração final
-                </p>
-            </div>
-            <span class="card-status {% if enrollment_complete %}status-completo{% elif enrollment_incomplete %}status-pendente{% else %}status-pendente{% endif %}">
-                {% if enrollment_complete %}
-                    <i class="fas fa-check"></i> Completo
-                {% else %}
-                    <i class="fas fa-clock"></i> Pendente
-                {% endif %}
-            </span>
-        </a>
-    </div>
-    
-    <!-- Botões de ação -->
-    <div class="row mt-5">
-        <div class="col-12 text-center">
-            <a href="{% url 'student_dashboard' %}" class="btn btn-secondary btn-lg me-3">
-                <i class="fas fa-arrow-left"></i> Voltar Buscar Estudante
+                <span class="card-status {% if student %}status-preenchido{% else %}status-pendente{% endif %}">
+                    {% if student %}
+                        <i class="fas fa-check"></i> Preenchido
+                    {% else %}
+                        <i class="fas fa-clock"></i> Pendente
+                    {% endif %}
+                </span>
             </a>
-            {% if all_completed %}
-            <a href="{% url 'enrollment_submit' enrollment.pk %}" class="btn btn-success btn-lg">
-                <i class="fas fa-paper-plane"></i> Submeter Inscrição
+            
+            <!-- Card 2: Dados de Endereço -->
+            <a href="{% url 'address_data_form' enrollment.pk %}" class="info-card" style="text-decoration: none; color: inherit;">
+                <div>
+                    <div class="card-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <h3 class="card-title">Dados de Endereço</h3>
+                    <p class="card-description">
+                        Informações residenciais e condições de moradia
+                    </p>
+                </div>
+                <span class="card-status {% if enrollment.address %}status-preenchido{% else %}status-pendente{% endif %}">
+                    {% if enrollment.address %}
+                        <i class="fas fa-check"></i> Preenchido
+                    {% else %}
+                        <i class="fas fa-clock"></i> Pendente
+                    {% endif %}
+                </span>
             </a>
-            {% else %}
-            <button class="btn btn-success btn-lg" disabled>
-                <i class="fas fa-lock"></i> Complete todos os campos para submeter
-            </button>
-            {% endif %}
+            
+            <!-- Card 3: Dados de Membros Familiares -->
+            <a href="{% url 'family_members_form' enrollment.pk %}" class="info-card" style="text-decoration: none; color: inherit;">
+                <div>
+                    <div class="card-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3 class="card-title">Dados de Membros Familiares</h3>
+                    <p class="card-description">
+                        Informações sobre o grupo familiar e renda
+                    </p>
+                </div>
+                <span class="card-status {% if enrollment_has_family %}status-preenchido{% else %}status-pendente{% endif %}">
+                    {% if enrollment_has_family %}
+                        <i class="fas fa-check"></i> Preenchido
+                    {% else %}
+                        <i class="fas fa-clock"></i> Pendente
+                    {% endif %}
+                </span>
+            </a>
+            
+            <!-- Card 4: Dados de Deslocamento -->
+            <a href="{% url 'displacement_data_form' enrollment.pk %}" class="info-card" style="text-decoration: none; color: inherit;">
+                <div>
+                    <div class="card-icon">
+                        <i class="fas fa-bus"></i>
+                    </div>
+                    <h3 class="card-title">Dados de Deslocamento</h3>
+                    <p class="card-description">
+                        Informações sobre transporte e trajeto diário
+                    </p>
+                </div>
+                <span class="card-status {% if enrollment.displacement %}status-preenchido{% else %}status-pendente{% endif %}">
+                    {% if enrollment.displacement %}
+                        <i class="fas fa-check"></i> Preenchido
+                    {% else %}
+                        <i class="fas fa-clock"></i> Pendente
+                    {% endif %}
+                </span>
+            </a>
+            
+            <!-- Card 5: Dados de Inscrição -->
+            <a href="{% url 'enrollment_data_form' enrollment.pk %}" class="info-card" style="text-decoration: none; color: inherit;">
+                <div>
+                    <div class="card-icon">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <h3 class="card-title">Dados de Inscrição</h3>
+                    <p class="card-description">
+                        Informações socioeconômicas e declaração final
+                    </p>
+                </div>
+                <span class="card-status {% if enrollment_complete %}status-completo{% elif enrollment_incomplete %}status-pendente{% else %}status-pendente{% endif %}">
+                    {% if enrollment_complete %}
+                        <i class="fas fa-check"></i> Completo
+                    {% else %}
+                        <i class="fas fa-clock"></i> Pendente
+                    {% endif %}
+                </span>
+            </a>
+        </div>
+        
+        <!-- Botões de ação -->
+        <div class="row mt-5">
+            <div class="col-12 text-center">
+                <a href="{% url 'student_dashboard' %}" class="btn btn-secondary btn-lg me-3">
+                    <i class="fas fa-arrow-left"></i> Voltar Buscar Estudante
+                </a>
+                {% if all_completed %}
+                <a href="{% url 'enrollment_submit' enrollment.pk %}" class="btn btn-success btn-lg">
+                    <i class="fas fa-paper-plane"></i> Submeter Inscrição
+                </a>
+                {% else %}
+                <button class="btn btn-success btn-lg" disabled>
+                    <i class="fas fa-lock"></i> Complete todos os campos para submeter
+                </button>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+    function toggleMenu() {
+        const leftPanel = document.getElementById('leftPanel');
+        leftPanel.classList.toggle('active');
+    }
+    
+    // Fechar menu ao clicar fora em mobile
+    document.addEventListener('click', function(event) {
+        const leftPanel = document.getElementById('leftPanel');
+        const mobileToggle = document.querySelector('.mobile-menu-toggle');
+        
+        if (window.innerWidth <= 768) {
+            if (!leftPanel.contains(event.target) && !mobileToggle.contains(event.target)) {
+                leftPanel.classList.remove('active');
+            }
+        }
+    });
+</script>
 {% endblock %}
