@@ -4,6 +4,7 @@ Views do aplicativo Enrollments - Gestão de inscrições e editais
 import re
 from decimal import Decimal, InvalidOperation
 from datetime import datetime
+from django.db import IntegrityError
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -15,12 +16,47 @@ from ifpe_mvp.apps.students.models import Student
 
 def enrollment_period_list(request):
     """Lista todos os editais/periodos de inscrição ativos."""
+    from inscricoes.models import Edital, Inscricao
+    
+    # Obter períodos locais ativos
     periods = EnrollmentPeriod.objects.filter(
         ativo=True,
         data_fim__gte=timezone.now()
     ).order_by('-data_inicio')
     
-    context = {'periods': periods}
+    # Obter editais do app inscricoes que estão ativos e com inscrições abertas
+    editais_inscricoes = Edital.objects.filter(
+        ativo=True,
+        status='ATIVO',
+        periodo_inscricao_fechamento__gte=timezone.now()
+    ).order_by('-criado_em')
+    
+    # Se o usuário estiver logado, verificar quais editais ele já tem inscrição submetida
+    user_has_submitted = []
+    if request.user.is_authenticated:
+        try:
+            student = request.user.student
+            # Verificar inscrições SUBMETIDAS no modelo Enrollment (enrollments app)
+            submitted_enrollment_periods = Enrollment.objects.filter(
+                student=student,
+                status='SUBMETIDA'
+            ).values_list('enrollment_period_id', flat=True)
+            
+            # Verificar inscrições SUBMETIDAS no modelo Inscricao (inscricoes app)
+            submitted_inscricoes = Inscricao.objects.filter(
+                estudante__cpf=student.cpf,
+                status='SUBMETIDA'
+            ).values_list('edital_id', flat=True)
+            
+            user_has_submitted = list(submitted_enrollment_periods) + list(submitted_inscricoes)
+        except (Student.DoesNotExist, AttributeError):
+            pass
+    
+    context = {
+        'periods': periods,
+        'editais_inscricoes': editais_inscricoes,
+        'user_has_submitted': user_has_submitted,
+    }
     return render(request, 'enrollments/period_list.html', context)
 
 
@@ -1039,11 +1075,30 @@ def enrollment_review(request, pk):
         return redirect('enrollment_dashboard', pk=pk)
 
     if request.method == 'POST':
+        # Verificar se já existe uma inscrição submetida para este estudante e edital (chave única)
+        existing_enrollment = Enrollment.objects.filter(
+            student=student,
+            enrollment_period=period,
+            status='SUBMETIDA'
+        ).exclude(pk=enrollment.pk).first()
+        
+        if existing_enrollment:
+            messages.error(request, 'Você já possui uma inscrição submetida para este edital. Não é permitido enviar mais de uma inscrição por edital.')
+            return redirect('enrollment_review', pk=pk)
+        
         # Submeter a inscrição
-        enrollment.submeter()
-        messages.success(request, 'Inscrição submetida com sucesso para análise!')
-        # Redireciona para página de Minhas Submissões após submeter
-        return redirect('minhas_submissoes')
+        try:
+            enrollment.submeter()
+            messages.success(request, 'Inscrição submetida com sucesso para análise!')
+            # Redireciona para página de Minhas Submissões após submeter
+            return redirect('minhas_submissoes')
+        except IntegrityError as e:
+            # Captura erro de chave única duplicada (estudante + edital)
+            if 'unique' in str(e).lower() or 'duplicate' in str(e).lower():
+                messages.error(request, 'Você já possui uma inscrição submetida para este edital. Não é permitido enviar mais de uma inscrição por edital.')
+            else:
+                messages.error(request, f'Erro ao submeter inscrição: {str(e)}')
+            return redirect('enrollment_review', pk=pk)
 
     context = {
         'period': period,
