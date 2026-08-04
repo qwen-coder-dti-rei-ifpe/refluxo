@@ -103,41 +103,12 @@ def assistente_dashboard_view(request):
 @login_required
 def student_dashboard_view(request):
     """
-    View para dashboard do estudante com seleção de edital e busca por matrícula.
-    Esta é a tela inicial da jornada de nova inscrição (Passo 1).
+    View para dashboard do estudante.
+    Redireciona para a tela de seleção de editais abertos (Passo 1 da jornada).
     """
-    from inscricoes.models import Edital, Inscricao
-    
-    # Verifica se é assistente social, se for redireciona
-    if hasattr(request.user, 'is_assistente_social') and request.user.is_assistente_social:
-        return redirect('/dashboard/assistente/')
-    
-    # Buscar estudante logado
-    estudante = None
-    try:
-        estudante = Estudante.objects.get(cpf=request.user.username)
-    except Estudante.DoesNotExist:
-        pass
-    
-    # Buscar todas as inscrições do estudante ordenadas por data de criação
-    inscricoes = []
-    if estudante:
-        inscricoes = Inscricao.objects.filter(estudante=estudante).order_by('-criado_em')
-    
-    # Buscar editais ativos para seleção (Passo 1 da jornada)
-    editais_ativos = Edital.objects.filter(
-        ativo=True,
-        status='ATIVO',
-        periodo_inscricao_fechamento__gte=timezone.now()
-    ).order_by('-criado_em')
-    
-    context = {
-        'inscricoes': inscricoes,
-        'estudante': estudante,
-        'editais_ativos': editais_ativos,
-    }
-    
-    return render(request, 'dashboard/student.html', context)
+    from django.shortcuts import redirect
+    # Redireciona para a lista de períodos de inscrição onde o estudante pode selecionar um edital
+    return redirect('enrollment_period_list')
 
 
 @login_required
