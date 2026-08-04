@@ -10,6 +10,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.utils import timezone
 from .models import Estudante, Endereco, Usuario
 from .serializers import EstudanteSerializer, EnderecoSerializer
 from .forms import LoginForm, JornadaForm
@@ -102,9 +103,8 @@ def assistente_dashboard_view(request):
 @login_required
 def student_dashboard_view(request):
     """
-    View para dashboard do estudante.
-    Exibe apenas as inscrições realizadas pelo estudante.
-    Para criar nova inscrição, o estudante deve clicar em "Nova Inscrição".
+    View para dashboard do estudante com seleção de edital e busca por matrícula.
+    Esta é a tela inicial da jornada de nova inscrição (Passo 1).
     """
     from inscricoes.models import Edital, Inscricao
     
@@ -124,9 +124,17 @@ def student_dashboard_view(request):
     if estudante:
         inscricoes = Inscricao.objects.filter(estudante=estudante).order_by('-criado_em')
     
+    # Buscar editais ativos para seleção (Passo 1 da jornada)
+    editais_ativos = Edital.objects.filter(
+        ativo=True,
+        status='ATIVO',
+        periodo_inscricao_fechamento__gte=timezone.now()
+    ).order_by('-criado_em')
+    
     context = {
         'inscricoes': inscricoes,
         'estudante': estudante,
+        'editais_ativos': editais_ativos,
     }
     
     return render(request, 'dashboard/student.html', context)
