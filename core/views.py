@@ -430,6 +430,28 @@ def resultado_avaliacao_renda_view(request):
 
 
 @login_required
+def student_profile_view(request):
+    """
+    View para exibir o perfil completo do estudante com todas as informações.
+    """
+    from core.models import Estudante, Endereco
+    
+    try:
+        estudante = Estudante.objects.get(cpf=request.user.username)
+        endereco = Endereco.objects.filter(estudante=estudante).first()
+    except Estudante.DoesNotExist:
+        estudante = None
+        endereco = None
+    
+    context = {
+        'estudante': estudante,
+        'endereco': endereco,
+    }
+    
+    return render(request, 'student/perfil.html', context)
+
+
+@login_required
 def minhas_submissoes_view(request):
     """
     View para listar todas as submissões do estudante.
