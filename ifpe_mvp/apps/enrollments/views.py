@@ -68,7 +68,7 @@ def enrollment_dashboard(request, pk):
     )
     
     # Verificar se possui membros familiares cadastrados
-    enrollment_has_family = FamilyMember.objects.filter(student=student).exists()
+    enrollment_has_family = FamilyMember.objects.filter(inscricao=student.matricula if student.matricula else '').exists()
     
     # Tentar obter dados da API CadÚnico se tiver CPF do estudante
     faixa_renda_familiar_per_capita = None
@@ -584,9 +584,9 @@ def family_members_form(request, pk):
         messages.success(request, 'Dados de membros familiares salvos com sucesso!')
         return redirect('displacement_data_form', pk=pk)
     
-    # Get family members (all existing ones)
+    # Get family members filtered by enrollment
     from ifpe_mvp.apps.family.models import FamilyMember
-    family_members = FamilyMember.objects.all()
+    family_members = FamilyMember.objects.filter(inscricao=student.matricula if student.matricula else '')
     
     context = {
         'period': period,

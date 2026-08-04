@@ -156,5 +156,5 @@ SPECTACULAR_SETTINGS = {
 
 # Login URL
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'dashboard'
+LOGIN_REDIRECT_URL = 'student_dashboard'
 LOGOUT_REDIRECT_URL = 'login'
