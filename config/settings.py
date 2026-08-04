@@ -186,7 +186,7 @@ AUTHENTICATION_BACKENDS = [
 # Modelo de usuário personalizado
 AUTH_USER_MODEL = 'core.Usuario'
 
-# URL de redirecionamento após login
-LOGIN_REDIRECT_URL = 'assistente_dashboard'
+# URL de redirecionamento após login - será sobrescrito pela CustomLoginView
+LOGIN_REDIRECT_URL = 'student_dashboard'
 LOGIN_URL = 'login'
 LOGOUT_REDIRECT_URL = 'login'
