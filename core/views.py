@@ -10,6 +10,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.utils import timezone
 from .models import Estudante, Endereco, Usuario
 from .serializers import EstudanteSerializer, EnderecoSerializer
 from .forms import LoginForm, JornadaForm
@@ -102,31 +103,21 @@ def assistente_dashboard_view(request):
 @login_required
 def student_dashboard_view(request):
     """
-    View para dashboard do estudante.
-    Exibe apenas as inscrições realizadas pelo estudante.
-    Para criar nova inscrição, o estudante deve clicar em "Nova Inscrição".
+    View para dashboard do estudante - Step 2 da jornada.
+    Exibe seleção de edital e campo para informar número da matrícula.
     """
-    from inscricoes.models import Edital, Inscricao
+    from inscricoes.models import Edital
+    from django.utils import timezone
     
-    # Verifica se é assistente social, se for redireciona
-    if hasattr(request.user, 'is_assistente_social') and request.user.is_assistente_social:
-        return redirect('/dashboard/assistente/')
-    
-    # Buscar estudante logado
-    estudante = None
-    try:
-        estudante = Estudante.objects.get(cpf=request.user.username)
-    except Estudante.DoesNotExist:
-        pass
-    
-    # Buscar todas as inscrições do estudante ordenadas por data de criação
-    inscricoes = []
-    if estudante:
-        inscricoes = Inscricao.objects.filter(estudante=estudante).order_by('-criado_em')
+    # Obter editais ativos com inscrições abertas
+    editais = Edital.objects.filter(
+        ativo=True,
+        status='ATIVO',
+        periodo_inscricao_fechamento__gte=timezone.now()
+    ).order_by('-criado_em')
     
     context = {
-        'inscricoes': inscricoes,
-        'estudante': estudante,
+        'editais': editais,
     }
     
     return render(request, 'dashboard/student.html', context)
