@@ -1,6 +1,6 @@
 {% extends 'student_base.html' %}
 
-{% block title %}Minhas Inscrições - PAMA{% endblock %}
+{% block title %}Dashboard do Estudante - PAMA{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -8,203 +8,167 @@
         background: none !important;
         background-color: #f8f9fa !important;
     }
-    .submissions-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-        gap: 1.5rem;
+    .pama-full-name {
+        font-size: 0.9rem;
+        color: #6c757d;
+        font-weight: normal;
     }
     
-    .submission-card {
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.07);
-        padding: 1.5rem;
-        transition: transform 0.3s, box-shadow 0.3s;
-        border-left: 4px solid #e9ecef;
-    }
-    
-    .submission-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-    }
-    
-    .submission-card.status-submetida {
-        border-left-color: #27ae60;
-    }
-    
-    .submission-card.status-em-analise {
-        border-left-color: #f39c12;
-    }
-    
-    .submission-card.status-deferida {
-        border-left-color: #27ae60;
-    }
-    
-    .submission-card.status-indeferida {
-        border-left-color: #e74c3c;
-    }
-    
-    .submission-card.status-rascunho {
-        border-left-color: #95a5a6;
-    }
-    
-    .status-badge {
-        display: inline-block;
-        padding: 0.25rem 0.75rem;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-    }
-    
-    .status-submetida .status-badge {
-        background-color: #d4edda;
-        color: #155724;
-    }
-    
-    .status-em-analise .status-badge {
-        background-color: #fff3cd;
-        color: #856404;
-    }
-    
-    .status-deferida .status-badge {
-        background-color: #d4edda;
-        color: #155724;
-    }
-    
-    .status-indeferida .status-badge {
-        background-color: #f8d7da;
-        color: #721c24;
-    }
-    
-    .status-rascunho .status-badge {
-        background-color: #e9ecef;
-        color: #495057;
-    }
-    
-    .card-header-info {
+    .progress-indicator {
         display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 1rem;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
     
-    .edital-number {
-        font-size: 0.85rem;
-        color: #6c757d;
-        margin-bottom: 0.25rem;
-    }
-    
-    .edital-title {
+    .progress-step {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
         font-size: 1.1rem;
-        font-weight: 600;
-        color: #2d3748;
-        margin-bottom: 0.5rem;
+        text-decoration: none;
+        transition: all 0.3s;
     }
     
-    .submission-date {
-        font-size: 0.85rem;
-        color: #6c757d;
+    .progress-step.active {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: white;
     }
     
-    .empty-state {
-        text-align: center;
-        padding: 3rem;
-        background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+    .progress-step.completed {
+        background: #27ae60;
+        color: white;
     }
     
-    .empty-state i {
-        font-size: 4rem;
-        color: #e9ecef;
-        margin-bottom: 1rem;
-    }
-    
-    .empty-state h4 {
-        color: #4a5568;
-        margin-bottom: 0.5rem;
-    }
-    
-    .empty-state p {
+    .progress-step.pending {
+        background: #e2e8f0;
         color: #718096;
-        margin-bottom: 1.5rem;
+    }
+    
+    .progress-step:hover {
+        transform: scale(1.1);
+    }
+    
+    .progress-line {
+        width: 60px;
+        height: 3px;
+        background: #e2e8f0;
+        border-radius: 2px;
+    }
+    
+    .progress-line.completed {
+        background: #27ae60;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col-12">
-            <h2 class="mb-2"><i class="fas fa-file-alt"></i> Minhas Inscrições</h2>
-            <p class="text-muted">Visualize todas as suas inscrições submetidas aos editais do PAMA</p>
-        </div>
-    </div>
-    
-    {% if inscricoes %}
-    <div class="submissions-grid">
-        {% for inscricao in inscricoes %}
-        <div class="submission-card status-{{ inscricao.status|lower|slugify }}">
-            <div class="card-header-info">
-                <div>
-                    <div class="edital-number">{{ inscricao.edital.numero }}</div>
-                    <div class="edital-title">{{ inscricao.edital.titulo }}</div>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mb-4">Dashboard do Estudante</h2>
+            <p class="text-muted mb-4">Programa de Apoio e Manutenção Acadêmica (PAMA)</p>
+            
+            {% if message %}
+            <div class="alert alert-info" role="alert">
+                {{ message }}
+            </div>
+            {% endif %}
+            
+            <!-- Progress Indicator -->
+            <div class="progress-indicator">
+                <div class="progress-step {% if edital %}completed{% else %}active{% endif %}" title="Selecionar Edital">1</div>
+                <div class="progress-line {% if edital %}completed{% endif %}"></div>
+                <div class="progress-step {% if edital and matricula_search %}completed{% elif edital %}active{% else %}pending{% endif %}" title="Buscar Matrícula">2</div>
+                <div class="progress-line"></div>
+                <div class="progress-step pending" title="Próximos Passos">3</div>
+            </div>
+            
+            <!-- Passo 1: Seleção de Edital Ativo -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Passo 1: Selecione um Edital Ativo</h5>
                 </div>
-                <span class="status-badge">{{ inscricao.get_status_display }}</span>
+                <div class="card-body">
+                    {% if editais_ativos %}
+                        {% if edital %}
+                            <div class="alert alert-success">
+                                <strong>Edital Selecionado:</strong> {{ edital.numero }} - {{ edital.titulo }}
+                            </div>
+                        {% else %}
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <label for="edital_id" class="form-label">Editais Disponíveis</label>
+                                        <select class="form-select" id="edital_id" name="edital_id" required>
+                                            <option value="">Selecione um edital...</option>
+                                            {% for edital_item in editais_ativos %}
+                                                <option value="{{ edital_item.id }}">{{ edital_item.numero }} - {{ edital_item.titulo }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 d-flex align-items-end">
+                                        <button type="submit" class="btn btn-success w-100">Selecionar Edital</button>
+                                    </div>
+                                </div>
+                            </form>
+                        {% endif %}
+                    {% else %}
+                        <div class="alert alert-warning" role="alert">
+                            Não há editais ativos no momento. Verifique novamente mais tarde.
+                        </div>
+                    {% endif %}
+                </div>
             </div>
             
-            <div class="mb-3">
-                <small class="text-muted">
-                    <i class="fas fa-calendar"></i> 
-                    Submetido em: {{ inscricao.criado_em|date:"d/m/Y H:i"|default:"Não submetido" }}
-                </small>
+            <!-- Passo 2: Busca por Matrícula (somente se edital selecionado) -->
+            {% if edital %}
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Passo 2: Buscar Matrícula</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-8">
+                                <label for="matricula" class="form-label">Número da Matrícula</label>
+                                <input type="text" class="form-control" id="matricula" name="matricula" 
+                                       value="{{ matricula_search|default:'' }}" placeholder="Digite sua matrícula" required>
+                                <small class="form-text text-muted">Digite sua matrícula para buscar suas informações.</small>
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="submit" class="btn btn-danger w-100">Buscar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
+            {% endif %}
             
-            <div class="mb-3">
-                <small class="text-muted d-block">
-                    <i class="fas fa-tag"></i> 
-                    Classificação: {{ inscricao.get_classificacao_display|default:"Em análise" }}
-                </small>
-            </div>
-            
-            {% if inscricao.status == 'RASCUNHO' %}
-            <div class="mt-3">
-                <a href="{% url 'enrollment_dashboard' pk=inscricao.edital.pk %}" class="btn btn-sm btn-outline-primary w-100">
-                    <i class="fas fa-edit"></i> Continuar Edição
-                </a>
-            </div>
-            {% elif inscricao.status == 'SUBMETIDA' or inscricao.status == 'EM_ANALISE' %}
-            <div class="mt-3">
-                <button class="btn btn-sm btn-outline-secondary w-100" disabled>
-                    <i class="fas fa-clock"></i> Em Análise
-                </button>
-            </div>
-            {% elif inscricao.status == 'DEFERIDA' %}
-            <div class="mt-3">
-                <button class="btn btn-sm btn-success w-100" disabled>
-                    <i class="fas fa-check"></i> Deferida
-                </button>
-            </div>
-            {% elif inscricao.status == 'INDEFERIDA' %}
-            <div class="mt-3">
-                <a href="#" class="btn btn-sm btn-outline-danger w-100">
-                    <i class="fas fa-exclamation-circle"></i> Ver Motivos
-                </a>
+            <!-- Informações do Estudante (se encontrado) -->
+            {% if matricula_search and not edital %}
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Sua Informação</h5>
+                </div>
+                <div class="card-body">
+                    <p>Matrícula pesquisada: <strong>{{ matricula_search }}</strong></p>
+                    <p>Para visualizar ou submeter documentos, selecione um edital ativo acima.</p>
+                </div>
             </div>
             {% endif %}
         </div>
-        {% endfor %}
     </div>
-    {% else %}
-    <div class="empty-state">
-        <i class="fas fa-folder-open"></i>
-        <h4>Nenhuma submissão encontrada</h4>
-        <p>Você ainda não possui inscrições submetidas aos editais do PAMA.</p>
-        <a href="{% url 'minhas_submissoes' %}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Criar Nova Inscrição
-        </a>
-    </div>
-    {% endif %}
 </div>
 {% endblock %}

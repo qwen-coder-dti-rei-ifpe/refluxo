@@ -125,10 +125,6 @@ class Edital(models.Model):
                 self.periodo_avaliacao_abertura and
                 self.periodo_avaliacao_fechamento and
                 self.periodo_avaliacao_abertura <= agora <= self.periodo_avaliacao_fechamento)
-    
-    def esta_aberto(self):
-        """Verifica se o edital está aberto para inscrições."""
-        return self.esta_dentro_periodo_inscricoes()
 
 
 class Inscricao(models.Model):
