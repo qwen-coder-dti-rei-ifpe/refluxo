@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Assistente Social - Dashboard{% endblock %}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --info-color: #1abc9c;
+            --light-bg: #ecf0f1;
+            --dark-bg: #34495e;
+            --white: #ffffff;
+            --text-dark: #2c3e50;
+            --text-light: #7f8c8d;
+            --border-color: #bdc3c7;
+            --sidebar-width: 280px;
+            --sidebar-collapsed-width: 70px;
+            --header-height: 60px;
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-dark);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color) 0%, var(--dark-bg) 100%);
+            color: var(--white);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all var(--transition-speed) ease;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            transition: opacity var(--transition-speed);
+        }
+
+        .sidebar.collapsed .sidebar-header h3 {
+            opacity: 0;
+            width: 0;
+        }
+
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: var(--white);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 5px;
+            transition: transform var(--transition-speed);
+        }
+
+        .user-info {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .user-details {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-role {
+            font-size: 0.8rem;
+            color: var(--secondary-color);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sidebar.collapsed .user-details {
+            display: none;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all var(--transition-speed);
+            border-left: 3px solid transparent;
+            gap: 15px;
+        }
+
+        .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+            color: var(--white);
+            border-left-color: var(--secondary-color);
+        }
+
+        .nav-link.active {
+            background: rgba(52, 152, 219, 0.2);
+            color: var(--white);
+            border-left-color: var(--secondary-color);
+        }
+
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .nav-text {
+            white-space: nowrap;
+            overflow: hidden;
+            transition: opacity var(--transition-speed);
+        }
+
+        .sidebar.collapsed .nav-text {
+            opacity: 0;
+            width: 0;
+        }
+
+        .badge {
+            background: var(--accent-color);
+            color: var(--white);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin-left: auto;
+            white-space: nowrap;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all var(--transition-speed);
+            border-radius: 5px;
+        }
+
+        .logout-btn:hover {
+            background: rgba(231, 76, 60, 0.2);
+            color: var(--white);
+        }
+
+        .sidebar.collapsed .logout-btn span {
+            display: none;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: margin-left var(--transition-speed);
+            padding: 20px;
+        }
+
+        .sidebar.collapsed ~ .main-content {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+
+        .header {
+            background: var(--white);
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+        }
+
+        .campus-filter {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .campus-select {
+            padding: 8px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 0.9rem;
+            background: var(--white);
+            color: var(--text-dark);
+        }
+
+        .content-card {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--white);
+        }
+
+        .stat-icon.blue { background: var(--secondary-color); }
+        .stat-icon.green { background: var(--success-color); }
+        .stat-icon.orange { background: var(--warning-color); }
+        .stat-icon.red { background: var(--accent-color); }
+
+        .stat-info h3 {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .stat-info p {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--light-bg);
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: rgba(52, 152, 219, 0.05);
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--secondary-color);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: var(--white);
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: var(--white);
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-open { background: rgba(39, 174, 96, 0.2); color: var(--success-color); }
+        .status-pending { background: rgba(243, 156, 18, 0.2); color: var(--warning-color); }
+        .status-analyzed { background: rgba(52, 152, 219, 0.2); color: var(--secondary-color); }
+        .status-classified { background: rgba(26, 188, 156, 0.2); color: var(--info-color); }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: var(--sidebar-collapsed-width);
+            }
+            
+            .sidebar .sidebar-header h3,
+            .sidebar .user-details,
+            .sidebar .nav-text,
+            .sidebar .logout-btn span {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: var(--sidebar-collapsed-width);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3>Assistente Social</h3>
+            <button class="toggle-btn" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <div class="user-info">
+            <div class="user-avatar">
+                {{ user.first_name|default:user.username|slice:":1"|upper }}
+            </div>
+            <div class="user-details">
+                <div class="user-name">{{ user.get_full_name|default:user.username }}</div>
+                <div class="user-role">Assistente Social</div>
+            </div>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="{% url 'assistant_social:dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                    <i class="nav-icon fas fa-home"></i>
+                    <span class="nav-text">Início</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'assistant_social:analise_inscricoes' %}" class="nav-link {% if request.resolver_match.url_name == 'analise_inscricoes' %}active{% endif %}">
+                    <i class="nav-icon fas fa-clipboard-list"></i>
+                    <span class="nav-text">Análise de Inscrições</span>
+                    <span class="badge">{{ pending_enrollments_count|default:0 }}</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'assistant_social:analise_recursos' %}" class="nav-link {% if request.resolver_match.url_name == 'analise_recursos' %}active{% endif %}">
+                    <i class="nav-icon fas fa-gavel"></i>
+                    <span class="nav-text">Análise de Recursos</span>
+                    <span class="badge">{{ pending_appeals_count|default:0 }}</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'assistant_social:classificacao_inscricoes' %}" class="nav-link {% if request.resolver_match.url_name == 'classificacao_inscricoes' %}active{% endif %}">
+                    <i class="nav-icon fas fa-sort-numeric-down"></i>
+                    <span class="nav-text">Classificação de Inscrições</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{% url 'assistant_social:classificacao_recursos' %}" class="nav-link {% if request.resolver_match.url_name == 'classificacao_recursos' %}active{% endif %}">
+                    <i class="nav-icon fas fa-tasks"></i>
+                    <span class="nav-text">Classificação de Recursos</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <a href="{% url 'logout' %}" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Sair</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="header">
+            <h1>{% block header_title %}Dashboard{% endblock %}</h1>
+            <div class="campus-filter">
+                <label for="campus-select"><strong>Campus:</strong></label>
+                <select id="campus-select" class="campus-select" onchange="filterByCampus(this.value)">
+                    <option value="Recife" {% if current_campus == 'Recife' %}selected{% endif %}>Recife</option>
+                    <!-- Add more campuses as needed -->
+                </select>
+            </div>
+        </header>
+
+        {% block content %}
+        <!-- Default dashboard content -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon blue">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ pending_enrollments_count|default:0 }}</h3>
+                    <p>Inscrições Pendentes</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange">
+                    <i class="fas fa-gavel"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ pending_appeals_count|default:0 }}</h3>
+                    <p>Recursos Pendentes</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ analyzed_enrollments_count|default:0 }}</h3>
+                    <p>Inscrições Analisadas</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon red">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>{{ classified_count|default:0 }}</h3>
+                    <p>Classificados</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <h2 style="margin-bottom: 20px;">Últimas Inscrições para Análise</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Estudante</th>
+                        <th>Edital</th>
+                        <th>Data</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for enrollment in recent_enrollments %}
+                    <tr>
+                        <td>{{ enrollment.student.get_full_name|default:enrollment.student.username }}</td>
+                        <td>{{ enrollment.edital.title }}</td>
+                        <td>{{ enrollment.created_at|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <span class="status-badge status-pending">Pendente</span>
+                        </td>
+                        <td>
+                            <a href="{% url 'assistant_social:detalhe_inscricao' enrollment.id %}" class="btn btn-primary">
+                                Analisar
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align: center;">Nenhuma inscrição pendente</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endblock %}
+    </main>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('collapsed');
+        }
+
+        function filterByCampus(campus) {
+            // Reload page with campus filter
+            const url = new URL(window.location);
+            url.searchParams.set('campus', campus);
+            window.location.href = url.toString();
+        }
+
+        // Set active nav item based on current URL
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

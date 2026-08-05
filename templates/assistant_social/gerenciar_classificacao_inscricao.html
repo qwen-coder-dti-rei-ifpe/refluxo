@@ -1,0 +1,79 @@
+{% extends 'assistant_social/base.html' %}
+
+{% block title %}Gerenciar Classificação de Inscrição - Assistente Social{% endblock %}
+
+{% block header_title %}Gerenciar Classificação de Inscrição{% endblock %}
+
+{% block content %}
+<div class="content-card">
+    <div style="margin-bottom: 20px;">
+        <a href="{% url 'assistant_social:classificacao_inscricoes' %}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Voltar para Lista
+        </a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+        <div>
+            <h3 style="margin-bottom: 15px; color: var(--primary-color);">Dados do Estudante</h3>
+            <p><strong>Nome:</strong> {{ enrollment.student.get_full_name|default:enrollment.student.username }}</p>
+            <p><strong>Email:</strong> {{ enrollment.student.email }}</p>
+            <p><strong>Matrícula:</strong> {{ enrollment.student.matricula|default:"-" }}</p>
+            <p><strong>Campus:</strong> {{ enrollment.campus|default:"Recife" }}</p>
+        </div>
+        <div>
+            <h3 style="margin-bottom: 15px; color: var(--primary-color);">Dados do Edital</h3>
+            <p><strong>Título:</strong> {{ enrollment.edital.title }}</p>
+            <p><strong>Número:</strong> {{ enrollment.edital.number }}</p>
+            <p><strong>Pontuação Atual:</strong> {{ enrollment.score|default:"-" }}</p>
+            <p><strong>Status:</strong> 
+                {% if enrollment.is_classified %}
+                <span class="status-badge status-classified">Classificado</span>
+                {% else %}
+                <span class="status-badge status-analyzed">Analisado</span>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <h3 style="margin-bottom: 15px; color: var(--primary-color);">Gerenciar Classificação</h3>
+    <form method="post" style="background: var(--light-bg); padding: 20px; border-radius: 10px;">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 15px;">
+            <label for="classification_status" style="display: block; margin-bottom: 5px;"><strong>Status de Classificação:</strong></label>
+            <select id="classification_status" name="classification_status" 
+                    style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 5px;">
+                <option value="classified" {% if enrollment.is_classified %}selected{% endif %}>Classificado</option>
+                <option value="not_classified" {% if not enrollment.is_classified %}selected{% endif %}>Não Classificado</option>
+            </select>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="classification_rank" style="display: block; margin-bottom: 5px;"><strong>Posição na Classificação:</strong></label>
+            <input type="number" id="classification_rank" name="classification_rank" min="1" 
+                   value="{{ enrollment.classification_rank|default:'' }}" 
+                   placeholder="Ex: 1, 2, 3..."
+                   style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 5px;">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="score" style="display: block; margin-bottom: 5px;"><strong>Pontuação:</strong></label>
+            <input type="number" id="score" name="score" step="0.01" min="0" max="100" 
+                   value="{{ enrollment.score|default:0 }}" 
+                   style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 5px;">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="notes" style="display: block; margin-bottom: 5px;"><strong>Observações da Classificação:</strong></label>
+            <textarea id="notes" name="notes" rows="4" 
+                      style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 5px;">{{ enrollment.classification_notes|default:"" }}</textarea>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <button type="submit" class="btn btn-success">
+                <i class="fas fa-save"></i> Salvar Classificação
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

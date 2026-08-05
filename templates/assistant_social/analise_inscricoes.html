@@ -1,0 +1,97 @@
+{% extends 'assistant_social/base.html' %}
+
+{% block title %}Análise de Inscrições - Assistente Social{% endblock %}
+
+{% block header_title %}Análise de Inscrições por Edital{% endblock %}
+
+{% block content %}
+<div class="content-card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>Inscrições Pendentes de Análise</h2>
+        <div>
+            <label for="edital-filter" style="margin-right: 10px;"><strong>Filtrar por Edital:</strong></label>
+            <select id="edital-filter" class="campus-select" onchange="filterByEdital(this.value)">
+                <option value="">Todos os Editais</option>
+                {% for edital in editais %}
+                <option value="{{ edital.id }}" {% if selected_edital == edital.id|stringformat:"s" %}selected{% endif %}>
+                    {{ edital.title }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Estudante</th>
+                <th>Edital</th>
+                <th>Campus</th>
+                <th>Data de Inscrição</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for enrollment in enrollments %}
+            <tr>
+                <td>{{ enrollment.student.get_full_name|default:enrollment.student.username }}</td>
+                <td>{{ enrollment.edital.title }}</td>
+                <td>{{ enrollment.campus|default:"Recife" }}</td>
+                <td>{{ enrollment.created_at|date:"d/m/Y H:i" }}</td>
+                <td>
+                    <span class="status-badge status-pending">Pendente</span>
+                </td>
+                <td>
+                    <a href="{% url 'assistant_social:detalhe_inscricao' enrollment.id %}" class="btn btn-primary">
+                        <i class="fas fa-eye"></i> Analisar
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 40px;">
+                    <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--success-color); margin-bottom: 15px;"></i>
+                    <p>Nenhuma inscrição pendente para análise neste campus.</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+{% if enrollments.has_other_pages %}
+<div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
+    {% if enrollments.has_previous %}
+    <a href="?page={{ enrollments.previous_page_number }}{% if selected_edital %}&edital={{ selected_edital }}{% endif %}&campus={{ current_campus }}" class="btn btn-primary">
+        <i class="fas fa-chevron-left"></i> Anterior
+    </a>
+    {% endif %}
+
+    <span style="padding: 8px 15px; background: var(--light-bg); border-radius: 5px;">
+        Página {{ enrollments.number }} de {{ enrollments.paginator.num_pages }}
+    </span>
+
+    {% if enrollments.has_next %}
+    <a href="?page={{ enrollments.next_page_number }}{% if selected_edital %}&edital={{ selected_edital }}{% endif %}&campus={{ current_campus }}" class="btn btn-primary">
+        Próxima <i class="fas fa-chevron-right"></i>
+    </a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function filterByEdital(editalId) {
+    const url = new URL(window.location);
+    if (editalId) {
+        url.searchParams.set('edital', editalId);
+    } else {
+        url.searchParams.delete('edital');
+    }
+    window.location.href = url.toString();
+}
+</script>
+{% endblock %}
