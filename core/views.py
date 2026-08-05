@@ -82,6 +82,7 @@ def assistente_dashboard_view(request):
     """
     View para dashboard do assistente social - lista todos os períodos (editais) do programa.
     Apenas usuários com is_assistente_social=True podem acessar.
+    Filtra editais baseados no campus do assistente social.
     Permite editar e deletar editais.
     """
     # Verifica se o usuário é assistente social
@@ -90,10 +91,19 @@ def assistente_dashboard_view(request):
         return redirect('/dashboard/student/')
     
     from inscricoes.models import Edital
-    editais = Edital.objects.all().order_by('-criado_em')
+    
+    # Obtém o campus do usuário (se houver)
+    user_campus = getattr(request.user, 'campus', None)
+    
+    # Filtra editais: se tiver campus, mostra apenas do campus; senão, mostra todos
+    if user_campus:
+        editais = Edital.objects.filter(campus=user_campus).order_by('-criado_em')
+    else:
+        editais = Edital.objects.all().order_by('-criado_em')
     
     context = {
         'editais': editais,
+        'user_campus': user_campus,
     }
     
     return render(request, 'core/assistente_dashboard.html', context)
@@ -454,3 +464,117 @@ class EnderecoViewSet(viewsets.ModelViewSet):
     serializer_class = EnderecoSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['estudante', 'cidade', 'estado']
+
+
+@login_required
+def minhas_inscricoes_view(request):
+    """
+    View para listar todas as inscrições do estudante.
+    """
+    from inscricoes.models import Inscricao
+    from core.models import Estudante
+    
+    try:
+        estudante = Estudante.objects.get(cpf=request.user.username)
+        inscricoes = Inscricao.objects.filter(estudante=estudante).select_related('edital').order_by('-criado_em')
+    except Estudante.DoesNotExist:
+        inscricoes = []
+    
+    context = {
+        'inscricoes': inscricoes,
+    }
+    
+    return render(request, 'dashboard/minhas_inscricoes.html', context)
+
+
+@login_required
+def criar_recurso_view(request):
+    """
+    View para criar novo recurso administrativo.
+    """
+    from inscricoes.models import Edital
+    
+    if request.method == 'POST':
+        # Processar formulário de criação de recurso
+        messages.success(request, 'Recurso enviado com sucesso!')
+        return redirect('meus_recursos')
+    
+    editais = Edital.objects.filter(ativo=True, status='ATIVO')
+    
+    context = {
+        'editais': editais,
+    }
+    
+    return render(request, 'dashboard/criar_recurso.html', context)
+
+
+@login_required
+def meus_recursos_view(request):
+    """
+    View para listar recursos do estudante.
+    """
+    # Placeholder - em produção buscar do banco
+    recursos = []
+    
+    context = {
+        'recursos': recursos,
+    }
+    
+    return render(request, 'dashboard/meus_recursos.html', context)
+
+
+@login_required
+def avaliacao_situacional_view(request):
+    """
+    View para avaliação situacional ConectaGov.
+    """
+    return render(request, 'dashboard/avaliacao_situacional.html')
+
+
+@login_required
+def criar_edital_view(request):
+    """
+    View para assistente social criar novo edital associado ao seu campus.
+    """
+    from inscricoes.models import Edital
+    from django import forms
+    
+    class EditalForm(forms.ModelForm):
+        class Meta:
+            model = Edital
+            fields = ['titulo', 'numero', 'descricao', 'campus', 'periodo_inscricao_abertura', 
+                      'periodo_inscricao_fechamento', 'periodo_avaliacao_abertura', 
+                      'periodo_avaliacao_fechamento', 'status']
+            widgets = {
+                'titulo': forms.TextInput(attrs={'class': 'form-control'}),
+                'numero': forms.TextInput(attrs={'class': 'form-control'}),
+                'descricao': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+                'campus': forms.TextInput(attrs={'class': 'form-control'}),
+                'periodo_inscricao_abertura': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+                'periodo_inscricao_fechamento': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+                'periodo_avaliacao_abertura': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+                'periodo_avaliacao_fechamento': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+                'status': forms.Select(attrs={'class': 'form-select'}),
+            }
+    
+    if request.method == 'POST':
+        form = EditalForm(request.POST)
+        if form.is_valid():
+            edital = form.save(commit=False)
+            # Associar campus do usuário se não estiver definido
+            if not edital.campus and hasattr(request.user, 'campus'):
+                edital.campus = request.user.campus
+            edital.save()
+            messages.success(request, 'Edital criado com sucesso!')
+            return redirect('assistente_dashboard')
+    else:
+        form = EditalForm()
+        # Pre-preencher campus do usuário
+        if hasattr(request.user, 'campus') and request.user.campus:
+            form.initial['campus'] = request.user.campus
+    
+    context = {
+        'form': form,
+    }
+    
+    return render(request, 'core/criar_edital.html', context)

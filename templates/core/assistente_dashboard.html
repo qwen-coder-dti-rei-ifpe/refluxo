@@ -247,6 +247,12 @@
             </a>
         </li>
         <li>
+            <a href="{% url 'criar_edital' %}">
+                <i class="fas fa-plus-circle"></i>
+                Criar Edital
+            </a>
+        </li>
+        <li>
             <a href="/admin/">
                 <i class="fas fa-cog"></i>
                 Admin
@@ -266,7 +272,11 @@
 <div class="container py-4">
     <div class="dashboard-container">
         <h2 class="dashboard-header">
-            Períodos do Programa (Editais)
+            {% if user_campus %}
+                Editais do Campus: {{ user_campus }}
+            {% else %}
+                Períodos do Programa (Editais)
+            {% endif %}
         </h2>
         
         {% if editais %}
@@ -275,6 +285,7 @@
                     <tr>
                         <th>Número</th>
                         <th>Título</th>
+                        <th>Campus</th>
                         <th>Status</th>
                         <th>Inscrições</th>
                         <th>Avaliação</th>
@@ -286,6 +297,7 @@
                     <tr>
                         <td>{{ edital.numero }}</td>
                         <td>{{ edital.titulo }}</td>
+                        <td>{{ edital.campus|default:"Todos os campi" }}</td>
                         <td>
                             <span class="status-badge {% if edital.status == 'ATIVO' %}status-ativo{% elif edital.status == 'SUSPENSO' %}status-suspenso{% else %}status-inativo{% endif %}">
                                 {{ edital.get_status_display }}
@@ -316,7 +328,11 @@
             </table>
         {% else %}
             <p style="color: #666; padding: 2rem; text-align: center; background: #f9f9f9; border-radius: 8px;">
-                Nenhum período/edital cadastrado no momento.
+                {% if user_campus %}
+                    Nenhum edital cadastrado para o campus {{ user_campus }} no momento.
+                {% else %}
+                    Nenhum período/edital cadastrado no momento.
+                {% endif %}
             </p>
         {% endif %}
         

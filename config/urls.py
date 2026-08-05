@@ -20,7 +20,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-from core.views import home_view, buscar_cpf_view, CustomLoginView, assistente_dashboard_view, assistente_edital_detalhes_view, jornada_estudante_view, student_dashboard_view, step3_cards_view
+from core.views import home_view, buscar_cpf_view, CustomLoginView, assistente_dashboard_view, assistente_edital_detalhes_view, jornada_estudante_view, student_dashboard_view, step3_cards_view, minhas_inscricoes_view, criar_recurso_view, meus_recursos_view, avaliacao_situacional_view, criar_edital_view
 
 urlpatterns = [
     # Página inicial do programa
@@ -43,6 +43,15 @@ urlpatterns = [
     
     # Step 3 - Cards de navegação da jornada
     path('step3-cards/', step3_cards_view, name='step3_cards'),
+    
+    # Student dashboard new pages
+    path('minhas-inscricoes/', minhas_inscricoes_view, name='minhas_inscricoes'),
+    path('criar-recurso/', criar_recurso_view, name='criar_recurso'),
+    path('meus-recursos/', meus_recursos_view, name='meus_recursos'),
+    path('avaliacao-situacional/', avaliacao_situacional_view, name='avaliacao_situacional'),
+    
+    # Assistente social - criar edital
+    path('assistente/criar-edital/', criar_edital_view, name='criar_edital'),
     
     # Enrollment app URLs (fluxo de inscrição completo)
     path('enrollments/', include('ifpe_mvp.apps.enrollments.urls')),

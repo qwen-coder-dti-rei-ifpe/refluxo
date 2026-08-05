@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Criar Edital - Assistente Social{% endblock %}
+
+{% block extra_css %}
+<style>
+    body { background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); min-height: 100vh; }
+    .left-panel { position: fixed; top: 0; left: 0; width: 280px; height: 100vh; background: linear-gradient(180deg, #417690 0%, #5a9bb5 100%); box-shadow: 4px 0 10px rgba(0,0,0,0.1); z-index: 1000; overflow-y: auto; transition: transform 0.3s ease; }
+    .left-panel-header { padding: 1.5rem 1rem; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.2); }
+    .left-panel-header h3 { color: white; font-size: 1.2rem; margin: 0; font-weight: 700; }
+    .left-panel-header p { color: rgba(255,255,255,0.9); font-size: 0.85rem; margin: 0.5rem 0 0 0; }
+    .left-panel-menu { list-style: none; padding: 1rem 0; margin: 0; }
+    .left-panel-menu li { margin: 0.25rem 0.5rem; }
+    .left-panel-menu a { display: flex; align-items: center; padding: 0.875rem 1rem; color: rgba(255,255,255,0.95); text-decoration: none; border-radius: 8px; transition: all 0.3s ease; font-weight: 500; font-size: 0.95rem; }
+    .left-panel-menu a:hover { background: rgba(255,255,255,0.15); color: white; transform: translateX(5px); }
+    .left-panel-menu a.active { background: rgba(255,255,255,0.25); color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+    .left-panel-menu i { width: 24px; margin-right: 0.75rem; font-size: 1.1rem; text-align: center; }
+    .main-content { margin-left: 280px; padding: 2rem; transition: margin-left 0.3s ease; }
+    .mobile-menu-toggle { display: none; position: fixed; top: 20px; left: 20px; z-index: 1001; background: white; color: #417690; border: 2px solid #417690; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+    .mobile-menu-toggle:hover { background: #417690; color: white; }
+    @media (max-width: 768px) { .left-panel { transform: translateX(-100%); } .left-panel.active { transform: translateX(0); } .main-content { margin-left: 0; } .mobile-menu-toggle { display: block; } }
+    .form-container { background: white; border-radius: 12px; padding: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 900px; margin: 2rem auto; }
+</style>
+{% endblock %}
+
+{% block content %}
+<button class="mobile-menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i> Menu</button>
+
+<div class="left-panel" id="leftPanel">
+    <div class="left-panel-header">
+        <h3><i class="fas fa-user-tie"></i> Área do Assistente Social</h3>
+        <p>PAMA - IFPE</p>
+    </div>
+    <ul class="left-panel-menu">
+        <li><a href="{% url 'assistente_dashboard' %}"><i class="fas fa-home"></i> Dashboard</a></li>
+        <li><a href="{% url 'criar_edital' %}" class="active"><i class="fas fa-plus-circle"></i> Criar Edital</a></li>
+        <li><a href="/admin/"><i class="fas fa-cog"></i> Admin</a></li>
+        <li><a href="/"><i class="fas fa-arrow-left"></i> Voltar ao Início</a></li>
+    </ul>
+</div>
+
+<div class="main-content">
+<div class="container mt-5">
+    <div class="form-container">
+        <h2 class="mb-4"><i class="fas fa-plus-circle"></i> Criar Novo Edital</h2>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.numero.id_for_label }}" class="form-label">Número do Edital</label>
+                    {{ form.numero }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.campus.id_for_label }}" class="form-label">Campus</label>
+                    {{ form.campus }}
+                    <small class="text-muted">Deixe em branco para todos os campi</small>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="{{ form.titulo.id_for_label }}" class="form-label">Título</label>
+                {{ form.titulo }}
+            </div>
+            
+            <div class="mb-3">
+                <label for="{{ form.descricao.id_for_label }}" class="form-label">Descrição</label>
+                {{ form.descricao }}
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Início das Inscrições</label>
+                    {{ form.periodo_inscricao_abertura }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Fim das Inscrições</label>
+                    {{ form.periodo_inscricao_fechamento }}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Início da Avaliação</label>
+                    {{ form.periodo_avaliacao_abertura }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Fim da Avaliação</label>
+                    {{ form.periodo_avaliacao_fechamento }}
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                {{ form.status }}
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save"></i> Salvar Edital
+                </button>
+                <a href="{% url 'assistente_dashboard' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+
+<script>
+function toggleMenu() {
+    document.getElementById('leftPanel').classList.toggle('active');
+}
+</script>
+{% endblock %}
