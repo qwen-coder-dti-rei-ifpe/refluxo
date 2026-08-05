@@ -1,0 +1,115 @@
+{% extends 'student_workspace/base.html' %}
+
+{% block title %}Meus Recursos{% endblock %}
+
+{% block page_title %}Meus Recursos{% endblock %}
+
+{% block content %}
+<div class="content-card">
+    <h5 class="mb-4"><i class="fas fa-history text-info"></i> Meus Recursos</h5>
+    
+    {% if recursos %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Edital</th>
+                        <th>Data de Submissão</th>
+                        <th>Motivo</th>
+                        <th>Status</th>
+                        <th>Resposta</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for recurso in recursos %}
+                    <tr>
+                        <td>
+                            <strong>{{ recurso.inscricao.edital.numero }}</strong><br>
+                            <small class="text-muted">{{ recurso.inscricao.edital.titulo|truncatewords:8 }}</small>
+                        </td>
+                        <td>
+                            {{ recurso.criado_em|date:"d/m/Y H:i" }}
+                        </td>
+                        <td>
+                            {{ recurso.motivo|truncatewords:10 }}
+                        </td>
+                        <td>
+                            {% if recurso.status == 'PENDENTE' %}
+                                <span class="badge bg-warning">Pendente</span>
+                            {% elif recurso.status == 'EM_ANALISE' %}
+                                <span class="badge bg-info">Em Análise</span>
+                            {% elif recurso.status == 'DEFERIDO' %}
+                                <span class="badge bg-success">Deferido</span>
+                            {% elif recurso.status == 'INDEFERIDO' %}
+                                <span class="badge bg-danger">Indeferido</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ recurso.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if recurso.resposta %}
+                                <small>{{ recurso.resposta|truncatewords:5 }}</small>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#modalRecurso{{ recurso.id }}">
+                                <i class="fas fa-eye"></i> Ver Detalhes
+                            </button>
+                        </td>
+                    </tr>
+                    
+                    <!-- Modal Detalhes do Recurso -->
+                    <div class="modal fade" id="modalRecurso{{ recurso.id }}" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Detalhes do Recurso</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p><strong>Edital:</strong> {{ recurso.inscricao.edital.numero }} - {{ recurso.inscricao.edital.titulo }}</p>
+                                    <p><strong>Data de Submissão:</strong> {{ recurso.criado_em|date:"d/m/Y H:i" }}</p>
+                                    <p><strong>Status:</strong> 
+                                        {% if recurso.status == 'PENDENTE' %}
+                                            <span class="badge bg-warning">Pendente</span>
+                                        {% elif recurso.status == 'EM_ANALISE' %}
+                                            <span class="badge bg-info">Em Análise</span>
+                                        {% elif recurso.status == 'DEFERIDO' %}
+                                            <span class="badge bg-success">Deferido</span>
+                                        {% elif recurso.status == 'INDEFERIDO' %}
+                                            <span class="badge bg-danger">Indeferido</span>
+                                        {% endif %}
+                                    </p>
+                                    <hr>
+                                    <p><strong>Motivo:</strong></p>
+                                    <p>{{ recurso.motivo|linebreaks }}</p>
+                                    {% if recurso.resposta %}
+                                        <hr>
+                                        <p><strong>Resposta:</strong></p>
+                                        <p>{{ recurso.resposta|linebreaks }}</p>
+                                        <p><strong>Data da Resposta:</strong> {{ recurso.resposta_em|date:"d/m/Y H:i"|default:"-" }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            <i class="fas fa-info-circle"></i> Você ainda não possui recursos.
+            <a href="{% url 'student_workspace_novo_recurso' %}" class="alert-link">Clique aqui</a> para criar um novo recurso.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

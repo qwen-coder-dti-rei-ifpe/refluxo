@@ -1,0 +1,65 @@
+{% extends 'student_workspace/base.html' %}
+
+{% block title %}Novo Recurso{% endblock %}
+
+{% block page_title %}Novo Recurso{% endblock %}
+
+{% block content %}
+<div class="content-card">
+    <h5 class="mb-4"><i class="fas fa-exclamation-triangle text-warning"></i> Novo Recurso</h5>
+    
+    <div class="alert alert-info" role="alert">
+        <i class="fas fa-info-circle"></i> 
+        <strong>Critérios para criar um Recurso:</strong>
+        <ul class="mb-0 mt-2">
+            <li>Inscrição deve ter sido submetida pelo estudante</li>
+            <li>Inscrição deve ter sido analisada pelo assistente social</li>
+            <li>Edital deve estar em período de recurso configurado</li>
+            <li>Dentro do intervalo de tempo configurado para recursos</li>
+        </ul>
+    </div>
+    
+    {% if inscricoes_elegiveis %}
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label for="inscricao_id" class="form-label">Selecione a Inscrição para Recorrer:</label>
+                <select class="form-select" id="inscricao_id" name="inscricao_id" required>
+                    <option value="">Selecione uma inscrição...</option>
+                    {% for inscricao in inscricoes_elegiveis %}
+                        <option value="{{ inscricao.id }}">
+                            {{ inscricao.edital.numero }} - {{ inscricao.edital.titulo }} 
+                            (Status: {{ inscricao.status }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label for="motivo" class="form-label">Motivo do Recurso *</label>
+                <textarea class="form-control" id="motivo" name="motivo" rows="5" required 
+                          placeholder="Descreva detalhadamente o motivo do seu recurso..."></textarea>
+            </div>
+            
+            <div class="mb-3">
+                <label for="documentos" class="form-label">Documentos Comprobatórios (Opcional)</label>
+                <input type="file" class="form-control" id="documentos" name="documentos" multiple>
+                <small class="form-text text-muted">Anexe documentos que comprovem seu recurso (PDF, JPG, PNG).</small>
+            </div>
+            
+            <button type="submit" class="btn btn-warning">
+                <i class="fas fa-paper-plane"></i> Submeter Recurso
+            </button>
+            <a href="{% url 'student_workspace_meus_recursos' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Cancelar
+            </a>
+        </form>
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            <i class="fas fa-exclamation-triangle"></i> 
+            Não há inscrições elegíveis para recurso no momento.
+            Verifique os critérios ou aguarde o período de recursos.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

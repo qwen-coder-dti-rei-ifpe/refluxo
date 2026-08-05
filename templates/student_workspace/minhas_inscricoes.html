@@ -1,0 +1,74 @@
+{% extends 'student_workspace/base.html' %}
+
+{% block title %}Minhas Inscrições{% endblock %}
+
+{% block page_title %}Minhas Inscrições{% endblock %}
+
+{% block content %}
+<div class="content-card">
+    <h5 class="mb-4"><i class="fas fa-file-alt text-primary"></i> Minhas Inscrições</h5>
+    
+    {% if inscricoes %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Edital</th>
+                        <th>Data de Submissão</th>
+                        <th>Status</th>
+                        <th>Classificação</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for inscricao in inscricoes %}
+                    <tr>
+                        <td>
+                            <strong>{{ inscricao.edital.numero }}</strong><br>
+                            <small class="text-muted">{{ inscricao.edital.titulo|truncatewords:10 }}</small>
+                        </td>
+                        <td>
+                            {% if inscricao.submetida_em %}
+                                {{ inscricao.submetida_em|date:"d/m/Y H:i" }}
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if inscricao.status == 'SUBMETIDA' %}
+                                <span class="badge bg-info">Submetida</span>
+                            {% elif inscricao.status == 'EM_ANALISE' %}
+                                <span class="badge bg-warning">Em Análise</span>
+                            {% elif inscricao.status == 'DEFERIDA' %}
+                                <span class="badge bg-success">Deferida</span>
+                            {% elif inscricao.status == 'INDEFERIDA' %}
+                                <span class="badge bg-danger">Indeferida</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ inscricao.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if inscricao.classificacao %}
+                                <span class="badge bg-primary">{{ inscricao.get_classificacao_display }}</span>
+                            {% else %}
+                                <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'enrollment_dashboard' inscricao.edital.id %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye"></i> Visualizar
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            <i class="fas fa-info-circle"></i> Você ainda não possui inscrições.
+            <a href="{% url 'student_workspace_nova_inscricao' %}" class="alert-link">Clique aqui</a> para criar uma nova inscrição.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
