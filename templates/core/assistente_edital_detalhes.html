@@ -6,84 +6,216 @@
 <h1 id="site-name">Submissões dos Estudantes - {{ edital.numero }}</h1>
 {% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Palette de Cores Unificada - Verde (mesma paleta do Student Dashboard) */
+    :root {
+        --pama-green-primary: #27ae60;
+        --pama-green-secondary: #2ecc71;
+        --pama-green-dark: #219a52;
+        --pama-green-light: #e8f5e9;
+    }
+    
+    #content {
+        background: #fff !important;
+    }
+    
+    .submissions-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+    .submissions-card {
+        background: white;
+        border-radius: 8px;
+        padding: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .submissions-header {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--pama-green-primary);
+    }
+    
+    .submissions-title {
+        color: var(--pama-green-primary);
+        margin-bottom: 0.5rem;
+    }
+    
+    .submissions-description {
+        color: #666;
+        margin: 0;
+    }
+    
+    .status-badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        color: white;
+    }
+    
+    .status-ativo { background: var(--pama-green-primary); }
+    .status-suspenso { background: #ff9800; }
+    .status-inativo { background: #f44336; }
+    
+    .status-submetida { background: #2196f3; }
+    .status-em-analise { background: #ff9800; }
+    .status-deferida { background: var(--pama-green-primary); }
+    .status-indeferida { background: #f44336; }
+    .status-pendente { background: #9e9e9e; }
+    
+    .classificacao-contemplado { background: var(--pama-green-primary); }
+    .classificacao-elegivel { background: #8bc34a; }
+    .classificacao-nao-contemplado { background: #f44336; }
+    .classificacao-com-pendencia { background: #ff9800; }
+    .classificacao-sem-classificacao { background: #9e9e9e; }
+    
+    .btn-back, .btn-admin {
+        display: inline-block;
+        padding: 8px 16px;
+        background: #e0e0e0;
+        color: #333;
+        text-decoration: none;
+        border-radius: 4px;
+        margin-right: 0.5rem;
+    }
+    
+    .btn-admin-link {
+        display: inline-block;
+        padding: 8px 16px;
+        background: var(--pama-green-primary);
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+    }
+    
+    .submissions-count {
+        color: #333;
+        margin-bottom: 1rem;
+    }
+    
+    .submissions-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .submissions-table thead tr {
+        background: var(--pama-green-light);
+    }
+    
+    .submissions-table th {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 2px solid var(--pama-green-primary);
+        color: var(--pama-green-dark);
+    }
+    
+    .submissions-table td {
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .submissions-table tbody tr:nth-child(even) {
+        background: #f9f9f9;
+    }
+    
+    .btn-details {
+        display: inline-block;
+        padding: 6px 12px;
+        background: var(--pama-green-primary);
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        font-size: 0.85rem;
+    }
+    
+    .empty-message {
+        color: #666;
+        padding: 3rem;
+        text-align: center;
+        background: #f9f9f9;
+        border-radius: 8px;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div style="max-width: 1400px; margin: 0 auto;">
-    <div style="background: white; border-radius: 8px; padding: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-        <div style="margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid #417690;">
-            <h2 style="color: #417690; margin-bottom: 0.5rem;">{{ edital.titulo }}</h2>
-            <p style="color: #666; margin: 0;">{{ edital.descricao|truncatewords:30 }}</p>
+<div class="submissions-container">
+    <div class="submissions-card">
+        <div class="submissions-header">
+            <h2 class="submissions-title">{{ edital.titulo }}</h2>
+            <p class="submissions-description">{{ edital.descricao|truncatewords:30 }}</p>
             <p style="margin-top: 0.5rem;">
                 <strong>Status:</strong> 
-                <span style="padding: 4px 8px; border-radius: 4px; background: {% if edital.status == 'ATIVO' %}#4caf50{% elif edital.status == 'SUSPENSO' %}#ff9800{% else %}#f44336{% endif %}; color: white; font-size: 0.85rem;">
+                <span class="status-badge {% if edital.status == 'ATIVO' %}status-ativo{% elif edital.status == 'SUSPENSO' %}status-suspenso{% else %}status-inativo{% endif %}">
                     {{ edital.get_status_display }}
                 </span>
             </p>
         </div>
         
         <div style="margin-bottom: 1.5rem;">
-            <a href="javascript:history.back()" 
-               style="display: inline-block; padding: 8px 16px; background: #e0e0e0; color: #333; text-decoration: none; border-radius: 4px; margin-right: 0.5rem;">
+            <a href="javascript:history.back()" class="btn-back">
                 ← Voltar
             </a>
-            <a href="{% url 'assistente_dashboard' %}" 
-               style="display: inline-block; padding: 8px 16px; background: #f5f5f5; color: #333; text-decoration: none; border-radius: 4px; margin-right: 0.5rem;">
+            <a href="{% url 'assistente_dashboard' %}" class="btn-back">
                 ← Voltar aos Períodos
             </a>
-            <a href="/admin/" 
-               style="display: inline-block; padding: 8px 16px; background: #417690; color: white; text-decoration: none; border-radius: 4px;">
+            <a href="/admin/" class="btn-admin-link">
                 Admin
             </a>
         </div>
         
-        <h3 style="color: #333; margin-bottom: 1rem;">
+        <h3 class="submissions-count">
             Total de Submissões: {{ inscricoes.count }}
         </h3>
         
         {% if inscricoes %}
             <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem;">
+                <table class="submissions-table">
                     <thead>
-                        <tr style="background: #f5f5f5;">
-                            <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Estudante</th>
-                            <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Matrícula</th>
-                            <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Curso</th>
-                            <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Campus</th>
-                            <th style="padding: 12px; text-align: center; border-bottom: 2px solid #ddd;">Status</th>
-                            <th style="padding: 12px; text-align: center; border-bottom: 2px solid #ddd;">Classificação</th>
-                            <th style="padding: 12px; text-align: center; border-bottom: 2px solid #ddd;">Submetido em</th>
-                            <th style="padding: 12px; text-align: center; border-bottom: 2px solid #ddd;">Ações</th>
+                        <tr>
+                            <th>Estudante</th>
+                            <th>Matrícula</th>
+                            <th>Curso</th>
+                            <th>Campus</th>
+                            <th style="text-align: center;">Status</th>
+                            <th style="text-align: center;">Classificação</th>
+                            <th style="text-align: center;">Submetido em</th>
+                            <th style="text-align: center;">Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for inscricao in inscricoes %}
-                        <tr style="{% cycle '' 'background: #f9f9f9;' %}">
-                            <td style="padding: 12px; border-bottom: 1px solid #eee;">
+                        <tr>
+                            <td>
                                 <strong>{{ inscricao.estudante.nome_completo }}</strong><br>
                                 <small style="color: #666;">CPF: {{ inscricao.estudante.cpf }}</small>
                             </td>
-                            <td style="padding: 12px; border-bottom: 1px solid #eee;">{{ inscricao.estudante.matricula }}</td>
-                            <td style="padding: 12px; border-bottom: 1px solid #eee;">{{ inscricao.estudante.curso }}</td>
-                            <td style="padding: 12px; border-bottom: 1px solid #eee;">{{ inscricao.estudante.campus }}</td>
-                            <td style="padding: 12px; text-align: center; border-bottom: 1px solid #eee;">
-                                <span style="padding: 4px 8px; border-radius: 4px; background: {% if inscricao.status == 'SUBMETIDA' %}#2196f3{% elif inscricao.status == 'EM_ANALISE' %}#ff9800{% elif inscricao.status == 'DEFERIDA' %}#4caf50{% elif inscricao.status == 'INDEFERIDA' %}#f44336{% else %}#9e9e9e{% endif %}; color: white; font-size: 0.8rem;">
+                            <td>{{ inscricao.estudante.matricula }}</td>
+                            <td>{{ inscricao.estudante.curso }}</td>
+                            <td>{{ inscricao.estudante.campus }}</td>
+                            <td style="text-align: center;">
+                                <span class="status-badge {% if inscricao.status == 'SUBMETIDA' %}status-submetida{% elif inscricao.status == 'EM_ANALISE' %}status-em-analise{% elif inscricao.status == 'DEFERIDA' %}status-deferida{% elif inscricao.status == 'INDEFERIDA' %}status-indeferida{% else %}status-pendente{% endif %}">
                                     {{ inscricao.get_status_display }}
                                 </span>
                             </td>
-                            <td style="padding: 12px; text-align: center; border-bottom: 1px solid #eee;">
-                                <span style="padding: 4px 8px; border-radius: 4px; background: {% if inscricao.classificacao == 'CONTEMPLADO' %}#4caf50{% elif inscricao.classificacao == 'ELEGIVEL' %}#8bc34a{% elif inscricao.classificacao == 'NAO_CONTEMPLADO' %}#f44336{% elif inscricao.classificacao == 'COM_PENDENCIA' %}#ff9800{% else %}#9e9e9e{% endif %}; color: white; font-size: 0.8rem;">
+                            <td style="text-align: center;">
+                                <span class="status-badge {% if inscricao.classificacao == 'CONTEMPLADO' %}classificacao-contemplado{% elif inscricao.classificacao == 'ELEGIVEL' %}classificacao-elegivel{% elif inscricao.classificacao == 'NAO_CONTEMPLADO' %}classificacao-nao-contemplado{% elif inscricao.classificacao == 'COM_PENDENCIA' %}classificacao-com-pendencia{% else %}classificacao-sem-classificacao{% endif %}">
                                     {{ inscricao.get_classificacao_display }}
                                 </span>
                             </td>
-                            <td style="padding: 12px; text-align: center; border-bottom: 1px solid #eee;">
+                            <td style="text-align: center;">
                                 {% if inscricao.submetida_em %}
                                     {{ inscricao.submetida_em|date:"d/m/Y H:i" }}
                                 {% else %}
                                     -
                                 {% endif %}
                             </td>
-                            <td style="padding: 12px; text-align: center; border-bottom: 1px solid #eee;">
-                                <a href="/admin/inscricoes/inscricao/{{ inscricao.id }}/change/" 
-                                   style="display: inline-block; padding: 6px 12px; background: #417690; color: white; text-decoration: none; border-radius: 4px; font-size: 0.85rem;">
+                            <td style="text-align: center;">
+                                <a href="/admin/inscricoes/inscricao/{{ inscricao.id }}/change/" class="btn-details">
                                     Ver Detalhes
                                 </a>
                             </td>
@@ -93,7 +225,7 @@
                 </table>
             </div>
         {% else %}
-            <p style="color: #666; padding: 3rem; text-align: center; background: #f9f9f9; border-radius: 8px;">
+            <p class="empty-message">
                 Nenhuma submissão encontrada para este período/edital.
             </p>
         {% endif %}

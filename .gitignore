@@ -1,1 +1,1 @@
-Nothing should be ignored based on the provided file changes. The only modified file is a template HTML file (`ifpe_mvp/apps/enrollments/templates/enrollments/step3_cards.html`), which is a source code file that should be tracked in version control. No build artifacts, dependencies, temporary files, or other ignorable content were detected in the changes.
+Nothing should be ignored based on the provided file changes, as they only contain HTML template files which are source code files.
