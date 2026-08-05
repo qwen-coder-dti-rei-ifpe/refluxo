@@ -1,57 +1,312 @@
-{% extends 'admin/base_site.html' %}
+{% extends 'base.html' %}
 
 {% block title %}Dashboard do Assistente Social{% endblock %}
 
-{% block branding %}
-<h1 id="site-name">Área do Assistente Social - Programas e Períodos</h1>
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        min-height: 100vh;
+    }
+    
+    /* Left Panel Menu */
+    .left-panel {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 280px;
+        height: 100vh;
+        background: linear-gradient(180deg, #417690 0%, #5a9bb5 100%);
+        box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+        z-index: 1000;
+        overflow-y: auto;
+        transition: transform 0.3s ease;
+    }
+    
+    .left-panel-header {
+        padding: 1.5rem 1rem;
+        text-align: center;
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .left-panel-header h3 {
+        color: white;
+        font-size: 1.2rem;
+        margin: 0;
+        font-weight: 700;
+    }
+    
+    .left-panel-header p {
+        color: rgba(255,255,255,0.9);
+        font-size: 0.85rem;
+        margin: 0.5rem 0 0 0;
+    }
+    
+    .left-panel-menu {
+        list-style: none;
+        padding: 1rem 0;
+        margin: 0;
+    }
+    
+    .left-panel-menu li {
+        margin: 0.25rem 0.5rem;
+    }
+    
+    .left-panel-menu a {
+        display: flex;
+        align-items: center;
+        padding: 0.875rem 1rem;
+        color: rgba(255,255,255,0.95);
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+    
+    .left-panel-menu a:hover {
+        background: rgba(255,255,255,0.15);
+        color: white;
+        transform: translateX(5px);
+    }
+    
+    .left-panel-menu a.active {
+        background: rgba(255,255,255,0.25);
+        color: white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    
+    .left-panel-menu i {
+        width: 24px;
+        margin-right: 0.75rem;
+        font-size: 1.1rem;
+        text-align: center;
+    }
+    
+    .menu-badge {
+        margin-left: auto;
+        background: rgba(255,255,255,0.2);
+        padding: 0.2rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+    }
+    
+    .menu-badge.completed {
+        background: rgba(255,255,255,0.3);
+    }
+    
+    .main-content {
+        margin-left: 280px;
+        padding: 2rem;
+        transition: margin-left 0.3s ease;
+    }
+    
+    .mobile-menu-toggle {
+        display: none;
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1001;
+        background: white;
+        color: #417690;
+        border: 2px solid #417690;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .mobile-menu-toggle:hover {
+        background: #417690;
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .left-panel {
+            transform: translateX(-100%);
+        }
+        
+        .left-panel.active {
+            transform: translateX(0);
+        }
+        
+        .main-content {
+            margin-left: 0;
+        }
+        
+        .mobile-menu-toggle {
+            display: block;
+        }
+    }
+    
+    .dashboard-container {
+        background: white;
+        border-radius: 8px;
+        padding: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    
+    .dashboard-header {
+        color: #417690;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid #417690;
+        padding-bottom: 0.5rem;
+    }
+    
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+    
+    .data-table thead tr {
+        background: #f5f5f5;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .data-table th {
+        border-bottom: 2px solid #ddd;
+    }
+    
+    .status-badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        color: white;
+        font-size: 0.85rem;
+    }
+    
+    .status-ativo {
+        background: #4caf50;
+    }
+    
+    .status-suspenso {
+        background: #ff9800;
+    }
+    
+    .status-inativo {
+        background: #f44336;
+    }
+    
+    .action-btn {
+        display: inline-block;
+        padding: 8px 16px;
+        background: #417690;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: bold;
+    }
+    
+    .back-btn {
+        display: inline-block;
+        padding: 8px 16px;
+        background: #e0e0e0;
+        color: #333;
+        text-decoration: none;
+        border-radius: 4px;
+        margin-right: 1rem;
+    }
+    
+    .home-btn {
+        display: inline-block;
+        padding: 8px 16px;
+        background: #417690;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<div style="max-width: 1200px; margin: 0 auto;">
-    <div style="background: white; border-radius: 8px; padding: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-        <h2 style="color: #417690; margin-bottom: 1.5rem; border-bottom: 2px solid #417690; padding-bottom: 0.5rem;">
+<!-- Mobile Menu Toggle -->
+<button class="mobile-menu-toggle" onclick="toggleMenu()">
+    <i class="fas fa-bars"></i> Menu
+</button>
+
+<!-- Left Panel Menu -->
+<div class="left-panel" id="leftPanel">
+    <div class="left-panel-header">
+        <h3><i class="fas fa-user-tie"></i> Área do Assistente Social</h3>
+        <p>PAMA - IFPE</p>
+    </div>
+    <ul class="left-panel-menu">
+        <li>
+            <a href="{% url 'assistente_dashboard' %}" class="active">
+                <i class="fas fa-home"></i>
+                Dashboard
+            </a>
+        </li>
+        <li>
+            <a href="/admin/">
+                <i class="fas fa-cog"></i>
+                Admin
+            </a>
+        </li>
+        <li>
+            <a href="/">
+                <i class="fas fa-arrow-left"></i>
+                Voltar ao Início
+            </a>
+        </li>
+    </ul>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+<div class="container py-4">
+    <div class="dashboard-container">
+        <h2 class="dashboard-header">
             Períodos do Programa (Editais)
         </h2>
         
         {% if editais %}
-            <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+            <table class="data-table">
                 <thead>
-                    <tr style="background: #f5f5f5;">
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Número</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Título</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Status</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Inscrições</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Avaliação</th>
-                        <th style="padding: 12px; text-align: center; border-bottom: 2px solid #ddd;">Ações</th>
+                    <tr>
+                        <th>Número</th>
+                        <th>Título</th>
+                        <th>Status</th>
+                        <th>Inscrições</th>
+                        <th>Avaliação</th>
+                        <th style="text-align: center;">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for edital in editais %}
-                    <tr style="{% cycle '' 'background: #f9f9f9;' %}">
-                        <td style="padding: 12px; border-bottom: 1px solid #eee;">{{ edital.numero }}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid #eee;">{{ edital.titulo }}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid #eee;">
-                            <span style="padding: 4px 8px; border-radius: 4px; background: {% if edital.status == 'ATIVO' %}#4caf50{% elif edital.status == 'SUSPENSO' %}#ff9800{% else %}#f44336{% endif %}; color: white; font-size: 0.85rem;">
+                    <tr>
+                        <td>{{ edital.numero }}</td>
+                        <td>{{ edital.titulo }}</td>
+                        <td>
+                            <span class="status-badge {% if edital.status == 'ATIVO' %}status-ativo{% elif edital.status == 'SUSPENSO' %}status-suspenso{% else %}status-inativo{% endif %}">
                                 {{ edital.get_status_display }}
                             </span>
                         </td>
-                        <td style="padding: 12px; border-bottom: 1px solid #eee;">
+                        <td>
                             {% if edital.periodo_inscricao_abertura and edital.periodo_inscricao_fechamento %}
                                 {{ edital.periodo_inscricao_abertura|date:"d/m/Y" }} até {{ edital.periodo_inscricao_fechamento|date:"d/m/Y" }}
                             {% else %}
                                 Não definido
                             {% endif %}
                         </td>
-                        <td style="padding: 12px; border-bottom: 1px solid #eee;">
+                        <td>
                             {% if edital.periodo_avaliacao_abertura and edital.periodo_avaliacao_fechamento %}
                                 {{ edital.periodo_avaliacao_abertura|date:"d/m/Y" }} até {{ edital.periodo_avaliacao_fechamento|date:"d/m/Y" }}
                             {% else %}
                                 Não definido
                             {% endif %}
                         </td>
-                        <td style="padding: 12px; text-align: center; border-bottom: 1px solid #eee;">
-                            <a href="{% url 'assistente_edital_detalhes' edital.id %}" 
-                               style="display: inline-block; padding: 8px 16px; background: #417690; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">
+                        <td style="text-align: center;">
+                            <a href="{% url 'assistente_edital_detalhes' edital.id %}" class="action-btn">
                                 Ver Submissões
                             </a>
                         </td>
@@ -66,16 +321,36 @@
         {% endif %}
         
         <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #ddd;">
-            <a href="javascript:history.back()" style="display: inline-block; padding: 8px 16px; background: #e0e0e0; color: #333; text-decoration: none; border-radius: 4px; margin-right: 1rem;">
+            <a href="javascript:history.back()" class="back-btn">
                 ← Voltar
             </a>
-            <a href="/admin/" style="display: inline-block; padding: 8px 16px; background: #f5f5f5; color: #333; text-decoration: none; border-radius: 4px; margin-right: 1rem;">
+            <a href="/admin/" class="back-btn">
                 ← Voltar ao Admin
             </a>
-            <a href="/" style="display: inline-block; padding: 8px 16px; background: #417690; color: white; text-decoration: none; border-radius: 4px;">
+            <a href="/" class="home-btn">
                 Ir para Home
             </a>
         </div>
     </div>
 </div>
+</div>
+
+<script>
+    function toggleMenu() {
+        const leftPanel = document.getElementById('leftPanel');
+        leftPanel.classList.toggle('active');
+    }
+    
+    // Fechar menu ao clicar fora em mobile
+    document.addEventListener('click', function(event) {
+        const leftPanel = document.getElementById('leftPanel');
+        const mobileToggle = document.querySelector('.mobile-menu-toggle');
+        
+        if (window.innerWidth <= 768) {
+            if (!leftPanel.contains(event.target) && !mobileToggle.contains(event.target)) {
+                leftPanel.classList.remove('active');
+            }
+        }
+    });
+</script>
 {% endblock %}
