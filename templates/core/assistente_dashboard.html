@@ -6,52 +6,167 @@
 <h1 id="site-name">Área do Assistente Social - Programas e Períodos</h1>
 {% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Palette de Cores Unificada - Verde (mesma paleta do Student Dashboard) */
+    :root {
+        --pama-green-primary: #27ae60;
+        --pama-green-secondary: #2ecc71;
+        --pama-green-dark: #219a52;
+        --pama-green-light: #e8f5e9;
+    }
+    
+    #content {
+        background: #fff !important;
+    }
+    
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .dashboard-card {
+        background: white;
+        border-radius: 8px;
+        padding: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .dashboard-title {
+        color: var(--pama-green-primary);
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid var(--pama-green-primary);
+        padding-bottom: 0.5rem;
+    }
+    
+    .dashboard-table thead tr {
+        background: var(--pama-green-light);
+    }
+    
+    .dashboard-table th {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 2px solid var(--pama-green-primary);
+        color: var(--pama-green-dark);
+    }
+    
+    .dashboard-table td {
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .dashboard-table tbody tr:nth-child(even) {
+        background: #f9f9f9;
+    }
+    
+    .status-badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        color: white;
+    }
+    
+    .status-ativo { background: var(--pama-green-primary); }
+    .status-suspenso { background: #ff9800; }
+    .status-inativo { background: #f44336; }
+    
+    .btn-action {
+        display: inline-block;
+        padding: 8px 16px;
+        background: linear-gradient(135deg, var(--pama-green-primary), var(--pama-green-secondary));
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        font-weight: bold;
+        transition: all 0.3s;
+    }
+    
+    .btn-action:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    .btn-back {
+        display: inline-block;
+        padding: 8px 16px;
+        background: #e0e0e0;
+        color: #333;
+        text-decoration: none;
+        border-radius: 4px;
+        margin-right: 1rem;
+    }
+    
+    .btn-admin {
+        display: inline-block;
+        padding: 8px 16px;
+        background: #f5f5f5;
+        color: #333;
+        text-decoration: none;
+        border-radius: 4px;
+        margin-right: 1rem;
+    }
+    
+    .empty-message {
+        color: #666;
+        padding: 2rem;
+        text-align: center;
+        background: #f9f9f9;
+        border-radius: 8px;
+    }
+    
+    .action-bar {
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid #ddd;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div style="max-width: 1200px; margin: 0 auto;">
-    <div style="background: white; border-radius: 8px; padding: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-        <h2 style="color: #417690; margin-bottom: 1.5rem; border-bottom: 2px solid #417690; padding-bottom: 0.5rem;">
+<div class="dashboard-container">
+    <div class="dashboard-card">
+        <h2 class="dashboard-title">
             Períodos do Programa (Editais)
         </h2>
         
         {% if editais %}
-            <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+            <table class="dashboard-table" style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
                 <thead>
-                    <tr style="background: #f5f5f5;">
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Número</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Título</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Status</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Inscrições</th>
-                        <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Avaliação</th>
-                        <th style="padding: 12px; text-align: center; border-bottom: 2px solid #ddd;">Ações</th>
+                    <tr>
+                        <th>Número</th>
+                        <th>Título</th>
+                        <th>Status</th>
+                        <th>Inscrições</th>
+                        <th>Avaliação</th>
+                        <th style="text-align: center;">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for edital in editais %}
-                    <tr style="{% cycle '' 'background: #f9f9f9;' %}">
-                        <td style="padding: 12px; border-bottom: 1px solid #eee;">{{ edital.numero }}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid #eee;">{{ edital.titulo }}</td>
-                        <td style="padding: 12px; border-bottom: 1px solid #eee;">
-                            <span style="padding: 4px 8px; border-radius: 4px; background: {% if edital.status == 'ATIVO' %}#4caf50{% elif edital.status == 'SUSPENSO' %}#ff9800{% else %}#f44336{% endif %}; color: white; font-size: 0.85rem;">
+                    <tr>
+                        <td>{{ edital.numero }}</td>
+                        <td>{{ edital.titulo }}</td>
+                        <td>
+                            <span class="status-badge {% if edital.status == 'ATIVO' %}status-ativo{% elif edital.status == 'SUSPENSO' %}status-suspenso{% else %}status-inativo{% endif %}">
                                 {{ edital.get_status_display }}
                             </span>
                         </td>
-                        <td style="padding: 12px; border-bottom: 1px solid #eee;">
+                        <td>
                             {% if edital.periodo_inscricao_abertura and edital.periodo_inscricao_fechamento %}
                                 {{ edital.periodo_inscricao_abertura|date:"d/m/Y" }} até {{ edital.periodo_inscricao_fechamento|date:"d/m/Y" }}
                             {% else %}
                                 Não definido
                             {% endif %}
                         </td>
-                        <td style="padding: 12px; border-bottom: 1px solid #eee;">
+                        <td>
                             {% if edital.periodo_avaliacao_abertura and edital.periodo_avaliacao_fechamento %}
                                 {{ edital.periodo_avaliacao_abertura|date:"d/m/Y" }} até {{ edital.periodo_avaliacao_fechamento|date:"d/m/Y" }}
                             {% else %}
                                 Não definido
                             {% endif %}
                         </td>
-                        <td style="padding: 12px; text-align: center; border-bottom: 1px solid #eee;">
-                            <a href="{% url 'assistente_edital_detalhes' edital.id %}" 
-                               style="display: inline-block; padding: 8px 16px; background: #417690; color: white; text-decoration: none; border-radius: 4px; font-weight: bold;">
+                        <td style="text-align: center;">
+                            <a href="{% url 'assistente_edital_detalhes' edital.id %}" class="btn-action">
                                 Ver Submissões
                             </a>
                         </td>
@@ -60,19 +175,19 @@
                 </tbody>
             </table>
         {% else %}
-            <p style="color: #666; padding: 2rem; text-align: center; background: #f9f9f9; border-radius: 8px;">
+            <p class="empty-message">
                 Nenhum período/edital cadastrado no momento.
             </p>
         {% endif %}
         
-        <div style="margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #ddd;">
-            <a href="javascript:history.back()" style="display: inline-block; padding: 8px 16px; background: #e0e0e0; color: #333; text-decoration: none; border-radius: 4px; margin-right: 1rem;">
+        <div class="action-bar">
+            <a href="javascript:history.back()" class="btn-back">
                 ← Voltar
             </a>
-            <a href="/admin/" style="display: inline-block; padding: 8px 16px; background: #f5f5f5; color: #333; text-decoration: none; border-radius: 4px; margin-right: 1rem;">
+            <a href="/admin/" class="btn-admin">
                 ← Voltar ao Admin
             </a>
-            <a href="/" style="display: inline-block; padding: 8px 16px; background: #417690; color: white; text-decoration: none; border-radius: 4px;">
+            <a href="/" class="btn-action">
                 Ir para Home
             </a>
         </div>
