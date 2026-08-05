@@ -1,0 +1,74 @@
+{% extends 'student_workspace/base.html' %}
+
+{% block title %}Avaliações Integradas Conecta Gov{% endblock %}
+
+{% block page_title %}Avaliações Integradas Conecta Gov{% endblock %}
+
+{% block content %}
+<div class="content-card">
+    <h5 class="mb-4"><i class="fas fa-chart-line text-success"></i> Avaliações Integradas Conecta Gov</h5>
+    
+    <div class="alert alert-info" role="alert">
+        <i class="fas fa-info-circle"></i> 
+        <strong>Sobre as Avaliações Integradas:</strong>
+        <p class="mb-0 mt-2">
+            Esta seção integra dados do sistema Conecta Gov para apresentar avaliações e análises 
+            socioeconômicas dos estudantes inscritos no programa.
+        </p>
+    </div>
+    
+    {% if avaliacoes %}
+        <div class="row">
+            {% for avaliacao in avaliacoes %}
+            <div class="col-md-6 mb-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h6 class="mb-0">{{ avaliacao.titulo }}</h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">{{ avaliacao.descricao|truncatewords:20 }}</p>
+                        <hr>
+                        <div class="row">
+                            <div class="col-6">
+                                <small class="text-muted">
+                                    <strong>Data:</strong><br>
+                                    {{ avaliacao.data|date:"d/m/Y"|default:"-" }}
+                                </small>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">
+                                    <strong>Status:</strong><br>
+                                    {% if avaliacao.status == 'CONCLUIDO' %}
+                                        <span class="badge bg-success">Concluído</span>
+                                    {% elif avaliacao.status == 'EM_ANDAMENTO' %}
+                                        <span class="badge bg-warning">Em Andamento</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Pendente</span>
+                                    {% endif %}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white border-0">
+                        <button class="btn btn-sm btn-outline-primary w-100">
+                            <i class="fas fa-eye"></i> Ver Detalhes
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            <i class="fas fa-exclamation-triangle"></i> 
+            Nenhuma avaliação integrada disponível no momento.
+        </div>
+    {% endif %}
+    
+    <div class="mt-4">
+        <a href="{% url 'student_workspace_inicio' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Voltar ao Início
+        </a>
+    </div>
+</div>
+{% endblock %}

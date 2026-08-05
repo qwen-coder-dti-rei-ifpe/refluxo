@@ -56,6 +56,9 @@ urlpatterns = [
     path('dashboard/assistente/', assistente_dashboard_view, name='assistente_dashboard'),
     path('assistente/edital/<int:edital_id>/', assistente_edital_detalhes_view, name='assistente_edital_detalhes'),
     
+    # Assistant Social (Social Worker) Dashboard - New System
+    path('assistant-social/', include('assistant_social.urls', namespace='assistant_social')),
+    
     # Admin Django
     path('admin/', admin.site.urls),
     

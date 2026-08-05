@@ -1,0 +1,58 @@
+{% extends 'student_workspace/base.html' %}
+
+{% block title %}Nova Inscrição{% endblock %}
+
+{% block page_title %}Nova Inscrição{% endblock %}
+
+{% block content %}
+<div class="content-card">
+    <h5 class="mb-4"><i class="fas fa-plus-circle text-success"></i> Nova Inscrição</h5>
+    
+    <div class="alert alert-info" role="alert">
+        <i class="fas fa-info-circle"></i> 
+        <strong>Critérios para Nova Inscrição:</strong>
+        <ul class="mb-0 mt-2">
+            <li>Edital deve estar com inscrições abertas</li>
+            <li>Edital deve estar no período de tempo configurado</li>
+            <li>Estudante não pode ter inscrição já classificada neste edital</li>
+        </ul>
+    </div>
+    
+    {% if editais_disponiveis %}
+        <div class="row">
+            {% for edital in editais_disponiveis %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h6 class="mb-0">{{ edital.numero }}</h6>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ edital.titulo }}</h5>
+                        <p class="card-text text-muted">{{ edital.descricao|truncatewords:15 }}</p>
+                        <hr>
+                        <div class="mb-3">
+                            <small class="text-muted">
+                                <strong>Período:</strong><br>
+                                {{ edital.periodo_inscricao_abertura|date:"d/m/Y" }} até {{ edital.periodo_inscricao_fechamento|date:"d/m/Y" }}
+                            </small>
+                        </div>
+                        <span class="badge bg-success">Disponível para Inscrição</span>
+                    </div>
+                    <div class="card-footer bg-white border-0">
+                        <a href="{% url 'enrollment_dashboard' edital.id %}" class="btn btn-success btn-sm w-100">
+                            <i class="fas fa-plus"></i> Criar Nova Inscrição
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            <i class="fas fa-exclamation-triangle"></i> 
+            Não há editais disponíveis para nova inscrição no momento.
+            Verifique os critérios ou aguarde novos editais.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

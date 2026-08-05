@@ -1,0 +1,52 @@
+{% extends 'student_workspace/base.html' %}
+
+{% block title %}Início - Editais Abertos{% endblock %}
+
+{% block page_title %}Editais Abertos{% endblock %}
+
+{% block content %}
+<div class="content-card">
+    <h5 class="mb-4"><i class="fas fa-bullhorn text-primary"></i> Editais Abertos para Inscrição</h5>
+    
+    {% if editais_abertos %}
+        <div class="row">
+            {% for edital in editais_abertos %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h6 class="mb-0">{{ edital.numero }}</h6>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ edital.titulo }}</h5>
+                        <p class="card-text text-muted">{{ edital.descricao|truncatewords:20 }}</p>
+                        <hr>
+                        <div class="mb-3">
+                            <small class="text-muted">
+                                <i class="far fa-calendar-alt"></i> 
+                                <strong>Início:</strong> {{ edital.periodo_inscricao_abertura|date:"d/m/Y H:i" }}<br>
+                                <i class="far fa-calendar-times"></i>
+                                <strong>Fim:</strong> {{ edital.periodo_inscricao_fechamento|date:"d/m/Y H:i" }}
+                            </small>
+                        </div>
+                        {% if edital.esta_com_inscricoes_abertas %}
+                            <span class="badge bg-success">Inscrições Abertas</span>
+                        {% else %}
+                            <span class="badge bg-warning">Em Breve</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer bg-white border-0">
+                        <a href="{% url 'student_dashboard' %}?edital_id={{ edital.id }}" class="btn btn-primary btn-sm w-100">
+                            <i class="fas fa-arrow-right"></i> Acessar Edital
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info" role="alert">
+            <i class="fas fa-info-circle"></i> Não há editais abertos no momento. Verifique novamente mais tarde.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

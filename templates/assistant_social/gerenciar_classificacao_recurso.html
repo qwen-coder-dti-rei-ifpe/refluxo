@@ -1,0 +1,86 @@
+{% extends 'assistant_social/base.html' %}
+
+{% block title %}Gerenciar Classificação de Recurso - Assistente Social{% endblock %}
+
+{% block header_title %}Gerenciar Classificação de Recurso{% endblock %}
+
+{% block content %}
+<div class="content-card">
+    <div style="margin-bottom: 20px;">
+        <a href="{% url 'assistant_social:classificacao_recursos' %}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Voltar para Lista
+        </a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+        <div>
+            <h3 style="margin-bottom: 15px; color: var(--primary-color);">Dados do Estudante</h3>
+            <p><strong>Nome:</strong> {{ appeal.enrollment.student.get_full_name|default:appeal.enrollment.student.username }}</p>
+            <p><strong>Email:</strong> {{ appeal.enrollment.student.email }}</p>
+            <p><strong>Matrícula:</strong> {{ appeal.enrollment.student.matricula|default:"-" }}</p>
+            <p><strong>Campus:</strong> {{ appeal.enrollment.campus|default:"Recife" }}</p>
+        </div>
+        <div>
+            <h3 style="margin-bottom: 15px; color: var(--primary-color);">Dados do Edital</h3>
+            <p><strong>Título:</strong> {{ appeal.enrollment.edital.title }}</p>
+            <p><strong>Número:</strong> {{ appeal.enrollment.edital.number }}</p>
+            <p><strong>Data do Recurso:</strong> {{ appeal.created_at|date:"d/m/Y H:i" }}</p>
+            <p><strong>Status do Recurso:</strong> 
+                {% if appeal.is_approved %}
+                <span class="status-badge status-open">Aprovado</span>
+                {% elif appeal.is_rejected %}
+                <span class="status-badge status-classified">Rejeitado</span>
+                {% else %}
+                <span class="status-badge status-analyzed">Analisado</span>
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <h3 style="margin-bottom: 15px; color: var(--primary-color);">Motivo do Recurso</h3>
+    <div style="background: var(--light-bg); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+        <p>{{ appeal.reason }}</p>
+    </div>
+
+    <h3 style="margin-bottom: 15px; color: var(--primary-color);">Gerenciar Classificação do Recurso</h3>
+    <form method="post" style="background: var(--light-bg); padding: 20px; border-radius: 10px;">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 15px;">
+            <label for="appeal_status" style="display: block; margin-bottom: 5px;"><strong>Status do Recurso:</strong></label>
+            <select id="appeal_status" name="appeal_status" 
+                    style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 5px;">
+                <option value="approved" {% if appeal.is_approved %}selected{% endif %}>Aprovado</option>
+                <option value="rejected" {% if appeal.is_rejected %}selected{% endif %}>Rejeitado</option>
+                <option value="analyzed" {% if not appeal.is_approved and not appeal.is_rejected %}selected{% endif %}>Analisado (pendente classificação)</option>
+            </select>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="new_score" style="display: block; margin-bottom: 5px;"><strong>Nova Pontuação (se aprovado):</strong></label>
+            <input type="number" id="new_score" name="new_score" step="0.01" min="0" max="100" 
+                   value="{{ appeal.enrollment.score|default:0 }}" 
+                   style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 5px;">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="classification_notes" style="display: block; margin-bottom: 5px;"><strong>Observações da Classificação:</strong></label>
+            <textarea id="classification_notes" name="classification_notes" rows="4" 
+                      style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 5px;">{{ appeal.classification_notes|default:"" }}</textarea>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="update_enrollment" style="display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" id="update_enrollment" name="update_enrollment" checked>
+                <span>Atualizar status da inscrição relacionada</span>
+            </label>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <button type="submit" class="btn btn-success">
+                <i class="fas fa-save"></i> Salvar Classificação
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
