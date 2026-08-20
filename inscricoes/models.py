@@ -27,6 +27,14 @@ class Edital(models.Model):
     descricao = models.TextField()
     numero = models.CharField(max_length=50, unique=True)
     
+    # Campus associado ao edital (para assistente social)
+    campus = models.CharField(
+        max_length=100, 
+        blank=True, 
+        verbose_name="Campus",
+        help_text="Campus ao qual este edital está associado. Deixe em branco para todos os campi."
+    )
+    
     # Período de inscrições dos estudantes
     periodo_inscricao_abertura = models.DateTimeField(null=True, blank=True)
     periodo_inscricao_fechamento = models.DateTimeField(null=True, blank=True)
