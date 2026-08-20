@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+
+{% block title %}Criar Novo Recurso - PAMA{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: none !important;
+        background-color: #fff !important;
+    }
+    
+    .left-panel {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 280px;
+        height: 100vh;
+        background: linear-gradient(180deg, #27ae60 0%, #2ecc71 100%);
+        box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+        z-index: 1000;
+        overflow-y: auto;
+        transition: transform 0.3s ease;
+    }
+    
+    .left-panel-header {
+        padding: 1.5rem 1rem;
+        text-align: center;
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .left-panel-header h3 {
+        color: white;
+        font-size: 1.2rem;
+        margin: 0;
+        font-weight: 700;
+    }
+    
+    .left-panel-header p {
+        color: rgba(255,255,255,0.9);
+        font-size: 0.85rem;
+        margin: 0.5rem 0 0 0;
+    }
+    
+    .left-panel-menu {
+        list-style: none;
+        padding: 1rem 0;
+        margin: 0;
+    }
+    
+    .left-panel-menu li {
+        margin: 0.25rem 0.5rem;
+    }
+    
+    .left-panel-menu a {
+        display: flex;
+        align-items: center;
+        padding: 0.875rem 1rem;
+        color: rgba(255,255,255,0.95);
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+    
+    .left-panel-menu a:hover {
+        background: rgba(255,255,255,0.15);
+        color: white;
+        transform: translateX(5px);
+    }
+    
+    .left-panel-menu a.active {
+        background: rgba(255,255,255,0.25);
+        color: white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    
+    .left-panel-menu i {
+        width: 24px;
+        margin-right: 0.75rem;
+        font-size: 1.1rem;
+        text-align: center;
+    }
+    
+    .main-content {
+        margin-left: 280px;
+        padding: 2rem;
+        transition: margin-left 0.3s ease;
+    }
+    
+    .mobile-menu-toggle {
+        display: none;
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1001;
+        background: white;
+        color: #27ae60;
+        border: 2px solid #27ae60;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .mobile-menu-toggle:hover {
+        background: #27ae60;
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .left-panel {
+            transform: translateX(-100%);
+        }
+        
+        .left-panel.active {
+            transform: translateX(0);
+        }
+        
+        .main-content {
+            margin-left: 0;
+        }
+        
+        .mobile-menu-toggle {
+            display: block;
+        }
+    }
+    
+    .form-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        max-width: 800px;
+        margin: 2rem auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<button class="mobile-menu-toggle" onclick="toggleMenu()">
+    <i class="fas fa-bars"></i> Menu
+</button>
+
+<div class="left-panel" id="leftPanel">
+    <div class="left-panel-header">
+        <h3><i class="fas fa-graduation-cap"></i> Área do Estudante</h3>
+        <p>PAMA - IFPE</p>
+    </div>
+    <ul class="left-panel-menu">
+        <li><a href="{% url 'student_dashboard' %}"><i class="fas fa-home"></i> Dashboard</a></li>
+        <li><a href="{% url 'step3_cards' %}"><i class="fas fa-file-alt"></i> Nova Inscrição</a></li>
+        <li><a href="{% url 'minhas_inscricoes' %}"><i class="fas fa-clipboard-list"></i> Minhas Inscrições</a></li>
+        <li><a href="{% url 'criar_recurso' %}" class="active"><i class="fas fa-plus-circle"></i> Criar Novo Recurso</a></li>
+        <li><a href="{% url 'meus_recursos' %}"><i class="fas fa-folder-open"></i> Meus Recursos</a></li>
+        <li><a href="{% url 'avaliacao_situacional' %}"><i class="fas fa-clipboard-check"></i> Avaliação Situacional ConectaGov</a></li>
+        <li><a href="/"><i class="fas fa-arrow-left"></i> Voltar ao Início</a></li>
+    </ul>
+</div>
+
+<div class="main-content">
+<div class="container mt-5">
+    <div class="form-card">
+        <h2 class="mb-4"><i class="fas fa-plus-circle"></i> Criar Novo Recurso</h2>
+        <p class="text-muted">Utilize este formulário para criar um recurso administrativo referente à sua inscrição.</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="edital" class="form-label">Edital</label>
+                <select class="form-select" id="edital" name="edital" required>
+                    <option value="">Selecione o edital...</option>
+                    {% for edital in editais %}
+                        <option value="{{ edital.id }}">{{ edital.numero }} - {{ edital.titulo }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label for="tipo_recurso" class="form-label">Tipo de Recurso</label>
+                <select class="form-select" id="tipo_recurso" name="tipo_recurso" required>
+                    <option value="">Selecione o tipo...</option>
+                    <option value="ADMINISTRATIVO">Recurso Administrativo</option>
+                    <option value="HIERARQUICO">Recurso Hierárquico</option>
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label for="motivo" class="form-label">Motivo do Recurso</label>
+                <textarea class="form-control" id="motivo" name="motivo" rows="5" required placeholder="Descreva detalhadamente os motivos do seu recurso..."></textarea>
+            </div>
+            
+            <div class="mb-3">
+                <label for="anexos" class="form-label">Documentos Anexos (opcional)</label>
+                <input type="file" class="form-control" id="anexos" name="anexos" multiple>
+                <small class="form-text text-muted">Anexe documentos que comprovem suas alegações.</small>
+            </div>
+            
+            <button type="submit" class="btn btn-success w-100">
+                <i class="fas fa-paper-plane"></i> Enviar Recurso
+            </button>
+        </form>
+    </div>
+</div>
+</div>
+
+<script>
+    function toggleMenu() {
+        document.getElementById('leftPanel').classList.toggle('active');
+    }
+</script>
+{% endblock %}

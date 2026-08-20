@@ -1,81 +1,107 @@
 ```gitignore
-# Python cache files
+# Python
 __pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.env
+.venv
+env.bak
+venv.bak
+
+# Compiled and build artifacts
 *.pyc
 *.pyo
 *.pyd
+*.so
+*.o
+*.obj
+*.out
+*.dll
+*.dylib
+*.class
 
-# Virtual environment
-venv/
-
-# Dependencies in virtual environment
-venv/lib/python*/site-packages/
-
-# Logs
+# Django
 *.log
-
-# Environment variables
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
 .env
 .env.local
-*.env.*
 
-# IDE and editor files
+# IDE and Editor
 .vscode/
 .idea/
 *.swp
 *.swo
 *.tmp
+*~
+.DS_Store
+Thumbs.db
 
-# Coverage reports
+# Testing and coverage
+.coverage
 coverage/
 htmlcov/
-.coverage
-
-# Build and distribution
-dist/
-build/
-*.egg-info/
-
-# MyPy cache
+.nyc_output/
+.pytest_cache/
 .mypy_cache/
 
-# PyTest cache
-.pytest_cache/
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+*.egg-info/
+*.dist-info/
 
-# Gradle
-.gradle/
-
-# Target directory (Maven, Rust, etc.)
-target/
-
-# Julia packages
-julia-*/
-
-# Zig cache
-zig-cache/
-zig-out/
-
-# Compressed files
-*.zip
-*.gz
-*.tar
-*.tgz
-*.bz2
-*.xz
-*.7z
-*.rar
-*.zst
-*.lz4
-*.lzh
-*.cab
-*.arj
-*.rpm
-*.deb
-*.Z
-*.lz
-*.lzo
-*.tar.gz
-*.tar.bz2
-*.tar.xz
-*.tar.zst
+# System
+.DS_Store
+Thumbs.db
+.DS_Store?
+ehthumbs.db
+Icon?
+.directory
+.Trashes
+._*
+.Spotlight-V100
+.TemporaryItems
 ```
